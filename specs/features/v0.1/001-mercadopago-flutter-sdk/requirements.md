@@ -10,7 +10,7 @@
 - [ ] `MercadoPagoSDK.initialize()` debe ser llamado antes de cualquier otra operación; si no, lanzar `SDKError.notInitialized`
 - [ ] `publicKey` debe validarse en init: formato `APP_USR-{alphanum}` — rechazar cualquier otro formato con `SDKError.invalidPublicKey`
 - [ ] `countryCode` debe ser uno de los 19 países soportados — rechazar inválidos con `SDKError.countryInvalid`
-- [ ] Todos los requests HTTP deben incluir los headers: `X-Product-id`, `Meli-Session-id` (UUID v4), `SDK-version`, y `public_key` como query param en GETs
+- [ ] Todos los requests HTTP deben incluir los headers: `X-Product-id` (ver nota abajo), `Meli-Session-id` (UUID v4), `SDK-version`, y `public_key` como query param en GETs
 - [ ] Session UUID regenerado en cada llamada a `initialize()` o `setNewConfiguration()`
 - [ ] Validación Luhn de número de tarjeta localmente antes de llamar al server
 - [ ] Tokens NO deben ser persistidos por el SDK (TTL ~15 min — responsabilidad del backend)
@@ -51,6 +51,17 @@
 - Los errores de red se mapean a `MercadoPagoError.network(code, isRetriable)` — incluir el flag `isRetriable` para que el developer decida reintentar
 - `locationDescription` en errores: indica en qué paso del flujo ocurrió (`tokenization`, `paymentMethods`, `installments`, `issuer`, `initialization`)
 - `CardToken.token` es el único valor que el developer necesita para crear un pago — documentarlo prominentemente
+
+## Constants
+
+| Constante | Valor actual | Nota |
+|-----------|-------------|------|
+| `X-Product-id` | `MP_FLUTTER_SDK_001` | **TODO**: reemplazar con el valor real que provea el equipo de MercadoPago antes del primer release. Es un identificador interno del producto para analytics/tracking. |
+| `SDK-version` | `0.1.0` | Se actualiza en cada release sincronizado con `pubspec.yaml` |
+| Base URL | `https://api.mercadopago.com` | Fijo, sin configuración por el developer |
+| Tracks URL | `https://api.mercadolibre.com/tracks` | Fijo, para analytics |
+
+> **Nota sobre DeviceFingerPrint.xcframework (iOS)**: Es un binario nativo provisto por el equipo de MercadoPago iOS (el mismo que usa el SDK iOS nativo). No está disponible públicamente. Antes de implementar el Grupo 7 (fingerprinting), solicitar el `.xcframework` al equipo de iOS. Mientras tanto, el Platform Channel retornará `DeviceData.empty()` sin error para que el resto del SDK funcione.
 
 ## Security considerations
 

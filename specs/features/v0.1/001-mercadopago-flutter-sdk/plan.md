@@ -177,6 +177,6 @@ Ejemplo funcional y README de integración.
 
 ## Open questions
 
-- [ ] ¿Se usa `http` (más liviano) o `dio` (más features) como HTTP client? — decidir en Grupo 2 antes de implementar repositorios
-- [ ] ¿Dónde se obtiene `DeviceFingerPrint.xcframework` para iOS? ¿Se incluye en el repo o se descarga en CI?
-- [ ] ¿`X-Product-id` tiene un valor fijo para el SDK Flutter o debe ser configurado por el developer?
+- [x] ~~¿Se usa `http` o `dio`?~~ → **`http`** (package:http). Más liviano, suficiente para los endpoints fijos del SDK.
+- [ ] `DeviceFingerPrint.xcframework` para iOS: solicitar al equipo iOS de MercadoPago antes de implementar Grupo 7. Mientras tanto el Platform Channel retorna `DeviceData.empty()`.
+- [x] ~~¿`X-Product-id` fijo o configurable?~~ → **Fijo**. Placeholder: `MP_FLUTTER_SDK_001`. **TODO**: reemplazar con el valor real cuando el equipo lo provea.
