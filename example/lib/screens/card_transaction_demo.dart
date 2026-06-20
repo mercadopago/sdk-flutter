@@ -30,7 +30,7 @@ class _CardTransactionDemoState extends State<CardTransactionDemo> {
       },
     );
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => builder.build()),
+      MaterialPageRoute<void>(builder: (_) => builder.build()),
     );
   }
 

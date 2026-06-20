@@ -1,5 +1,4 @@
 import 'package:mercadopago_sdk/mercadopago_sdk.dart';
-import 'package:mercadopago_sdk/src/domain/models/card_token.dart';
 import 'package:mercadopago_sdk/src/domain/models/device_data.dart';
 import 'package:mercadopago_sdk/src/domain/repositories.dart' as repos;
 

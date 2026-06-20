@@ -16,11 +16,14 @@ class InstallmentRepositoryImpl implements InstallmentRepository {
     required double amount,
     required ProcessingMode mode,
   }) async {
-    final list = await _api.getList(_path, queryParameters: {
-      'bin': bin,
-      'amount': amount.toString(),
-      'processing_mode': mode.value,
-    });
+    final list = await _api.getList(
+      _path,
+      queryParameters: {
+        'bin': bin,
+        'amount': amount.toString(),
+        'processing_mode': mode.value,
+      },
+    );
     return list
         .whereType<Map<String, dynamic>>()
         .map(InstallmentDto.fromJson)

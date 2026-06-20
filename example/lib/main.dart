@@ -52,7 +52,7 @@ class _Home extends StatelessWidget {
               icon: const Icon(Icons.credit_card),
               label: const Text('Card Save (hosted checkout)'),
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CardSaveDemo()),
+                MaterialPageRoute<void>(builder: (_) => const CardSaveDemo()),
               ),
             ),
             const SizedBox(height: 12),
@@ -60,7 +60,9 @@ class _Home extends StatelessWidget {
               icon: const Icon(Icons.shopping_bag),
               label: const Text('Card Transaction (hosted checkout)'),
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CardTransactionDemo()),
+                MaterialPageRoute<void>(
+                  builder: (_) => const CardTransactionDemo(),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -68,7 +70,9 @@ class _Home extends StatelessWidget {
               icon: const Icon(Icons.build),
               label: const Text('Core Methods (custom UI)'),
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CoreMethodsDemo()),
+                MaterialPageRoute<void>(
+                  builder: (_) => const CoreMethodsDemo(),
+                ),
               ),
             ),
           ],

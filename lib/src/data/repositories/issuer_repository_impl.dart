@@ -15,10 +15,13 @@ class IssuerRepositoryImpl implements IssuerRepository {
     required String paymentMethodId,
     required String bin,
   }) async {
-    final list = await _api.getList(_path, queryParameters: {
-      'payment_method_id': paymentMethodId,
-      'bin': bin,
-    });
+    final list = await _api.getList(
+      _path,
+      queryParameters: {
+        'payment_method_id': paymentMethodId,
+        'bin': bin,
+      },
+    );
     return list
         .whereType<Map<String, dynamic>>()
         .map(IssuerDto.fromJson)

@@ -12,7 +12,6 @@ import '../domain/models/card_transaction_result.dart';
 import '../domain/models/installment.dart';
 import '../domain/models/mp_cancel_context.dart';
 import '../domain/models/payment_method.dart';
-import '../domain/repositories.dart';
 import '../domain/result.dart';
 
 /// Type of checkout flow the user is performing.

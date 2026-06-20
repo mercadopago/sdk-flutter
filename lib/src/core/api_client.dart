@@ -57,9 +57,11 @@ class ApiClient {
       }
     }
 
-    final body = await _send(() => _client
-        .get(uri, headers: _headers())
-        .timeout(_timeout, onTimeout: _onTimeout));
+    final body = await _send(
+      () => _client
+          .get(uri, headers: _headers())
+          .timeout(_timeout, onTimeout: _onTimeout),
+    );
 
     if (cache) {
       _cache[cacheKey] = _CacheEntry(body, _clock());
@@ -74,7 +76,7 @@ class ApiClient {
     bool cache = true,
   }) async {
     final uri = _buildUri(path, queryParameters);
-    final cacheKey = '${uri}::list';
+    final cacheKey = '$uri::list';
 
     if (cache) {
       final entry = _cache[cacheKey];
@@ -83,9 +85,11 @@ class ApiClient {
       }
     }
 
-    final decoded = await _sendRaw(() => _client
-        .get(uri, headers: _headers())
-        .timeout(_timeout, onTimeout: _onTimeout));
+    final decoded = await _sendRaw(
+      () => _client
+          .get(uri, headers: _headers())
+          .timeout(_timeout, onTimeout: _onTimeout),
+    );
 
     if (decoded is! List) {
       throw const ApiException(message: 'Expected JSON array response.');
@@ -108,9 +112,11 @@ class ApiClient {
       ..._headers(),
       kHeaderContentType: kContentTypeJson,
     };
-    return _send(() => _client
-        .post(uri, headers: headers, body: jsonEncode(body))
-        .timeout(_timeout, onTimeout: _onTimeout));
+    return _send(
+      () => _client
+          .post(uri, headers: headers, body: jsonEncode(body))
+          .timeout(_timeout, onTimeout: _onTimeout),
+    );
   }
 
   /// Clears the in-memory GET cache. Called when configuration changes.

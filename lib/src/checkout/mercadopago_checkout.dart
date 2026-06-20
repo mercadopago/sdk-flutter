@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../analytics/analytics_event.dart';
 import '../analytics/analytics_service.dart';
 import '../core/mercadopago_sdk.dart';
-import '../core_methods/core_methods.dart';
 import '../domain/models/card_save_result.dart';
 import '../domain/models/card_transaction_result.dart';
 import '../domain/models/mp_cancel_context.dart';

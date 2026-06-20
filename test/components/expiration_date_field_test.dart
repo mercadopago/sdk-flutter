@@ -6,9 +6,11 @@ void main() {
   group('ExpirationDateField', () {
     testWidgets('inserts / after the second digit', (tester) async {
       final controller = PciFieldState();
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(body: ExpirationDateField(controller: controller)),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: ExpirationDateField(controller: controller)),
+        ),
+      );
 
       await tester.enterText(find.byType(TextField), '1230');
       await tester.pump();
@@ -18,9 +20,11 @@ void main() {
 
     testWidgets('rejects month > 12', (tester) async {
       final controller = PciFieldState();
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(body: ExpirationDateField(controller: controller)),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: ExpirationDateField(controller: controller)),
+        ),
+      );
 
       await tester.enterText(find.byType(TextField), '13');
       await tester.pump();

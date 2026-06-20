@@ -25,7 +25,7 @@ class _CardSaveDemoState extends State<CardSaveDemo> {
       },
     );
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => builder.build()),
+      MaterialPageRoute<void>(builder: (_) => builder.build()),
     );
   }
 

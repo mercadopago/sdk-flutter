@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -94,11 +93,13 @@ void main() {
       );
       expect(
         () => client.get('/payment_methods'),
-        throwsA(isA<ApiException>().having(
-          (e) => e.statusCode,
-          'statusCode',
-          400,
-        )),
+        throwsA(
+          isA<ApiException>().having(
+            (e) => e.statusCode,
+            'statusCode',
+            400,
+          ),
+        ),
       );
     });
   });

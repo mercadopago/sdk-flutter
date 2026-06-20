@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mercadopago_sdk/mercadopago_sdk.dart';
 import 'package:mercadopago_sdk/src/core/api_error.dart';
-import 'package:mercadopago_sdk/src/core_methods/core_methods.dart';
 
 import '../_fakes/fake_analytics_service.dart';
 import '../_fakes/fake_fingerprint_service.dart';
@@ -173,15 +172,17 @@ void main() {
   group('getIdentificationTypes', () {
     test('forwards repository results', () async {
       final cm = buildCoreMethods(
-        identification: FakeIdentificationRepository(response: const [
-          IdentificationType(
-            id: 'DNI',
-            name: 'DNI',
-            type: 'number',
-            minLength: 7,
-            maxLength: 8,
-          ),
-        ]),
+        identification: FakeIdentificationRepository(
+          response: const [
+            IdentificationType(
+              id: 'DNI',
+              name: 'DNI',
+              type: 'number',
+              minLength: 7,
+              maxLength: 8,
+            ),
+          ],
+        ),
       );
       final result = await cm.getIdentificationTypes();
       expect(result, isA<Success<List<IdentificationType>>>());
