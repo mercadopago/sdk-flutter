@@ -1,0 +1,19 @@
+lib/src/core/sdk_error.dart
+  s_2ca54c59646ab5::t_6bb1faf4e21730 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "f778bcf22a59e93652650ee28364220a74e60367",
+  "prompts": {},
+  "sessions": {
+    "s_2ca54c59646ab5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed39ab68-0daa-4044-a029-93380d2d6ad1",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
