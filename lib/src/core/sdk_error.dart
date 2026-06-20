@@ -36,7 +36,7 @@ final class SDKAlreadyInitializedError extends SDKError {
 final class SDKInvalidPublicKeyError extends SDKError {
   const SDKInvalidPublicKeyError()
       : super(
-          'Invalid public key. Expected format: APP_USR-{alphanumeric}.',
+          'Invalid public key. Expected format: APP_USR-{uuid}.',
         );
 }
 
