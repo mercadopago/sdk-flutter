@@ -1,0 +1,41 @@
+example/lib/screens/card_save_demo.dart
+  s_b84497818435cb::t_1503830a2589a4 28
+lib/src/data/repositories/issuer_repository_impl.dart
+  s_b84497818435cb::t_d2c6e0fd95c61b 18-24
+test/core_methods/core_methods_test.dart
+  s_b84497818435cb::t_ce7dcae52cc189 175-185
+example/lib/main.dart
+  s_b84497818435cb::t_a0a007367956bf 63-65
+  s_b84497818435cb::t_25f1aec858f72d 73-75
+  s_b84497818435cb::t_c6f9ebfe90fd99 55
+test/components/card_number_field_test.dart
+  s_b84497818435cb::t_335b468188883c 9-13,15
+  s_b84497818435cb::t_01371cc4dd43aa 28-34,37
+test/core/api_client_test.dart
+  s_b84497818435cb::t_5a6037f2a44692 96-102
+example/lib/screens/card_transaction_demo.dart
+  s_b84497818435cb::t_3cd698ea2317a1 33
+lib/src/core/api_client.dart
+  s_b84497818435cb::t_f9fda84b4e1128 60-64,79,88-92
+  s_b84497818435cb::t_ed45899d004e49 115-119
+lib/src/data/repositories/installment_repository_impl.dart
+  s_b84497818435cb::t_cad545b98fc74a 19-26
+test/components/expiration_date_field_test.dart
+  s_b84497818435cb::t_095fd2360b87db 9-13,23-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "27a88fb0d489a944c0148e79494ab4dc24712ce4",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
