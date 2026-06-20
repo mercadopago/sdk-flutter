@@ -1,0 +1,29 @@
+lib/src/core/constants.dart
+  s_2ca54c59646ab5::t_816b5133409353 35-36
+test/core/configuration_test.dart
+  s_b84497818435cb::t_b1dc4b065ed145 14-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "fdd42700efd193976100e733e47acafb72e2d501",
+  "prompts": {},
+  "sessions": {
+    "s_2ca54c59646ab5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed39ab68-0daa-4044-a029-93380d2d6ad1",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    },
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
