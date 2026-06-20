@@ -1,0 +1,54 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+.pub-cache/
+.pub/
+pubspec.lock
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# macOS
+.DS_Store
+
+# Coverage
+coverage/
+
+# Android
+android/.gradle/
+android/local.properties
+android/captures/
+android/.cxx/
+android/gradlew
+android/gradlew.bat
+android/gradle/
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# Example app
+example/.dart_tool/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+example/build/
+example/pubspec.lock
+example/ios/Pods/
+example/android/.gradle/
+example/android/local.properties
+
+# Generated
+*.g.dart
+*.freezed.dart
+*.mocks.dart
