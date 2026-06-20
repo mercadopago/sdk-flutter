@@ -1,0 +1,29 @@
+lib/src/core/configuration.dart
+  s_b84497818435cb::t_c08af15066a3b9 4,14
+README.md
+  s_b84497818435cb::t_907e9f6fa587c4 263-265
+specs/constitution/mission.md
+  s_b84497818435cb::t_a5612821128061 13-14
+CHANGELOG.md
+  s_b84497818435cb::t_9a3abf11dd4aab 32-33
+specs/features/v0.1/001-mercadopago-flutter-sdk/requirements.md
+  s_b84497818435cb::t_7f218fec62e466 12
+specs/features/v0.1/001-mercadopago-flutter-sdk/plan.md
+  s_b84497818435cb::t_05facff8e948cd 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "1bf691c39741ae1a80e6344279175982e0ad2382",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
