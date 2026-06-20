@@ -1,0 +1,176 @@
+android/src/main/kotlin/com/mercadopago/sdk/MercadopagoSdkPlugin.kt
+  s_b84497818435cb::t_568b197a1670bc 1-33
+lib/src/data/dtos/installment_dto.dart
+  s_b84497818435cb::t_57981b3a4bc4e9 1-130
+lib/src/core_methods/card_data.dart
+  s_b84497818435cb::t_31e33db284c82e 1-38
+lib/src/components/expiration_date_field.dart
+  s_b84497818435cb::t_332cfd18c6b522 1-93
+lib/src/data/dtos/card_token_dto.dart
+  s_b84497818435cb::t_d82b94dcc4ce52 1-76
+test/_fakes/fake_fingerprint_service.dart
+  s_b84497818435cb::t_f37d3d4a4eaf4c 1-11
+lib/src/core/error_mapper.dart
+  s_b84497818435cb::t_2129502f486eaf 1-16
+lib/src/domain/models/card_token.dart
+  s_b84497818435cb::t_24c437337d0a37 1-50
+lib/src/domain/models/card_transaction_result.dart
+  s_b84497818435cb::t_a3239757558c10 1-28
+CHANGELOG.md
+  s_b84497818435cb::t_f3bebf88cc7db2 1-38
+ios/Classes/FingerprintHandler.swift
+  s_b84497818435cb::t_7516e8576e43da 1-50
+lib/src/checkout/mercadopago_checkout.dart
+  s_b84497818435cb::t_4d31139cec6e26 1-222
+lib/src/data/repositories/card_token_repository_impl.dart
+  s_b84497818435cb::t_e9cc24014830e9 1-57
+lib/src/core/session_manager.dart
+  s_b84497818435cb::t_91300135dc1cdb 1-20
+lib/src/core/api_error.dart
+  s_b84497818435cb::t_a1f9d3d4fb5e08 1-27
+test/core/configuration_test.dart
+  s_b84497818435cb::t_d80d4762b286cd 1-39
+lib/src/domain/errors.dart
+  s_b84497818435cb::t_e29c8c5bc1e8c3 1-150
+lib/src/data/dtos/issuer_dto.dart
+  s_b84497818435cb::t_875c57126ba213 1-37
+ios/mercadopago_sdk.podspec
+  s_b84497818435cb::t_b161fa20afb54e 1-18
+lib/src/checkout/screens/installment_screen.dart
+  s_b84497818435cb::t_9a5d005a5b082e 1-68
+lib/src/core/api_client.dart
+  s_b84497818435cb::t_481e3cb26640cf 1-209
+.gitignore
+  s_b84497818435cb::t_9d7ca43034e2c2 1-54
+lib/src/data/repositories/installment_repository_impl.dart
+  s_b84497818435cb::t_fbacc620348d5e 1-30
+lib/src/components/_formatters.dart
+  s_b84497818435cb::t_02a49cfeeba4da 1-82
+test/core/session_manager_test.dart
+  s_b84497818435cb::t_506c8591433ccf 1-26
+README.md
+  s_b84497818435cb::t_c7b94513c2f259 3-4,6,8,10-14,16-18,20,22-293
+test/core/api_client_test.dart
+  s_b84497818435cb::t_9fe0685dea9349 1-105
+lib/src/core/luhn.dart
+  s_b84497818435cb::t_06768c7057b7bb 1-26
+lib/src/fingerprint/fingerprint_service.dart
+  s_b84497818435cb::t_bdac06f8aecbda 1-52
+lib/src/domain/models/identification_type.dart
+  s_b84497818435cb::t_24d3bd1396d0a4 1-19
+lib/src/data/repositories/issuer_repository_impl.dart
+  s_b84497818435cb::t_cd1ce2745f666e 1-28
+lib/src/analytics/analytics_service.dart
+  s_b84497818435cb::t_25789ac7c0c312 1-54
+lib/src/components/security_code_field.dart
+  s_b84497818435cb::t_00a02cdb241e0f 1-85
+test/components/pci_field_state_test.dart
+  s_b84497818435cb::t_d3c2290e25e299 1-31
+lib/src/data/dtos/payment_method_dto.dart
+  s_b84497818435cb::t_c5713acbc8608c 1-84
+lib/src/data/dtos/identification_type_dto.dart
+  s_b84497818435cb::t_debfe040443526 1-34
+lib/src/checkout/screens/card_form_screen.dart
+  s_b84497818435cb::t_94dc1c0b428d4f 1-8,10-86,88-191
+  s_b84497818435cb::t_ca3fdde9fa3ea7 87
+  s_b84497818435cb::t_983589b75f85ca 9
+lib/src/domain/models/device_data.dart
+  s_b84497818435cb::t_7a5fcb064d32c2 1-18
+lib/src/data/repositories/identification_repository_impl.dart
+  s_b84497818435cb::t_ef1afa4cd50626 1-22
+lib/src/domain/result.dart
+  s_b84497818435cb::t_a506acccac06d3 1-38
+test/components/card_number_field_test.dart
+  s_b84497818435cb::t_2ecb67ab33aec1 1-41
+lib/src/domain/repositories.dart
+  s_b84497818435cb::t_223faa5d49b08a 1-86
+analysis_options.yaml
+  s_b84497818435cb::t_65e0172888a0a6 1-34
+lib/src/domain/models/mp_cancel_context.dart
+  s_b84497818435cb::t_87ff59913d1195 1-16
+lib/mercadopago_sdk.dart
+  s_b84497818435cb::t_366072613d2b9f 1-76
+example/lib/screens/card_save_demo.dart
+  s_b84497818435cb::t_eec0e7ba1d6977 1-52
+lib/src/core/constants.dart
+  s_b84497818435cb::t_4517b24b4c5c8e 1-36
+example/lib/main.dart
+  s_b84497818435cb::t_a8368ce574a792 1-79
+android/build.gradle
+  s_b84497818435cb::t_48a5e85baa5d17 1-50
+lib/src/domain/models/payment_method.dart
+  s_b84497818435cb::t_f7178f95e78b45 1-34
+test/_fakes/fake_analytics_service.dart
+  s_b84497818435cb::t_d1ddeb3c07f05b 1-14
+lib/src/checkout/screens/review_screen.dart
+  s_b84497818435cb::t_e408cc58b232f7 1-76
+android/src/main/kotlin/com/mercadopago/sdk/FingerprintHandler.kt
+  s_b84497818435cb::t_380731479291f5 1-44
+lib/src/checkout/checkout_controller.dart
+  s_b84497818435cb::t_f64cc8cca9d288 1-197
+ios/Classes/MercadopagoSdkPlugin.swift
+  s_b84497818435cb::t_28bd819dab7501 1-24
+lib/src/core/configuration.dart
+  s_b84497818435cb::t_df0df741a71dc8 1-76
+example/lib/screens/card_transaction_demo.dart
+  s_b84497818435cb::t_db910a3d713059 1-57
+android/proguard-rules.pro
+  s_b84497818435cb::t_a8ae47ef79283d 1-17
+android/src/main/AndroidManifest.xml
+  s_b84497818435cb::t_8171c5dea7a8cf 1-9
+lib/src/domain/models/card_save_result.dart
+  s_b84497818435cb::t_258641c894d236 1-20
+pubspec.yaml
+  s_b84497818435cb::t_56530cc6b6c46a 2,5-6,9-10,15-16,22
+lib/src/core/sdk_error.dart
+  s_b84497818435cb::t_19bcf025578786 1-47
+lib/src/data/repositories/payment_method_repository_impl.dart
+  s_b84497818435cb::t_1f85b2f8e5395b 1-22
+lib/src/domain/models/installment.dart
+  s_b84497818435cb::t_bb347b1969499f 1-66
+lib/src/analytics/analytics_event.dart
+  s_b84497818435cb::t_16f5e112ad94eb 1-13,26-29
+  s_b84497818435cb::t_c6df9814b3b0e2 14-25
+lib/src/components/card_number_field.dart
+  s_b84497818435cb::t_0eb7977eca3477 1-109
+example/lib/screens/core_methods_demo.dart
+  s_b84497818435cb::t_eef747e710f45b 1-97
+test/core_methods/core_methods_test.dart
+  s_b84497818435cb::t_d31c976476885c 1-194
+test/domain/result_test.dart
+  s_b84497818435cb::t_bb212bd733b10d 1-30
+test/components/expiration_date_field_test.dart
+  s_b84497818435cb::t_2e48d2322ce4f1 1-31
+lib/src/core/mercadopago_sdk.dart
+  s_b84497818435cb::t_029ee5833239bb 1-154
+lib/src/components/pci_field_state.dart
+  s_b84497818435cb::t_087164c452d3f8 1-51
+lib/src/checkout/checkout_appearance.dart
+  s_b84497818435cb::t_9ba05911b8f121 1-20
+test/_fakes/fake_repositories.dart
+  s_b84497818435cb::t_b90935090b2a06 1-106
+test/core/luhn_test.dart
+  s_b84497818435cb::t_2043bcd1d39b40 1-26
+lib/src/core_methods/core_methods.dart
+  s_b84497818435cb::t_520bc02d7b3c3d 1-230
+example/pubspec.yaml
+  s_b84497818435cb::t_a119e973d4e7b0 1-22
+lib/src/domain/models/issuer.dart
+  s_b84497818435cb::t_acd74eb2f1ab67 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "66902f7a82ad3faa11607a2e80135bb57b911fa9",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
