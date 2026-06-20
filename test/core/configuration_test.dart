@@ -11,6 +11,16 @@ void main() {
       expect(config.country, Country.argentina);
     });
 
+    test('accepts a real MercadoPago public key with UUID hyphens', () {
+      // Real keys are UUIDs (8-4-4-4-12 with hyphens). This guards against
+      // a regression where the regex omitted '-' from the body class.
+      final config = Configuration.fromValues(
+        publicKey: 'APP_USR-00000000-0000-4000-8000-000000000000',
+        countryCode: 'ARG',
+      );
+      expect(config.country, Country.argentina);
+    });
+
     test('rejects a public key without APP_USR prefix', () {
       expect(
         () => Configuration.fromValues(
