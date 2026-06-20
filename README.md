@@ -260,8 +260,9 @@ fingerprinting SDK to collect richer signals.
 
 ## Supported countries
 
-`ARG`, `BRA`, `CHL`, `COL`, `MEX`, `CRI`, `PER`, `ECU`, `DOM`, `URY`,
-`VEN`, `PAN`, `BOL`, `PRY`, `GTM`, `HND`, `SLV`, `NIC`, `CUB`.
+MercadoPago operates — and the SDK is supported — in:
+`ARG` (Argentina), `BRA` (Brazil), `CHL` (Chile), `COL` (Colombia),
+`MEX` (Mexico), `PER` (Peru), `URY` (Uruguay).
 
 ---
 

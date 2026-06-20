@@ -29,7 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Device fingerprinting via Platform Channel (`mercadopago/fingerprint`).
 - Automatic analytics event tracking (fire-and-forget) to `/tracks`.
 - Sealed `MercadoPagoResult<T>` type with `Success`, `Failure`, and `Cancelled` variants.
-- Support for 19 Latin American countries.
+- Support for the 7 Latin American countries where MercadoPago operates
+  (ARG, BRA, CHL, COL, MEX, PER, URY).
 - Example app demonstrating all three integration paths.
 
 ### Known limitations

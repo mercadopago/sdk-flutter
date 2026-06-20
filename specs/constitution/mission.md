@@ -10,7 +10,8 @@ Flutter developers building consumer-facing payment flows in Latin America. The 
 
 ## Supported countries
 
-Argentina (ARG), Brazil (BRA), Chile (CHL), Colombia (COL), Mexico (MEX), Costa Rica (CRI), Peru (PER), Ecuador (ECU), Dominican Republic (DOM), Uruguay (URY), Venezuela (VEN), Panama (PAN), Bolivia (BOL), Paraguay (PRY), Guatemala (GTM), Honduras (HND), El Salvador (SLV), Nicaragua (NIC), Cuba (CUB).
+MercadoPago operates in 7 Latin American markets and the SDK is supported in all of them:
+Argentina (ARG), Brazil (BRA), Chile (CHL), Colombia (COL), Mexico (MEX), Peru (PER), Uruguay (URY).
 
 ## In scope
 

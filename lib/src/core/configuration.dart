@@ -1,7 +1,7 @@
 import 'constants.dart';
 import 'sdk_error.dart';
 
-/// Countries supported by the MercadoPago Flutter SDK.
+/// Countries where MercadoPago operates and which the SDK supports.
 ///
 /// The string value is the ISO 3-letter code expected by the API.
 enum Country {
@@ -10,20 +10,8 @@ enum Country {
   chile('CHL'),
   colombia('COL'),
   mexico('MEX'),
-  costaRica('CRI'),
   peru('PER'),
-  ecuador('ECU'),
-  dominicanRepublic('DOM'),
-  uruguay('URY'),
-  venezuela('VEN'),
-  panama('PAN'),
-  bolivia('BOL'),
-  paraguay('PRY'),
-  guatemala('GTM'),
-  honduras('HND'),
-  elSalvador('SLV'),
-  nicaragua('NIC'),
-  cuba('CUB');
+  uruguay('URY');
 
   const Country(this.code);
 

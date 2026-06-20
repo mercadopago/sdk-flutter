@@ -54,7 +54,7 @@ Scaffold mínimo del proyecto Flutter plugin.
 HTTP client, session management y configuración del SDK.
 
 - `MercadoPagoSDK` singleton: `initialize(publicKey, countryCode)`, `setNewConfiguration(...)`, `isInitialized`
-- `Configuration` value object: `publicKey` (validado formato `APP_USR-*`), `countryCode` (enum 19 países), `locale`
+- `Configuration` value object: `publicKey` (validado formato `APP_USR-*`), `countryCode` (enum 7 países: ARG, BRA, CHL, COL, MEX, PER, URY), `locale`
 - `SessionManager`: genera UUID v4 en init, lo expone como `sessionId`
 - `ApiClient`: agrega headers obligatorios en todos los requests, cache de GETs (5 min TTL), timeout 30s
 - `SDKError` sealed class: `notInitialized`, `alreadyInitialized`, `invalidPublicKey`, `countryInvalid`

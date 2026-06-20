@@ -9,7 +9,7 @@
 - [ ] Targets móviles únicamente: iOS 13.0+ y Android API 23+
 - [ ] `MercadoPagoSDK.initialize()` debe ser llamado antes de cualquier otra operación; si no, lanzar `SDKError.notInitialized`
 - [ ] `publicKey` debe validarse en init: formato `APP_USR-{alphanum}` — rechazar cualquier otro formato con `SDKError.invalidPublicKey`
-- [ ] `countryCode` debe ser uno de los 19 países soportados — rechazar inválidos con `SDKError.countryInvalid`
+- [ ] `countryCode` debe ser uno de los 7 países soportados (ARG, BRA, CHL, COL, MEX, PER, URY) — rechazar inválidos con `SDKError.countryInvalid`
 - [ ] Todos los requests HTTP deben incluir los headers: `X-Product-id` (ver nota abajo), `Meli-Session-id` (UUID v4), `SDK-version`, y `public_key` como query param en GETs
 - [ ] Session UUID regenerado en cada llamada a `initialize()` o `setNewConfiguration()`
 - [ ] Validación Luhn de número de tarjeta localmente antes de llamar al server
