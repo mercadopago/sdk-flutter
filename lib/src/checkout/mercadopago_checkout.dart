@@ -134,8 +134,11 @@ class _CheckoutHostState extends State<_CheckoutHost> {
 
   @override
   void dispose() {
-    _controller.removeListener(_onControllerChanged);
-    _controller.dispose();
+    try {
+      _controller.removeListener(_onControllerChanged);
+    } finally {
+      _controller.dispose();
+    }
     super.dispose();
   }
 

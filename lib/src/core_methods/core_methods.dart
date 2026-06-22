@@ -87,7 +87,7 @@ class CoreMethods {
         ),
       );
     }
-    if (data.securityCode.isEmpty || data.securityCode.length < 3) {
+    if (data.securityCode.length < 3 || data.securityCode.length > 4) {
       return const Failure<CardToken>(InvalidCvvError());
     }
 

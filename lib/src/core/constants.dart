@@ -33,4 +33,5 @@ const String kHeaderUserAgent = 'User-Agent';
 const String kContentTypeJson = 'application/json';
 
 /// Public-key validation pattern. Public keys are issued as `APP_USR-{uuid}`.
-final RegExp kPublicKeyPattern = RegExp(r'^APP_USR-[A-Za-z0-9\-]+$');
+/// Length is bounded to reject clearly malformed input before the network call.
+final RegExp kPublicKeyPattern = RegExp(r'^APP_USR-[A-Za-z0-9\-]{10,200}$');

@@ -11,6 +11,11 @@ import 'analytics_event.dart';
 ///
 /// Network failures are intentionally swallowed — analytics must never break
 /// the integrator's payment flow.
+///
+/// **Security note**: [AnalyticsEvent.data] must never contain PCI data
+/// (card numbers, CVVs, expiration dates) or personal data. The map is
+/// serialized verbatim and sent to the MercadoLibre tracks endpoint. Stick
+/// to non-sensitive contextual values (installment count, issuer ID, etc.).
 class AnalyticsService {
   AnalyticsService({
     required SessionManager sessionManager,

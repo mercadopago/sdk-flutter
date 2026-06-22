@@ -28,7 +28,9 @@ class FingerprintHandler(private val context: Context) {
             val method = clazz.getMethod("getDeviceInformation")
             @Suppress("UNCHECKED_CAST")
             method.invoke(instance) as? Map<String, Any?>
-        } catch (_: Throwable) {
+        } catch (_: ReflectiveOperationException) {
+            null
+        } catch (_: ClassCastException) {
             null
         }
     }

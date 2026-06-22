@@ -10,9 +10,13 @@ import UIKit
 /// UIDevice payload if the framework returns nil.
 enum FingerprintHandler {
     static func collect() -> [String: Any] {
-        if let data = Device.getInfoAsJsonData(),
-           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-            return json
+        do {
+            if let data = Device.getInfoAsJsonData(),
+               let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                return json
+            }
+        } catch {
+            // Framework returned invalid JSON — fall through to fallback.
         }
         return fallback()
     }

@@ -18,28 +18,36 @@ class CardTokenDto {
     required this.securityCodeLength,
   });
 
-  factory CardTokenDto.fromJson(Map<String, dynamic> json) => CardTokenDto(
-        id: json['id'] as String,
-        cardholderName:
-            (json['cardholder'] as Map<String, dynamic>?)?['name'] as String? ??
-                '',
-        firstSixDigits: json['first_six_digits'] as String? ?? '',
-        lastFourDigits: json['last_four_digits'] as String? ?? '',
-        expirationMonth: (json['expiration_month'] as num?)?.toInt() ?? 0,
-        expirationYear: (json['expiration_year'] as num?)?.toInt() ?? 0,
-        status: json['status'] as String? ?? '',
-        dateCreated:
-            DateTime.tryParse(json['date_created'] as String? ?? '') ??
-                DateTime.now(),
-        dateDue: DateTime.tryParse(json['date_due'] as String? ?? '') ??
-            DateTime.now().add(const Duration(minutes: 15)),
-        luhnValidation: json['luhn_validation'] as bool? ?? true,
-        liveMode: json['live_mode'] as bool? ?? false,
-        requireEsc: json['require_esc'] as bool? ?? false,
-        cardNumberLength: (json['card_number_length'] as num?)?.toInt() ?? 16,
-        securityCodeLength:
-            (json['security_code_length'] as num?)?.toInt() ?? 3,
-      );
+  factory CardTokenDto.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String?;
+    if (id == null || id.isEmpty) {
+      throw const FormatException("CardToken response missing required 'id' field.");
+    }
+    final dateCreated =
+        DateTime.tryParse(json['date_created'] as String? ?? '');
+    final dateDue = DateTime.tryParse(json['date_due'] as String? ?? '');
+
+    return CardTokenDto(
+      id: id,
+      cardholderName:
+          (json['cardholder'] as Map<String, dynamic>?)?['name'] as String? ??
+              '',
+      firstSixDigits: json['first_six_digits'] as String? ?? '',
+      lastFourDigits: json['last_four_digits'] as String? ?? '',
+      expirationMonth: (json['expiration_month'] as num?)?.toInt() ?? 0,
+      expirationYear: (json['expiration_year'] as num?)?.toInt() ?? 0,
+      status: json['status'] as String? ?? '',
+      dateCreated: dateCreated ??
+          DateTime.now().toUtc(), // fallback; token is still usable
+      dateDue: dateDue ??
+          DateTime.now().toUtc().add(const Duration(minutes: 15)),
+      luhnValidation: json['luhn_validation'] as bool? ?? true,
+      liveMode: json['live_mode'] as bool? ?? false,
+      requireEsc: json['require_esc'] as bool? ?? false,
+      cardNumberLength: (json['card_number_length'] as num?)?.toInt() ?? 16,
+      securityCodeLength: (json['security_code_length'] as num?)?.toInt() ?? 3,
+    );
+  }
 
   final String id;
   final String cardholderName;

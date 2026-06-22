@@ -5,7 +5,7 @@ void main() {
   group('Configuration', () {
     test('accepts a well-formed APP_USR public key', () {
       final config = Configuration.fromValues(
-        publicKey: 'APP_USR-abc123XYZ',
+        publicKey: 'APP_USR-abc123XYZabc',
         countryCode: 'ARG',
       );
       expect(config.country, Country.argentina);

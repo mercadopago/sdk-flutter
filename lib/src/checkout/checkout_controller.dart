@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../analytics/analytics_event.dart';
@@ -58,6 +60,7 @@ class CheckoutController extends ChangeNotifier {
 
   bool _busy = false;
   bool get isBusy => _busy;
+  Timer? _binDebounce;
 
   void _setBusy(bool value) {
     _busy = value;
@@ -65,26 +68,41 @@ class CheckoutController extends ChangeNotifier {
   }
 
   /// Loads payment methods for the entered BIN. Called as the user types.
-  Future<void> onBinChanged(String bin) async {
-    final result = await _coreMethods.getPaymentMethods(bin: bin);
-    switch (result) {
-      case Success(:final data):
-        if (data.isNotEmpty) {
-          _selectedMethod = data.first;
+  /// Debounced to 300 ms to avoid flooding the API on rapid keystrokes.
+  void onBinChanged(String bin) {
+    _binDebounce?.cancel();
+    _binDebounce = Timer(const Duration(milliseconds: 300), () async {
+      final result = await _coreMethods.getPaymentMethods(bin: bin);
+      switch (result) {
+        case Success(:final data):
+          if (data.isNotEmpty) {
+            _selectedMethod = data.first;
+            notifyListeners();
+          }
+        case Failure(:final error):
+          _lastError = error;
           notifyListeners();
-        }
-      case Failure(:final error):
-        _lastError = error;
-        notifyListeners();
-      case Cancelled():
-        break;
-    }
+        case Cancelled():
+          break;
+      }
+    });
   }
 
   /// Submits the card form. Performs tokenization and, for CardTransaction
   /// flows, advances to installment selection. For CardSave flows the result
   /// is delivered immediately to the caller via the screen's callback.
+  ///
+  /// Returns immediately with a [Failure] if a submission is already in
+  /// progress — callers must not call this concurrently.
   Future<MercadoPagoResult<CardToken>> submitCardForm(NewCardData data) async {
+    if (_busy) {
+      return const Failure(
+        ValidationError(
+          field: 'submit',
+          message: 'A submission is already in progress.',
+        ),
+      );
+    }
     _setBusy(true);
     try {
       final result = await _coreMethods.createTokenForNewCard(data);
@@ -141,11 +159,13 @@ class CheckoutController extends ChangeNotifier {
   }
 
   void backToCardForm() {
+    _lastError = null;
     _step = CheckoutStep.cardForm;
     notifyListeners();
   }
 
   void backToInstallments() {
+    _lastError = null;
     _step = CheckoutStep.installmentSelection;
     notifyListeners();
   }
@@ -193,4 +213,10 @@ class CheckoutController extends ChangeNotifier {
 
   MercadoPagoError mapApi(Object e, ErrorLocation location) =>
       mapApiError(e, location);
+
+  @override
+  void dispose() {
+    _binDebounce?.cancel();
+    super.dispose();
+  }
 }

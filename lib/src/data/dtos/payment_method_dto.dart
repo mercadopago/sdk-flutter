@@ -43,7 +43,7 @@ class PaymentMethodDto {
               .map((e) => e.toString())
               .toList(),
       binLengthMin: (bin['min'] as num?)?.toInt() ?? 6,
-      binLengthMax: (length['min'] as num?)?.toInt() ?? 13,
+      binLengthMax: (length['max'] as num?)?.toInt() ?? 19,
       securityCodeLength: (securityCode['length'] as num?)?.toInt() ?? 3,
       securityCodeLocation:
           securityCode['card_location'] as String? ?? 'back',

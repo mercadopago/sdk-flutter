@@ -81,7 +81,9 @@ class _CardFormScreenState extends State<CardFormScreen> {
     );
 
     if (!mounted) return;
-    setState(() => _submitting = false);
+    setState(() {
+      _submitting = false;
+    });
 
     switch (result) {
       case Success():
