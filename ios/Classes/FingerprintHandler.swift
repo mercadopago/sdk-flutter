@@ -1,37 +1,20 @@
+import DeviceFingerPrint
 import Foundation
 import UIKit
 
-/// Collects device fingerprint data for fraud detection.
+/// Collects device fingerprint data via the proprietary DeviceFingerPrint
+/// framework for fraud detection signals.
 ///
-/// TODO: integrate the proprietary `DeviceFingerPrint.xcframework` from the
-/// MercadoPago iOS team when the binary is available. The handler should
-/// then dynamically load its `DeviceFingerPrint` class and forward the
-/// collected payload. Until then, a minimal fallback payload is emitted so
-/// tokenization succeeds without the enriched anti-fraud signals.
+/// Returns a [String: Any] dictionary that is forwarded verbatim to the
+/// tokenization endpoint under the `device` key. Falls back to a minimal
+/// UIDevice payload if the framework returns nil.
 enum FingerprintHandler {
     static func collect() -> [String: Any] {
-        if let native = tryNativeFingerprint() {
-            return native
+        if let data = Device.getInfoAsJsonData(),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return json
         }
         return fallback()
-    }
-
-    private static func tryNativeFingerprint() -> [String: Any]? {
-        // Reflective lookup. The class is provided by an external binary
-        // that is not part of this pod; the call is a no-op when missing.
-        guard let cls = NSClassFromString("DeviceFingerPrint") as? NSObject.Type else {
-            return nil
-        }
-        let instance = cls.init()
-        let selector = NSSelectorFromString("deviceInformation")
-        guard instance.responds(to: selector) else {
-            return nil
-        }
-        let unmanaged = instance.perform(selector)
-        guard let dict = unmanaged?.takeUnretainedValue() as? [String: Any] else {
-            return nil
-        }
-        return dict
     }
 
     private static func fallback() -> [String: Any] {
@@ -41,7 +24,6 @@ enum FingerprintHandler {
             "model": device.model,
             "system_name": device.systemName,
             "system_version": device.systemVersion,
-            "name": device.name,
             "identifier_for_vendor": device.identifierForVendor?.uuidString ?? "",
             "bundle_id": Bundle.main.bundleIdentifier ?? "",
             "app_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",

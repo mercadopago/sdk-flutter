@@ -10,7 +10,8 @@ installments, and complete checkout UI for Latin America.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'MercadoPago' => 'developers@mercadopago.com' }
   s.source           = { :path => '.' }
-  s.source_files     = 'Classes/**/*'
+  s.source_files        = 'Classes/**/*'
+  s.vendored_frameworks = 'Frameworks/DeviceFingerPrint.xcframework'
   s.dependency 'Flutter'
   s.platform         = :ios, '13.0'
   s.swift_version    = '5.0'
