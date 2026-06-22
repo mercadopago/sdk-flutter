@@ -2,11 +2,7 @@
 library;
 
 /// Product identifier sent in the `X-Product-id` header on every request.
-///
-/// TODO: replace with the official identifier provided by MercadoPago before
-/// the first stable release (v1.0). The current value is a placeholder used
-/// during development.
-const String kProductId = 'MP_FLUTTER_SDK_001';
+const String kProductId = 'CVQP49FTT60D1548Q56G';
 
 /// Current SDK version. Must stay in sync with `pubspec.yaml`.
 const String kSdkVersion = '0.1.0';

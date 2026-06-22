@@ -56,12 +56,12 @@
 
 | Constante | Valor actual | Nota |
 |-----------|-------------|------|
-| `X-Product-id` | `MP_FLUTTER_SDK_001` | **TODO**: reemplazar con el valor real que provea el equipo de MercadoPago antes del primer release. Es un identificador interno del producto para analytics/tracking. |
+| `X-Product-id` | `CVQP49FTT60D1548Q56G` | Identificador interno del producto para analytics/tracking. |
 | `SDK-version` | `0.1.0` | Se actualiza en cada release sincronizado con `pubspec.yaml` |
 | Base URL | `https://api.mercadopago.com` | Fijo, sin configuración por el developer |
 | Tracks URL | `https://api.mercadolibre.com/tracks` | Fijo, para analytics |
 
-> **Nota sobre DeviceFingerPrint.xcframework (iOS)**: Es un binario nativo provisto por el equipo de MercadoPago iOS (el mismo que usa el SDK iOS nativo). No está disponible públicamente. Antes de implementar el Grupo 7 (fingerprinting), solicitar el `.xcframework` al equipo de iOS. Mientras tanto, el Platform Channel retornará `DeviceData.empty()` sin error para que el resto del SDK funcione.
+> **DeviceFingerPrint.xcframework (iOS)**: integrado desde `sdk-ios/Sources/Frameworks/`. Bundleado en `ios/Frameworks/` del plugin.
 
 ## Security considerations
 

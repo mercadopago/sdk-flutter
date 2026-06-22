@@ -178,5 +178,5 @@ Ejemplo funcional y README de integración.
 ## Open questions
 
 - [x] ~~¿Se usa `http` o `dio`?~~ → **`http`** (package:http). Más liviano, suficiente para los endpoints fijos del SDK.
-- [ ] `DeviceFingerPrint.xcframework` para iOS: solicitar al equipo iOS de MercadoPago antes de implementar Grupo 7. Mientras tanto el Platform Channel retorna `DeviceData.empty()`.
-- [x] ~~¿`X-Product-id` fijo o configurable?~~ → **Fijo**. Placeholder: `MP_FLUTTER_SDK_001`. **TODO**: reemplazar con el valor real cuando el equipo lo provea.
+- [x] ~~`DeviceFingerPrint.xcframework` para iOS~~ → integrado desde `sdk-ios/Sources/Frameworks/`.
+- [x] ~~¿`X-Product-id` fijo o configurable?~~ → **Fijo**. Valor: `CVQP49FTT60D1548Q56G`.
