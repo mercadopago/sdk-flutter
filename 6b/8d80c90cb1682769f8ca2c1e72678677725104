@@ -1,0 +1,52 @@
+lib/src/checkout/checkout_controller.dart
+  s_b84497818435cb::t_4503787bb05dc4 216-221
+  s_b84497818435cb::t_51280a38d75809 1-2
+  s_b84497818435cb::t_00dbe5b79aaaf4 162,168
+  s_b84497818435cb::t_d17a856208e27d 63,71-83,85-88,94-96,98-105
+lib/src/checkout/mercadopago_checkout.dart
+  s_b84497818435cb::t_f0293d675700a5 137-141
+test/components/security_code_field_test.dart
+  s_b84497818435cb::t_1497f36898543f 1-86
+lib/src/data/dtos/payment_method_dto.dart
+  s_b84497818435cb::t_a6cf246cee27b2 46
+lib/src/checkout/screens/card_form_screen.dart
+  s_b84497818435cb::t_bb953b647b6292 84-86
+android/src/main/kotlin/com/mercadopago/sdk/FingerprintHandler.kt
+  s_b84497818435cb::t_6482cc60d5ffb4 31-33
+lib/src/core/constants.dart
+  s_b84497818435cb::t_cfe503d9e3187b 36-37
+lib/src/analytics/analytics_service.dart
+  s_b84497818435cb::t_8c459431760258 14-18
+test/core/configuration_test.dart
+  s_b84497818435cb::t_ec88f3c5230b81 8
+test/checkout/checkout_controller_test.dart
+  s_b84497818435cb::t_80c7b2faf4daf9 1-188
+test/components/pci_field_state_test.dart
+  s_b84497818435cb::t_2cdddfd54fe903 30-59
+android/src/main/kotlin/com/mercadopago/sdk/MercadopagoSdkPlugin.kt
+  s_b84497818435cb::t_b1fa5a9815ee47 10-11,15-17,21-23,27-31,33
+ios/Classes/FingerprintHandler.swift
+  s_b84497818435cb::t_03b41a43764221 13-19
+lib/src/data/dtos/card_token_dto.dart
+  s_b84497818435cb::t_e4fd0e8d094cf8 41,44-50
+  s_b84497818435cb::t_1c219d29f2f346 24
+  s_b84497818435cb::t_9cecd03ac295a7 21-23,25-40,42-43
+lib/src/core_methods/core_methods.dart
+  s_b84497818435cb::t_791f179339245a 90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "6b8d80c90cb1682769f8ca2c1e72678677725104",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
