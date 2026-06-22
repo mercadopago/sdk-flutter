@@ -1,0 +1,24 @@
+lib/src/core/constants.dart
+  s_b84497818435cb::t_6a3820abbdda8b 5
+specs/features/v0.1/001-mercadopago-flutter-sdk/requirements.md
+  s_b84497818435cb::t_6ddad538e4b579 59
+  s_b84497818435cb::t_592da0f0e4d698 64
+specs/features/v0.1/001-mercadopago-flutter-sdk/plan.md
+  s_b84497818435cb::t_17da73f69d5d22 181-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "23606b1d9154bfb2a7fb2cff54892205b0a5671f",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
