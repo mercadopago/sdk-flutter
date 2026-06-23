@@ -1,0 +1,21 @@
+android/build.gradle
+  s_b84497818435cb::t_b150c5d98c39f6 49-50
+android/src/main/kotlin/com/mercadopago/sdk/FingerprintHandler.kt
+  s_b84497818435cb::t_ff67af97c35ddc 5,10-18,23,28-46,54-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6f6769ff282504a77a62d444ac8f41e05fe8ba3e",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
