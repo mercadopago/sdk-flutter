@@ -6,7 +6,7 @@ import '../dtos/identification_type_dto.dart';
 class IdentificationRepositoryImpl implements IdentificationRepository {
   IdentificationRepositoryImpl(this._api);
 
-  static const String _path = '/v1/identification_types';
+  static const String _path = '/cho-off/v1/identification_types';
 
   final ApiClient _api;
 

@@ -6,7 +6,7 @@ import '../dtos/issuer_dto.dart';
 class IssuerRepositoryImpl implements IssuerRepository {
   IssuerRepositoryImpl(this._api);
 
-  static const String _path = '/cho-off/v1/issuers';
+  static const String _path = '/cho-off/v1/card_issuers';
 
   final ApiClient _api;
 

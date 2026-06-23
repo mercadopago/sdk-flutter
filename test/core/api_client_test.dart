@@ -47,6 +47,9 @@ void main() {
       expect(req.headers[kHeaderSessionId], session.sessionId);
       expect(req.headers[kHeaderSdkVersion], kSdkVersion);
       expect(req.url.queryParameters['public_key'], 'APP_USR-test');
+      // GETs MUST include product_id as a query parameter — the API
+      // returns 400 'missing product_id' otherwise.
+      expect(req.url.queryParameters['product_id'], kProductId);
     });
 
     test('sends mandatory headers on POST requests', () async {
@@ -60,6 +63,9 @@ void main() {
       expect(req.headers[kHeaderContentType], kContentTypeJson);
       expect(req.headers[kHeaderProductId], kProductId);
       expect(req.headers[kHeaderSessionId], session.sessionId);
+      // POST card_tokens MUST NOT carry product_id as a query parameter;
+      // it travels only in the X-Product-id header (matches iOS/Android).
+      expect(req.url.queryParameters['product_id'], isNull);
     });
 
     test('caches GET responses for the configured TTL', () async {

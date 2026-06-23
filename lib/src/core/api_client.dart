@@ -47,7 +47,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     bool cache = true,
   }) async {
-    final uri = _buildUri(path, queryParameters);
+    final uri = _buildGetUri(path, queryParameters);
     final cacheKey = uri.toString();
 
     if (cache) {
@@ -75,7 +75,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     bool cache = true,
   }) async {
-    final uri = _buildUri(path, queryParameters);
+    final uri = _buildGetUri(path, queryParameters);
     final cacheKey = '$uri::list';
 
     if (cache) {
@@ -107,7 +107,7 @@ class ApiClient {
     required Map<String, dynamic> body,
     Map<String, String>? queryParameters,
   }) async {
-    final uri = _buildUri(path, queryParameters);
+    final uri = _buildPostUri(path, queryParameters);
     final headers = {
       ..._headers(),
       kHeaderContentType: kContentTypeJson,
@@ -130,7 +130,23 @@ class ApiClient {
     _cache.clear();
   }
 
-  Uri _buildUri(String path, Map<String, String>? extraQuery) {
+  /// Builds the URI for GET requests. Injects both `public_key` and
+  /// `product_id` as query parameters — the API requires both on every
+  /// read-only endpoint under `/cho-off/v1/...`.
+  Uri _buildGetUri(String path, Map<String, String>? extraQuery) {
+    final base = Uri.parse('$kApiBaseUrl$path');
+    final query = <String, String>{
+      'public_key': _publicKey,
+      'product_id': kProductId,
+      ...?extraQuery,
+    };
+    return base.replace(queryParameters: {...base.queryParameters, ...query});
+  }
+
+  /// Builds the URI for POST requests. Only `public_key` goes in the query
+  /// string; `product_id` is sent via the `X-Product-id` header (set in
+  /// [_headers]), matching the contract of the native iOS and Android SDKs.
+  Uri _buildPostUri(String path, Map<String, String>? extraQuery) {
     final base = Uri.parse('$kApiBaseUrl$path');
     final query = <String, String>{
       'public_key': _publicKey,
