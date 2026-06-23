@@ -1,0 +1,28 @@
+lib/src/core/api_client.dart
+  s_b84497818435cb::t_ffd4312b546220 78
+  s_b84497818435cb::t_b16159d4791dbf 133-149
+  s_b84497818435cb::t_558068ec0d8b82 110
+  s_b84497818435cb::t_0a10dea3e1afd2 50
+lib/src/data/repositories/issuer_repository_impl.dart
+  s_b84497818435cb::t_1306ceeac1a67a 9
+test/core/api_client_test.dart
+  s_b84497818435cb::t_c7d8971baa7ee0 50-52,66-68
+lib/src/data/repositories/identification_repository_impl.dart
+  s_b84497818435cb::t_d874fa797e4fe1 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6f862d3a17ecc77dbdc27223da4a591b788de2dd",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
