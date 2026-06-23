@@ -1,0 +1,24 @@
+lib/src/checkout/screens/installment_screen.dart
+  s_b84497818435cb::t_82333bfc386124 40
+lib/src/data/dtos/payment_method_dto.dart
+  s_b84497818435cb::t_4988ecf5488dd2 22-38,47-50,55-58,62-74
+test/data/payment_method_dto_test.dart
+  s_b84497818435cb::t_c7cb2a9df5a2e9 1-17,19-73
+  s_b84497818435cb::t_9486c263bb5e6c 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "bcbddae9bc47ffbdc69be59a379768a5ba5ff811",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
