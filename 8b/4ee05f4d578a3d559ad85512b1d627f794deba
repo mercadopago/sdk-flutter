@@ -1,0 +1,22 @@
+README.md
+  s_b84497818435cb::t_555537ec14a2fb 43-80
+android/build.gradle
+  s_b84497818435cb::t_f936591f2746c6 20-27
+  s_b84497818435cb::t_e86c353c554385 54-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8b4ee05f4d578a3d559ad85512b1d627f794deba",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
