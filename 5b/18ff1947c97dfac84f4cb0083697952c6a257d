@@ -1,0 +1,27 @@
+android/src/main/AndroidManifest.xml
+  s_b84497818435cb::t_c072aa5b4d0f97 4-5,7-10
+android/src/main/kotlin/com/mercadopago/sdk/MercadopagoSdkPlugin.kt
+  s_b84497818435cb::t_13350e250c6733 3-4,10-11,16-17,20-25,35-36,41-42,47-50
+android/build.gradle
+  s_b84497818435cb::t_6358d3e26e013a 46-54
+android/proguard-rules.pro
+  s_b84497818435cb::t_4f4cb13f9e9130 4-5,7-9,12-14
+android/src/main/kotlin/com/mercadopago/sdk/FingerprintHandler.kt
+  s_b84497818435cb::t_2f022882f4d165 5-6,9-10,12-13,15-17,21,24-25,27-32,36-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5b18ff1947c97dfac84f4cb0083697952c6a257d",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
