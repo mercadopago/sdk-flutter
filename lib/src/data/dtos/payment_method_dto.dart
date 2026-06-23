@@ -19,11 +19,23 @@ class PaymentMethodDto {
   });
 
   factory PaymentMethodDto.fromJson(Map<String, dynamic> json) {
-    final card = (json['card'] as Map<String, dynamic>?) ?? const {};
-    final bin = (card['bin'] as Map<String, dynamic>?) ?? const {};
-    final length = (card['length'] as Map<String, dynamic>?) ?? const {};
-    final securityCode =
-        (card['security_code'] as Map<String, dynamic>?) ?? const {};
+    // The /cho-off/v1/payment_methods response shape (verified against the
+    // canonical iOS PaymentMethodsResponse.swift and Android
+    // PaymentMethodResponse.kt):
+    //
+    //   card: {
+    //     bin: Int            ← the BIN itself (NOT an object with min/max)
+    //     length: { min, max }
+    //     validation: String
+    //     security_code: { mode, location, length }
+    //   }
+    //
+    // Some MercadoPago account configurations omit numeric scalars or send
+    // them as strings; treat every field defensively so a missing or wrongly
+    // typed value never throws a cast error.
+    final card = _asMap(json['card']);
+    final length = _asMap(card['length']);
+    final securityCode = _asMap(card['security_code']);
 
     return PaymentMethodDto(
       id: json['id'] as String? ?? '',
@@ -32,22 +44,34 @@ class PaymentMethodDto {
       status: json['status'] as String? ?? 'active',
       thumbnail: json['thumbnail'] as String? ?? '',
       secureThumbnail: json['secure_thumbnail'] as String? ?? '',
-      minAllowedAmount:
-          (json['min_allowed_amount'] as num?)?.toDouble() ?? 0,
-      maxAllowedAmount: (json['max_allowed_amount'] as num?)?.toDouble() ??
-          double.infinity,
-      accreditationTime:
-          (json['accreditation_time'] as num?)?.toInt() ?? 0,
+      minAllowedAmount: _asDouble(json['min_allowed_amount']) ?? 0,
+      maxAllowedAmount:
+          _asDouble(json['max_allowed_amount']) ?? double.infinity,
+      accreditationTime: _asInt(json['accreditation_time']) ?? 0,
       additionalInfoNeeded:
           (json['additional_info_needed'] as List<dynamic>? ?? const [])
               .map((e) => e.toString())
               .toList(),
-      binLengthMin: (bin['min'] as num?)?.toInt() ?? 6,
-      binLengthMax: (length['max'] as num?)?.toInt() ?? 19,
-      securityCodeLength: (securityCode['length'] as num?)?.toInt() ?? 3,
-      securityCodeLocation:
-          securityCode['card_location'] as String? ?? 'back',
+      binLengthMin: _asInt(length['min']) ?? 6,
+      binLengthMax: _asInt(length['max']) ?? 19,
+      securityCodeLength: _asInt(securityCode['length']) ?? 3,
+      securityCodeLocation: securityCode['location'] as String? ?? 'back',
     );
+  }
+
+  static Map<String, dynamic> _asMap(Object? value) =>
+      value is Map<String, dynamic> ? value : const {};
+
+  static int? _asInt(Object? value) {
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
+  static double? _asDouble(Object? value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
 
   final String id;

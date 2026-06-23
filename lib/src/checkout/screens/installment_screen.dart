@@ -37,6 +37,7 @@ class InstallmentScreen extends StatelessWidget {
                 final cost = payerCosts[i];
                 final selected = controller.selectedPayerCost == cost;
                 return ListTile(
+                  key: ValueKey(cost.paymentMethodOptionId),
                   selected: selected,
                   title: Text(
                     '${cost.installments}x ${cost.installmentAmount.toStringAsFixed(2)}',
