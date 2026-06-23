@@ -17,6 +17,14 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url 'https://artifacts.mercadolibre.com/repository/android-releases'
+            // Restrict this repo to MercadoLibre device SDK artifacts only,
+            // so Gradle never queries it for unrelated dependencies.
+            content {
+                includeGroup 'com.mercadolibre.android.device'
+            }
+        }
     }
 }
 
@@ -43,13 +51,13 @@ android {
 }
 
 dependencies {
-    // Device fingerprint AAR — bundled directly so integrators do not need
-    // access to the private MercadoLibre Maven repository. Mirrors the
-    // iOS plugin, which bundles DeviceFingerPrint.xcframework under
-    // ios/Frameworks/.
-    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // MercadoLibre device-fingerprint library. Resolved from the public
+    // MercadoLibre Artifactory declared in repositories above. The host app
+    // must mirror that repository declaration in its settings.gradle (see
+    // README → Android setup).
+    implementation 'com.mercadolibre.android.device:sdk:4.0.1'
 
-    // Gson is used to serialise the Device object into a Map<String, Any?>
-    // that can travel across the Flutter MethodChannel.
+    // Gson serialises the Device object into a Map<String, Any?> that can
+    // travel across the Flutter MethodChannel.
     implementation 'com.google.code.gson:gson:2.10.1'
 }

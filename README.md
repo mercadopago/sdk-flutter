@@ -40,6 +40,44 @@ flutter pub get
 - iOS `13.0+`
 - Android API `23+` (Android 6.0)
 
+### Android setup
+
+The SDK depends on MercadoLibre's device-fingerprinting library, which is
+distributed from MercadoLibre's public Artifactory (the same one
+`sdk-android` uses). Add this repository to your host app's
+`android/settings.gradle`:
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://artifacts.mercadolibre.com/repository/android-releases'
+            content {
+                includeGroup 'com.mercadolibre.android.device'
+            }
+        }
+    }
+}
+```
+
+> If your project still uses the legacy layout that declares repositories
+> in `android/build.gradle`'s `allprojects` block, add the same `maven {}`
+> entry there. Without this declaration, `flutter run` and
+> `flutter build apk` fail to resolve
+> `com.mercadolibre.android.device:sdk`.
+
+The `includeGroup` clause restricts Gradle so it only ever asks the
+MercadoLibre Artifactory for that exact group — every other dependency in
+your app keeps resolving from your usual repos.
+
+### iOS setup
+
+No extra configuration needed. The `DeviceFingerPrint.xcframework` ships
+embedded in the plugin (under `ios/Frameworks/`) and is wired
+automatically through the podspec.
+
 ---
 
 ## Initialization
