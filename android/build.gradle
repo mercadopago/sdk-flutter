@@ -43,9 +43,13 @@ android {
 }
 
 dependencies {
-    // The Mercado Libre device-fingerprint library is loaded reflectively
-    // when present. It is intentionally NOT a hard dependency so the plugin
-    // builds in environments where the artifact is unavailable.
-    // Artifact sourced from sdk-android/gradle/libs.versions.toml.
-    compileOnly 'com.mercadolibre.android.device:sdk:4.0.1'
+    // Device fingerprint AAR — bundled directly so integrators do not need
+    // access to the private MercadoLibre Maven repository. Mirrors the
+    // iOS plugin, which bundles DeviceFingerPrint.xcframework under
+    // ios/Frameworks/.
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+
+    // Gson is used to serialise the Device object into a Map<String, Any?>
+    // that can travel across the Flutter MethodChannel.
+    implementation 'com.google.code.gson:gson:2.10.1'
 }

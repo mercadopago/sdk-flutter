@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Required to reach the MercadoPago API. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required by the bundled DeviceSDK to report connectivity signals. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Optional permissions improve device-fingerprint quality. The host
-         app may declare them; the plugin does not request them at runtime. -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- Optional. The host app may declare and grant these at runtime to
+         improve fingerprint quality. The plugin does NOT request them. -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
 </manifest>
