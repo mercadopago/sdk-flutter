@@ -46,5 +46,6 @@ dependencies {
     // The Mercado Libre device-fingerprint library is loaded reflectively
     // when present. It is intentionally NOT a hard dependency so the plugin
     // builds in environments where the artifact is unavailable.
-    compileOnly 'com.mercadolibre.android:device:4.0.1'
+    // Artifact sourced from sdk-android/gradle/libs.versions.toml.
+    compileOnly 'com.mercadolibre.android.device:sdk:4.0.1'
 }

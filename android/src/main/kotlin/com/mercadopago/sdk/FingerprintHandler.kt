@@ -2,36 +2,79 @@ package com.mercadopago.sdk
 
 import android.content.Context
 import android.os.Build
+import org.json.JSONObject
 
 /**
  * Collects device fingerprint data for fraud detection.
  *
- * The official Mercado Libre `com.mercadolibre.android:device` library is
- * looked up reflectively so the plugin still compiles and runs in
- * environments where the artifact is unavailable. When missing, a minimal
- * fallback object is emitted; tokenization succeeds without the enriched
- * signals.
+ * The official Mercado Libre `com.mercadolibre.android.device:sdk` library is
+ * looked up reflectively so the plugin compiles and runs even when the artifact
+ * is not on the classpath. Usage mirrors sdk-android:
+ *
+ *   DeviceSDK.getInstance().execute(context)  // initialise
+ *   DeviceSDK.getInstance()?.info             // get Device object
+ *
+ * When the library is unavailable a minimal fallback map is returned so
+ * tokenization still succeeds without the enriched fraud signals.
  */
 class FingerprintHandler(private val context: Context) {
 
     fun collect(): Map<String, Any?> {
-        val native = tryNativeFingerprint()
-        if (native != null) return native
-        return fallback()
+        return tryNativeFingerprint() ?: fallback()
     }
 
     private fun tryNativeFingerprint(): Map<String, Any?>? {
         return try {
-            val clazz = Class.forName("com.mercadolibre.android.device.Device")
-            val instance = clazz.getDeclaredConstructor(Context::class.java)
-                .newInstance(context)
-            val method = clazz.getMethod("getDeviceInformation")
-            @Suppress("UNCHECKED_CAST")
-            method.invoke(instance) as? Map<String, Any?>
+            val sdkClass = Class.forName("com.mercadolibre.android.device.sdk.DeviceSDK")
+
+            // Static getInstance()
+            val getInstance = sdkClass.getMethod("getInstance")
+            val sdkInstance = getInstance.invoke(null) ?: return null
+
+            // execute(context) — initialises the SDK; idempotent if called again
+            val execute = sdkClass.getMethod("execute", Context::class.java)
+            execute.invoke(sdkInstance, context)
+
+            // getInfo() / info property accessor
+            val getInfo = try {
+                sdkClass.getMethod("getInfo")
+            } catch (_: NoSuchMethodException) {
+                sdkClass.getMethod("info") // Kotlin property accessor fallback
+            }
+            val device = getInfo.invoke(sdkInstance) ?: return null
+
+            deviceToMap(device)
         } catch (_: ReflectiveOperationException) {
             null
         } catch (_: ClassCastException) {
             null
+        }
+    }
+
+    /**
+     * Serialises the Device object to a plain Map via Gson (which is almost
+     * always present on Android) with a JSONObject fallback.
+     */
+    private fun deviceToMap(device: Any): Map<String, Any?>? {
+        return try {
+            val gsonClass = Class.forName("com.google.gson.Gson")
+            val gsonInstance = gsonClass.getDeclaredConstructor().newInstance()
+            val toJson = gsonClass.getMethod("toJson", Any::class.java)
+            val json = toJson.invoke(gsonInstance, device) as? String ?: return null
+            jsonStringToMap(json)
+        } catch (_: ReflectiveOperationException) {
+            null
+        }
+    }
+
+    private fun jsonStringToMap(json: String): Map<String, Any?> {
+        val obj = JSONObject(json)
+        return obj.keys().asSequence().associateWith { key ->
+            when (val v = obj.get(key)) {
+                is JSONObject -> jsonStringToMap(v.toString())
+                JSONObject.NULL -> null
+                else -> v
+            }
         }
     }
 
