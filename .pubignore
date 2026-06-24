@@ -14,3 +14,8 @@ sdk-android-reference.md
 *.iml
 *.ipr
 *.iws
+
+# AI context files — for repo contributors, not SDK consumers.
+ai/
+AGENTS.md
+.github/copilot-instructions.md
