@@ -160,8 +160,10 @@ class _ErrorBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_rounded,
-              color: Theme.of(context).colorScheme.error),
+          Icon(
+            Icons.warning_amber_rounded,
+            color: Theme.of(context).colorScheme.error,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

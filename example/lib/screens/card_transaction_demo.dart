@@ -77,7 +77,7 @@ class _CardTransactionDemoState extends State<CardTransactionDemo> {
                       ),
                     )
                   : const Icon(Icons.open_in_new),
-              label: Text('Pay \$$_amount'),
+              label: const Text('Pay \$1000'),
               onPressed: _state is _Loading ? null : _openCheckout,
             ),
             const SizedBox(height: 24),
