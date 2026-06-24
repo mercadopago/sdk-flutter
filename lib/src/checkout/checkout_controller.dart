@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../analytics/analytics_event.dart';
 import '../analytics/analytics_service.dart';
+import '../components/pci_field_state.dart';
 import '../core/error_mapper.dart';
-import '../core_methods/card_data.dart';
 import '../core_methods/core_methods.dart';
 import '../domain/errors.dart';
 import '../domain/models/card_save_result.dart';
@@ -94,7 +94,14 @@ class CheckoutController extends ChangeNotifier {
   ///
   /// Returns immediately with a [Failure] if a submission is already in
   /// progress — callers must not call this concurrently.
-  Future<MercadoPagoResult<CardToken>> submitCardForm(NewCardData data) async {
+  Future<MercadoPagoResult<CardToken>> submitCardForm({
+    required PciFieldState cardNumber,
+    required PciFieldState securityCode,
+    required PciFieldState expirationDate,
+    required String cardholderName,
+    String? documentType,
+    String? documentNumber,
+  }) async {
     if (_busy) {
       return const Failure(
         ValidationError(
@@ -105,7 +112,14 @@ class CheckoutController extends ChangeNotifier {
     }
     _setBusy(true);
     try {
-      final result = await _coreMethods.createTokenForNewCard(data);
+      final result = await _coreMethods.createTokenForNewCard(
+        cardNumber: cardNumber,
+        securityCode: securityCode,
+        expirationDate: expirationDate,
+        cardholderName: cardholderName,
+        documentType: documentType,
+        documentNumber: documentNumber,
+      );
       switch (result) {
         case Success(:final data):
           _token = data;

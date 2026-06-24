@@ -25,18 +25,18 @@ CoreMethods buildCoreMethods({
   );
 }
 
+/// Helper: creates a [PciFieldState] pre-filled with [value].
+PciFieldState pci(String value) => PciFieldState()..update(value);
+
 void main() {
   group('createTokenForNewCard', () {
     test('returns Success on valid input', () async {
       final cm = buildCoreMethods();
       final result = await cm.createTokenForNewCard(
-        const NewCardData(
-          cardNumber: '4111 1111 1111 1111',
-          cardholderName: 'JOHN DOE',
-          expirationMonth: 12,
-          expirationYear: 2030,
-          securityCode: '123',
-        ),
+        cardNumber: pci('4111111111111111'),
+        securityCode: pci('123'),
+        expirationDate: pci('1230'),
+        cardholderName: 'JOHN DOE',
       );
       expect(result, isA<Success<CardToken>>());
     });
@@ -44,13 +44,10 @@ void main() {
     test('returns Failure(InvalidCardNumberError) when Luhn fails', () async {
       final cm = buildCoreMethods();
       final result = await cm.createTokenForNewCard(
-        const NewCardData(
-          cardNumber: '4111111111111112',
-          cardholderName: 'JOHN DOE',
-          expirationMonth: 12,
-          expirationYear: 2030,
-          securityCode: '123',
-        ),
+        cardNumber: pci('4111111111111112'),
+        securityCode: pci('123'),
+        expirationDate: pci('1230'),
+        cardholderName: 'JOHN DOE',
       );
       expect(result, isA<Failure<CardToken>>());
       final failure = result as Failure<CardToken>;
@@ -60,13 +57,10 @@ void main() {
     test('returns Failure(InvalidCvvError) when CVV length wrong', () async {
       final cm = buildCoreMethods();
       final result = await cm.createTokenForNewCard(
-        const NewCardData(
-          cardNumber: '4111111111111111',
-          cardholderName: 'JOHN DOE',
-          expirationMonth: 12,
-          expirationYear: 2030,
-          securityCode: '1',
-        ),
+        cardNumber: pci('4111111111111111'),
+        securityCode: pci('1'),
+        expirationDate: pci('1230'),
+        cardholderName: 'JOHN DOE',
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<InvalidCvvError>());
@@ -76,13 +70,10 @@ void main() {
         () async {
       final cm = buildCoreMethods();
       final result = await cm.createTokenForNewCard(
-        const NewCardData(
-          cardNumber: '4111111111111111',
-          cardholderName: 'JOHN DOE',
-          expirationMonth: 1,
-          expirationYear: 2020,
-          securityCode: '123',
-        ),
+        cardNumber: pci('4111111111111111'),
+        securityCode: pci('123'),
+        expirationDate: pci('0120'), // January 2020 — expired
+        cardholderName: 'JOHN DOE',
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<CardExpiredError>());
@@ -96,13 +87,10 @@ void main() {
         ),
       );
       final result = await cm.createTokenForNewCard(
-        const NewCardData(
-          cardNumber: '4111111111111111',
-          cardholderName: 'JOHN DOE',
-          expirationMonth: 12,
-          expirationYear: 2030,
-          securityCode: '123',
-        ),
+        cardNumber: pci('4111111111111111'),
+        securityCode: pci('123'),
+        expirationDate: pci('1230'),
+        cardholderName: 'JOHN DOE',
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<NetworkError>());

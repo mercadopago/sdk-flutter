@@ -4,7 +4,6 @@ import '../../components/card_number_field.dart';
 import '../../components/expiration_date_field.dart';
 import '../../components/pci_field_state.dart';
 import '../../components/security_code_field.dart';
-import '../../core_methods/card_data.dart';
 import '../../domain/errors.dart';
 import '../../domain/result.dart';
 import '../checkout_controller.dart';
@@ -49,19 +48,13 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
   Future<void> _onSubmit() async {
     if (_submitting) return;
-    final number = _numberCtrl.rawValue;
-    final cvv = _cvvCtrl.rawValue;
-    final exp = _expCtrl.rawValue;
-    if (number.isEmpty ||
-        cvv.length < 3 ||
-        exp.length != 4 ||
+    if (_numberCtrl.rawValue.isEmpty ||
+        _cvvCtrl.rawValue.length < 3 ||
+        _expCtrl.rawValue.length != 4 ||
         _nameCtrl.text.trim().isEmpty) {
       setState(() => _localError = 'Please complete all required fields.');
       return;
     }
-
-    final month = int.parse(exp.substring(0, 2));
-    final year = 2000 + int.parse(exp.substring(2, 4));
 
     setState(() {
       _submitting = true;
@@ -69,15 +62,12 @@ class _CardFormScreenState extends State<CardFormScreen> {
     });
 
     final result = await widget.controller.submitCardForm(
-      NewCardData(
-        cardNumber: number,
-        cardholderName: _nameCtrl.text.trim(),
-        expirationMonth: month,
-        expirationYear: year,
-        securityCode: cvv,
-        documentType: _docCtrl.text.isNotEmpty ? _docType : null,
-        documentNumber: _docCtrl.text.isNotEmpty ? _docCtrl.text : null,
-      ),
+      cardNumber: _numberCtrl,
+      securityCode: _cvvCtrl,
+      expirationDate: _expCtrl,
+      cardholderName: _nameCtrl.text.trim(),
+      documentType: _docCtrl.text.isNotEmpty ? _docType : null,
+      documentNumber: _docCtrl.text.isNotEmpty ? _docCtrl.text : null,
     );
 
     if (!mounted) return;

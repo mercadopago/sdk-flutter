@@ -28,24 +28,19 @@ class _CoreMethodsDemoState extends State<CoreMethodsDemo> {
   }
 
   Future<void> _tokenize() async {
-    final exp = _exp.rawValue;
-    if (exp.length != 4) return;
-    final month = int.parse(exp.substring(0, 2));
-    final year = 2000 + int.parse(exp.substring(2, 4));
+    if (_exp.rawValue.length != 4) return;
 
     setState(() {
       _busy = true;
       _status = 'Tokenizing…';
     });
 
-    final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
-      NewCardData(
-        cardNumber: _number.rawValue,
-        cardholderName: _name.text.trim(),
-        expirationMonth: month,
-        expirationYear: year,
-        securityCode: _cvv.rawValue,
-      ),
+    final result =
+        await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
+      cardNumber: _number,
+      securityCode: _cvv,
+      expirationDate: _exp,
+      cardholderName: _name.text.trim(),
     );
 
     if (!mounted) return;

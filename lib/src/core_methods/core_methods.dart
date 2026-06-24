@@ -1,5 +1,6 @@
 import '../analytics/analytics_event.dart';
 import '../analytics/analytics_service.dart';
+import '../components/pci_field_state.dart';
 import '../core/error_mapper.dart';
 import '../core/luhn.dart';
 import '../domain/errors.dart';
@@ -11,12 +12,16 @@ import '../domain/models/payment_method.dart';
 import '../domain/repositories.dart';
 import '../domain/result.dart';
 import '../fingerprint/fingerprint_service.dart';
-import 'card_data.dart';
 
 /// Low-level, programmatic API for talking to MercadoPago.
 ///
 /// Use this when you want full control over the UI. If you prefer a hosted
 /// experience, use `MercadoPagoCheckout` instead.
+///
+/// Card data (number, CVV, expiration date) is passed as [PciFieldState]
+/// controllers — the raw values are read internally by the SDK and never
+/// returned to the caller. The integrator only ever receives the opaque
+/// [CardToken] that the backend needs to create a payment.
 class CoreMethods {
   CoreMethods({
     required TokenRepository tokenRepository,
@@ -43,26 +48,48 @@ class CoreMethods {
   final AnalyticsService _analytics;
 
   /// Tokenizes a brand-new card.
-  Future<MercadoPagoResult<CardToken>> createTokenForNewCard(
-    NewCardData data,
-  ) async {
-    final validation = _validateNewCard(data);
+  ///
+  /// Card data is supplied through [PciFieldState] controllers — the SDK
+  /// reads the raw values internally and they are never exposed to the caller.
+  ///
+  /// [expirationDate] must have been populated by [ExpirationDateField] in
+  /// MMYY format (4 digits, e.g. `"1230"` for December 2030).
+  Future<MercadoPagoResult<CardToken>> createTokenForNewCard({
+    required PciFieldState cardNumber,
+    required PciFieldState securityCode,
+    required PciFieldState expirationDate,
+    required String cardholderName,
+    String? documentType,
+    String? documentNumber,
+  }) async {
+    final validation = _validateNewCard(
+      cardNumber: cardNumber,
+      securityCode: securityCode,
+      expirationDate: expirationDate,
+      cardholderName: cardholderName,
+    );
     if (validation != null) {
       _analytics.track(const AnalyticsEvent.tokenizeFailed());
       return Failure<CardToken>(validation);
     }
 
+    final rawNumber = _stripSpaces(cardNumber.rawValue);
+    final rawCvv = securityCode.rawValue;
+    final exp = expirationDate.rawValue;
+    final month = int.parse(exp.substring(0, 2));
+    final year = 2000 + int.parse(exp.substring(2, 4));
+
     try {
       final device = await _fingerprint.collect();
       final token = await _tokens.createTokenForNewCard(
         NewCardInput(
-          cardNumber: _stripSpaces(data.cardNumber),
-          cardholderName: data.cardholderName,
-          expirationMonth: data.expirationMonth,
-          expirationYear: data.expirationYear,
-          securityCode: data.securityCode,
-          documentType: data.documentType,
-          documentNumber: data.documentNumber,
+          cardNumber: rawNumber,
+          cardholderName: cardholderName,
+          expirationMonth: month,
+          expirationYear: year,
+          securityCode: rawCvv,
+          documentType: documentType,
+          documentNumber: documentNumber,
         ),
         device,
       );
@@ -74,11 +101,17 @@ class CoreMethods {
     }
   }
 
-  /// Tokenizes a previously-saved card (identified by [SavedCardData.cardId]).
-  Future<MercadoPagoResult<CardToken>> createTokenForSavedCard(
-    SavedCardData data,
-  ) async {
-    if (data.cardId.isEmpty) {
+  /// Tokenizes a previously-saved card (identified by [cardId]).
+  ///
+  /// The [securityCode] (CVV) is supplied as a [PciFieldState] controller —
+  /// the raw value is read internally by the SDK.
+  Future<MercadoPagoResult<CardToken>> createTokenForSavedCard({
+    required String cardId,
+    required PciFieldState securityCode,
+    int? expirationMonth,
+    int? expirationYear,
+  }) async {
+    if (cardId.isEmpty) {
       return const Failure<CardToken>(
         ValidationError(
           field: 'cardId',
@@ -87,7 +120,8 @@ class CoreMethods {
         ),
       );
     }
-    if (data.securityCode.length < 3 || data.securityCode.length > 4) {
+    final rawCvv = securityCode.rawValue;
+    if (rawCvv.length < 3 || rawCvv.length > 4) {
       return const Failure<CardToken>(InvalidCvvError());
     }
 
@@ -95,10 +129,10 @@ class CoreMethods {
       final device = await _fingerprint.collect();
       final token = await _tokens.createTokenForSavedCard(
         SavedCardInput(
-          cardId: data.cardId,
-          securityCode: data.securityCode,
-          expirationMonth: data.expirationMonth,
-          expirationYear: data.expirationYear,
+          cardId: cardId,
+          securityCode: rawCvv,
+          expirationMonth: expirationMonth,
+          expirationYear: expirationYear,
         ),
         device,
       );
@@ -198,25 +232,36 @@ class CoreMethods {
     }
   }
 
-  MercadoPagoError? _validateNewCard(NewCardData data) {
-    final number = _stripSpaces(data.cardNumber);
+  MercadoPagoError? _validateNewCard({
+    required PciFieldState cardNumber,
+    required PciFieldState securityCode,
+    required PciFieldState expirationDate,
+    required String cardholderName,
+  }) {
+    final number = _stripSpaces(cardNumber.rawValue);
     if (number.isEmpty || !isValidLuhn(number)) {
       return const InvalidCardNumberError();
     }
-    if (data.securityCode.length < 3 || data.securityCode.length > 4) {
+    final cvv = securityCode.rawValue;
+    if (cvv.length < 3 || cvv.length > 4) {
       return const InvalidCvvError();
     }
-    if (data.expirationMonth < 1 || data.expirationMonth > 12) {
+    final exp = expirationDate.rawValue;
+    if (exp.length != 4) {
+      return const InvalidExpirationDateError();
+    }
+    final month = int.tryParse(exp.substring(0, 2)) ?? 0;
+    final year = int.tryParse(exp.substring(2, 4)) ?? 0;
+    if (month < 1 || month > 12) {
       return const InvalidExpirationDateError();
     }
     final now = DateTime.now();
-    final fullYear =
-        data.expirationYear < 100 ? 2000 + data.expirationYear : data.expirationYear;
-    final expiry = DateTime(fullYear, data.expirationMonth + 1, 0);
+    final fullYear = 2000 + year;
+    final expiry = DateTime(fullYear, month + 1, 0);
     if (expiry.isBefore(DateTime(now.year, now.month, 1))) {
       return const CardExpiredError();
     }
-    if (data.cardholderName.trim().isEmpty) {
+    if (cardholderName.trim().isEmpty) {
       return const ValidationError(
         field: 'cardholderName',
         message: 'cardholderName must not be empty.',

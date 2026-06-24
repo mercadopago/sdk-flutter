@@ -22,9 +22,11 @@ export 'src/core/sdk_error.dart'
         SDKInvalidPublicKeyError,
         SDKInvalidCountryError;
 
-// CoreMethods + inputs.
+// CoreMethods.
+// Card data inputs (NewCardData, SavedCardData) are intentionally not
+// exported — the public API takes PciFieldState controllers so the SDK
+// is the only code that ever reads raw card values.
 export 'src/core_methods/core_methods.dart' show CoreMethods;
-export 'src/core_methods/card_data.dart' show NewCardData, SavedCardData;
 export 'src/domain/repositories.dart' show ProcessingMode;
 
 // Result + error types.
