@@ -19,3 +19,7 @@ sdk-android-reference.md
 ai/
 AGENTS.md
 .github/copilot-instructions.md
+
+# Contributing and security docs — for repo contributors, not SDK consumers.
+CONTRIBUTING.md
+SECURITY.md
