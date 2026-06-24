@@ -336,6 +336,49 @@ flutter run
 
 ---
 
+## AI-friendly development
+
+This SDK is designed to work well with AI coding assistants (Claude Code,
+GitHub Copilot, Cursor, OpenAI Codex). The repository includes structured
+context files that give AI tools everything they need to help you integrate
+the SDK correctly — without you having to explain the architecture every time.
+
+### The `ai/` directory
+
+```
+ai/
+├── sdk-context.md   ← Complete reference: setup, API, examples, common errors
+├── claude.md        ← Instructions for Claude Code
+├── copilot.md       ← Instructions for GitHub Copilot
+└── codex.md         ← Instructions for OpenAI Codex / ChatGPT agents
+```
+
+### Auto-loaded context files
+
+These files at the repo root are picked up automatically by their respective
+tools when you open the project:
+
+| File | Tool |
+|------|------|
+| [`CLAUDE.md`](CLAUDE.md) | Claude Code |
+| [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | GitHub Copilot |
+| [`AGENTS.md`](AGENTS.md) | OpenAI Codex / ChatGPT Agents |
+
+### What AI tools learn from this context
+
+- The PCI secure fields pattern — why tokenization takes `PciFieldState`
+  controllers, not raw strings, and why `rawValue` should never be used
+  in integrator code
+- The three integration paths and when to use each
+- Required Android setup (the Artifactory step that most integrations miss)
+- Supported countries, test card numbers, and common error resolutions
+- Architecture decisions and what NOT to generate
+
+This means an AI assistant that opens this repo can immediately suggest
+correct, secure integration code without needing extra prompting.
+
+---
+
 ## Roadmap
 
 | Version | Focus |
