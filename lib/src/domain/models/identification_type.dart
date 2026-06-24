@@ -8,12 +8,19 @@ class IdentificationType {
     required this.maxLength,
   });
 
+  /// Identifier used in the tokenization request (e.g. `"DNI"`, `"CPF"`).
   final String id;
+
+  /// Human-readable label displayed to the cardholder.
   final String name;
 
-  /// `"number"` or `"string"`.
+  /// Input type hint: `"number"` for numeric-only documents, `"string"` for
+  /// alphanumeric.
   final String type;
 
+  /// Minimum number of characters a valid document number must have.
   final int minLength;
+
+  /// Maximum number of characters a valid document number may have.
   final int maxLength;
 }

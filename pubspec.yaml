@@ -5,6 +5,13 @@ homepage: https://github.com/mercadopago/sdk-flutter
 repository: https://github.com/mercadopago/sdk-flutter
 issue_tracker: https://github.com/mercadopago/sdk-flutter/issues
 
+topics:
+  - payments
+  - mercadopago
+  - checkout
+  - tokenization
+  - fintech
+
 environment:
   sdk: ">=3.0.0 <4.0.0"
   flutter: ">=3.10.0"
@@ -29,3 +36,11 @@ flutter:
         pluginClass: MercadopagoSdkPlugin
       ios:
         pluginClass: MercadopagoSdkPlugin
+      web:
+        pluginClass: none
+      macos:
+        pluginClass: none
+      windows:
+        pluginClass: none
+      linux:
+        pluginClass: none

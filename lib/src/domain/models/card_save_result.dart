@@ -10,9 +10,17 @@ class CardSaveResult {
     this.cardId,
   });
 
+  /// Tokenized card. Forward [CardToken.token] to your backend to create a
+  /// payment or save the card for future use.
   final CardToken token;
+
+  /// Payment method identifier (e.g. `"visa"`, `"master"`).
   final String paymentMethodId;
+
+  /// Payment type category (e.g. `"credit_card"`, `"debit_card"`).
   final String paymentTypeId;
+
+  /// Identifier of the card's issuing bank.
   final String issuerId;
 
   /// Populated when the card was already saved on the customer's account.

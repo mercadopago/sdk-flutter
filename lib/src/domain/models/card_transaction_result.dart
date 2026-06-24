@@ -12,9 +12,17 @@ class CardTransactionResult {
     required this.transactionAmount,
   });
 
+  /// Tokenized card. Forward [CardToken.token] to your backend together with
+  /// [installments] and [transactionAmount] to create the payment.
   final CardToken token;
+
+  /// Payment method identifier (e.g. `"visa"`, `"master"`).
   final String paymentMethodId;
+
+  /// Payment type category (e.g. `"credit_card"`, `"debit_card"`).
   final String paymentTypeId;
+
+  /// Identifier of the card's issuing bank.
   final String issuerId;
 
   /// Installment plan selected by the user.

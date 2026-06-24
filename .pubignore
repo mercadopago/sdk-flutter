@@ -1,0 +1,6 @@
+# Development-only specification docs — not relevant for pub.dev consumers.
+specs/
+
+# Internal SDK reference snapshots used during development.
+sdk-ios-reference.md
+sdk-android-reference.md
