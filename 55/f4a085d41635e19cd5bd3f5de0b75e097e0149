@@ -1,0 +1,25 @@
+example/lib/screens/card_transaction_demo.dart
+  s_b84497818435cb::t_99d34ad6c9dd15 4,6-8,17-18,20-25,28-29,32-43,51,59,63-65,67-68,74,76-79
+example/lib/screens/core_methods_demo.dart
+  s_b84497818435cb::t_2cc3b336e46c77 6,8,10-11,20-23,26-27,31-33,39,41-42,47-49,54-66,69,72-74,76,84,86-87,91-93,97,104,109-110,119,121,123
+example/lib/screens/card_save_demo.dart
+  s_b84497818435cb::t_487b21279ea7e9 4,6-8,17-18,20-25,30-41,49-50,58,62-64,66-67,73,75-78
+example/lib/main.dart
+  s_b84497818435cb::t_84ed9004dad359 8,56,58,60-75,78-86,90-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "55f4a085d41635e19cd5bd3f5de0b75e097e0149",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
