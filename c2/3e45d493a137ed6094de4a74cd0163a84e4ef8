@@ -1,0 +1,33 @@
+CLAUDE.md
+  s_b84497818435cb::t_3c8d2cab63afe8 1-50
+ai/sdk-context.md
+  s_b84497818435cb::t_7a092c2f5ccc0a 1-260
+.github/copilot-instructions.md
+  s_b84497818435cb::t_0ac71381d7e49d 1-37
+ai/README.md
+  s_b84497818435cb::t_a4ed505fbbbb6e 1-29
+ai/claude.md
+  s_b84497818435cb::t_4e706dc4ba95b6 1-45
+ai/codex.md
+  s_b84497818435cb::t_0629c6032d06e2 1-54
+ai/copilot.md
+  s_b84497818435cb::t_c2c76cf73710c2 1-37
+AGENTS.md
+  s_b84497818435cb::t_6cf24a9dbf8fd3 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "c23e45d493a137ed6094de4a74cd0163a84e4ef8",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
