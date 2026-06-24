@@ -1,0 +1,21 @@
+example/lib/screens/card_transaction_demo.dart
+  s_b84497818435cb::t_97c3f5664db254 80
+example/lib/main.dart
+  s_b84497818435cb::t_fbcd7bfd76f221 163-166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "ae60dc37a8da7481c8bb1b269eb4265ffd305944",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
