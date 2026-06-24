@@ -1,0 +1,19 @@
+example/lib/screens/core_methods_demo.dart
+  s_b84497818435cb::t_83280c019f3775 31-33,54-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "2ee80daadd384ed338fd558f0a01550b6c66f8f4",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
