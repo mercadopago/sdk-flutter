@@ -1,0 +1,88 @@
+example/ios/RunnerTests/RunnerTests.swift
+  s_b84497818435cb::t_dc4225e632dcf5 1-12
+example/linux/flutter/generated_plugin_registrant.cc
+  s_b84497818435cb::t_dc4225e632dcf5 1-11
+example/macos/Runner.xcodeproj/project.pbxproj
+  s_b84497818435cb::t_dc4225e632dcf5 1-729
+example/ios/Runner.xcodeproj/project.pbxproj
+  s_b84497818435cb::t_dc4225e632dcf5 1-644
+example/macos/Flutter/GeneratedPluginRegistrant.swift
+  s_b84497818435cb::t_dc4225e632dcf5 1-10
+example/windows/runner/main.cpp
+  s_b84497818435cb::t_dc4225e632dcf5 1-43
+example/android/gradle/wrapper/gradle-wrapper.properties
+  s_b84497818435cb::t_dc4225e632dcf5 1-5
+example/android/build.gradle.kts
+  s_b84497818435cb::t_14099d0d7d465b 5-12
+  s_b84497818435cb::t_dc4225e632dcf5 1-4,13-32
+example/.metadata
+  s_b84497818435cb::t_dc4225e632dcf5 1-45
+example/README.md
+  s_b84497818435cb::t_dc4225e632dcf5 1-17
+example/linux/flutter/generated_plugin_registrant.h
+  s_b84497818435cb::t_dc4225e632dcf5 1-15
+example/macos/Runner/Configs/AppInfo.xcconfig
+  s_b84497818435cb::t_dc4225e632dcf5 1-14
+example/windows/CMakeLists.txt
+  s_b84497818435cb::t_dc4225e632dcf5 1-108
+example/android/app/src/debug/AndroidManifest.xml
+  s_b84497818435cb::t_dc4225e632dcf5 1-7
+example/macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+  s_b84497818435cb::t_dc4225e632dcf5 1-117
+example/web/manifest.json
+  s_b84497818435cb::t_dc4225e632dcf5 1-35
+example/windows/runner/Runner.rc
+  s_b84497818435cb::t_dc4225e632dcf5 1-121
+example/linux/runner/my_application.cc
+  s_b84497818435cb::t_dc4225e632dcf5 1-148
+example/macos/RunnerTests/RunnerTests.swift
+  s_b84497818435cb::t_dc4225e632dcf5 1-12
+example/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+  s_b84497818435cb::t_dc4225e632dcf5 1-119
+example/android/app/src/main/kotlin/com/mercadopago/example/mercadopago_flutter_sdk_example/MainActivity.kt
+  s_b84497818435cb::t_dc4225e632dcf5 1-5
+example/android/settings.gradle.kts
+  s_b84497818435cb::t_dc4225e632dcf5 1-26
+example/linux/flutter/generated_plugins.cmake
+  s_b84497818435cb::t_dc4225e632dcf5 1-23
+example/windows/flutter/generated_plugin_registrant.h
+  s_b84497818435cb::t_dc4225e632dcf5 1-15
+example/android/app/src/profile/AndroidManifest.xml
+  s_b84497818435cb::t_dc4225e632dcf5 1-7
+example/windows/flutter/generated_plugin_registrant.cc
+  s_b84497818435cb::t_dc4225e632dcf5 1-11
+example/windows/flutter/generated_plugins.cmake
+  s_b84497818435cb::t_dc4225e632dcf5 1-23
+example/android/app/src/main/AndroidManifest.xml
+  s_b84497818435cb::t_dc4225e632dcf5 1-45
+example/android/app/build.gradle.kts
+  s_b84497818435cb::t_dc4225e632dcf5 1-45
+example/android/gradle.properties
+  s_b84497818435cb::t_dc4225e632dcf5 1-6
+example/web/index.html
+  s_b84497818435cb::t_dc4225e632dcf5 1-46
+example/ios/Runner/Info.plist
+  s_b84497818435cb::t_dc4225e632dcf5 1-70
+example/analysis_options.yaml
+  s_b84497818435cb::t_dc4225e632dcf5 1-28
+example/linux/CMakeLists.txt
+  s_b84497818435cb::t_dc4225e632dcf5 1-128
+example/.gitignore
+  s_b84497818435cb::t_dc4225e632dcf5 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "dd6dac81306f9b888c54be20c386292ec8887283",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
