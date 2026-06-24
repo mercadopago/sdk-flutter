@@ -48,13 +48,9 @@ idiomatic Flutter API.
 |----------|:---:|:---:|:---:|
 | Android (API 23+) | ✅ | ✅ | ✅ |
 | iOS (13.0+) | ✅ | ✅ | ✅ |
-| Web | ✅ | ✅ | — |
-| macOS | ✅ | ✅ | — |
-| Windows | ✅ | ✅ | — |
-| Linux | ✅ | ✅ | — |
 
-> Fingerprinting enriches fraud signals on Android and iOS. On other platforms
-> tokenization succeeds without it.
+This is a mobile-first SDK. MercadoPago card payments are designed for
+Android and iOS applications.
 
 ---
 
