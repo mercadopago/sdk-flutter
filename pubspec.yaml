@@ -36,11 +36,3 @@ flutter:
         pluginClass: MercadopagoSdkPlugin
       ios:
         pluginClass: MercadopagoSdkPlugin
-      web:
-        pluginClass: none
-      macos:
-        pluginClass: none
-      windows:
-        pluginClass: none
-      linux:
-        pluginClass: none
