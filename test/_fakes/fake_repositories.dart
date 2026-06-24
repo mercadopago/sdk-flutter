@@ -1,6 +1,6 @@
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
-import 'package:mercadopago_sdk/src/domain/models/device_data.dart';
-import 'package:mercadopago_sdk/src/domain/repositories.dart' as repos;
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
+import 'package:mercadopago_flutter_sdk/src/domain/models/device_data.dart';
+import 'package:mercadopago_flutter_sdk/src/domain/repositories.dart' as repos;
 
 class FakeTokenRepository implements repos.TokenRepository {
   FakeTokenRepository({this.response, this.error});

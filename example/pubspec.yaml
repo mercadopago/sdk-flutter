@@ -1,4 +1,4 @@
-name: mercadopago_sdk_example
+name: mercadopago_flutter_sdk_example
 description: Example application showcasing the MercadoPago Flutter SDK.
 publish_to: "none"
 version: 0.1.0+1
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  mercadopago_sdk:
+  mercadopago_flutter_sdk:
     path: ..
 
 dev_dependencies:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 
 import 'screens/card_save_demo.dart';
 import 'screens/card_transaction_demo.dart';

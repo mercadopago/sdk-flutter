@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 
 void main() {
   group('SecurityCodeField', () {

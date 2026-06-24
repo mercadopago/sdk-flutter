@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 
 /// Demonstrates how to bypass the hosted UI and use [CoreMethods] directly
 /// with the SDK's PCI widgets.

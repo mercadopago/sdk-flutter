@@ -25,7 +25,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  mercadopago_sdk: ^0.1.0
+  mercadopago_flutter_sdk: ^0.1.0
 ```
 
 Then run:
@@ -86,7 +86,7 @@ Call `initialize` once, typically in `main()`:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 
 void main() {
   MercadoPagoSDK.shared.initialize(

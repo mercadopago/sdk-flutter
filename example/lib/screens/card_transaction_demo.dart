@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 
 class CardTransactionDemo extends StatefulWidget {
   const CardTransactionDemo({super.key});

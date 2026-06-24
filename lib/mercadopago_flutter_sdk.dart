@@ -9,7 +9,7 @@
 /// * Standalone PCI widgets ([CardNumberField], [SecurityCodeField],
 ///   [ExpirationDateField]) for building a fully custom UI on top of
 ///   [CoreMethods].
-library mercadopago_sdk;
+library mercadopago_flutter_sdk;
 
 // SDK entry point.
 export 'src/core/mercadopago_sdk.dart' show MercadoPagoSDK;

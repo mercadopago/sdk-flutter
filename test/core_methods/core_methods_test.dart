@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago_sdk/mercadopago_sdk.dart';
-import 'package:mercadopago_sdk/src/core/api_error.dart';
+import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
+import 'package:mercadopago_flutter_sdk/src/core/api_error.dart';
 
 import '../_fakes/fake_analytics_service.dart';
 import '../_fakes/fake_fingerprint_service.dart';
