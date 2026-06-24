@@ -1,54 +1,102 @@
 # OpenAI Codex / ChatGPT Agents — MercadoPago Flutter SDK
 
-> Full SDK reference: see `ai/sdk-context.md`
+Full reference: `ai/sdk-context.md`
 
-## What this repo is
+## Project overview
 
-Flutter plugin for MercadoPago card tokenization. Package:
-`mercadopago_flutter_sdk`. The SDK tokenizes cards via MercadoPago's API
-and returns an opaque token — raw card data is never exposed to integrators.
+Flutter plugin for MercadoPago card tokenization. Raw card data stays inside
+the SDK — integrators receive only an opaque token. Package:
+`mercadopago_flutter_sdk: ^0.1.0`.
 
-## Critical rule when generating code
+Architecture:
+- `lib/src/core/` — HTTP, session, config, errors
+- `lib/src/domain/` — sealed Result<T>, models, repository interfaces
+- `lib/src/data/` — DTOs, repository implementations
+- `lib/src/core_methods/` — public low-level tokenization API
+- `lib/src/components/` — PCI input widgets
+- `lib/src/checkout/` — hosted checkout flow
+- `lib/mercadopago_flutter_sdk.dart` — public barrel (only export from here)
 
-The tokenization API takes `PciFieldState` controllers, NOT Dart strings.
-Never generate `NewCardData(cardNumber: someString)` — that class is
-intentionally removed from the public API.
+## Critical rule: PCI secure fields
 
-## Correct patterns to generate
+The tokenization API takes `PciFieldState` controllers, never raw strings.
+`NewCardData` was intentionally removed from the public API.
 
-### Initialize SDK
 ```dart
-MercadoPagoSDK.shared.initialize(publicKey: 'APP_USR-...', countryCode: 'ARG');
-```
-
-### Tokenize with custom form
-```dart
-final cardNumber = PciFieldState();
-// ... (attach to CardNumberField, SecurityCodeField, ExpirationDateField)
+// Always generate this pattern
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
-  cardNumber: cardNumber,
-  securityCode: cvvController,
-  expirationDate: expController,
+  cardNumber: cardNumberController,      // PciFieldState
+  securityCode: cvvController,           // PciFieldState
+  expirationDate: expirationController,  // PciFieldState (MMYY from ExpirationDateField)
   cardholderName: 'JOHN DOE',
+  documentType: 'DNI',    // optional
+  documentNumber: '12345678', // optional
 );
 ```
+
+## Integration patterns
 
 ### Hosted checkout
 ```dart
 MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
+MercadoPagoCheckout.forCardTransaction(amount: 1500.0, payerEmail: '...', onResult: (r) { ... }).build()
 ```
 
-### Handle results
+### Custom UI (PCI widgets)
+```dart
+// Setup
+final cardNumber = PciFieldState();
+// dispose() in StatefulWidget.dispose()
+
+// Render
+CardNumberField(controller: cardNumber),  // onBinChanged fires at 8 digits
+SecurityCodeField(controller: securityCode),
+ExpirationDateField(controller: expirationDate),
+
+// Submit
+final result = await sdk.coreMethods.createTokenForNewCard(cardNumber: cardNumber, ...);
+```
+
+### Result handling
 ```dart
 switch (result) {
-  case Success(:final data): /* data.token.token → backend */
-  case Failure(:final error): /* show error */
-  case Cancelled(): /* dismissed */
+  case Success(:final data):   // data.token.token → backend
+  case Failure(:final error):  // show error
+  case Cancelled():             // reset state
 }
 ```
 
-## Do not suggest
-- `NewCardData` with raw string fields
-- `PciFieldState.rawValue` in integrator code
-- State management libraries (Riverpod, Bloc) — the SDK has no external deps
-- `pluginClass: none` in pubspec.yaml — it's invalid Flutter syntax
+## Setup
+
+### Initialization
+```dart
+MercadoPagoSDK.shared.initialize(
+  publicKey: 'APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+  countryCode: 'ARG', // ARG BRA CHL COL MEX PER URY
+);
+```
+
+### Android (required by integrators)
+```gradle
+maven {
+    url 'https://artifacts.mercadolibre.com/repository/android-releases'
+    content { includeGroup 'com.mercadolibre.android.device' }
+}
+```
+
+## Error types
+- `InvalidCardNumberError` — Luhn failed
+- `InvalidCvvError` — length not 3–4
+- `CardExpiredError` — past expiry
+- `NetworkError(isRetriable: bool, message: String)`
+- `BinIsEmptyError` — empty BIN in getPaymentMethods
+
+## Test cards
+Visa: `4509 9535 6623 3704` / CVV `123` / exp `11/30` / BIN-8 `45099535`
+
+## Do NOT generate
+- `NewCardData(cardNumber: rawString)` — removed from API
+- `field.rawValue` in any user-facing code
+- `pluginClass: none` in pubspec.yaml
+- Riverpod/Bloc dependencies in SDK layer
+- 6-digit BINs (use 8 digits for all API calls)

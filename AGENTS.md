@@ -1,48 +1,90 @@
 # MercadoPago Flutter SDK — AI Agents Context
 
-This is the `mercadopago_flutter_sdk` Flutter plugin. Full reference: `ai/sdk-context.md`.
+Full reference: `ai/sdk-context.md`
 
-## What this SDK does
+## What this is
 
-Tokenizes credit/debit cards for MercadoPago payments in Latin America.
-The SDK ensures raw card data (number, CVV) never reaches integrator code —
-only an opaque, short-lived token is returned.
+`mercadopago_flutter_sdk` — Flutter plugin for MercadoPago card tokenization.
+Architecture: Clean Architecture, Dart layer (pure) + native Android/iOS for
+device fingerprinting. No third-party state management or DI frameworks.
+Package: `mercadopago_flutter_sdk: ^0.1.0`
 
-## Setup
+## Before making changes
 
-```yaml
-# pubspec.yaml
-dependencies:
-  mercadopago_flutter_sdk: ^0.1.0
+```bash
+flutter analyze   # must be 0 issues
+flutter test      # 63 tests, all must pass
 ```
+Do not commit if either fails.
 
-Android requires adding MercadoLibre's Artifactory to `android/settings.gradle`
-(see `ai/sdk-context.md` → Installation).
+## Security rule: PCI secure fields (most important)
 
-## The three integration patterns
-
-1. `MercadoPagoCheckout.forCardSave(onResult: ...)` — hosted UI, card save
-2. `MercadoPagoCheckout.forCardTransaction(amount:, payerEmail:, onResult: ...)` — hosted UI + installments
-3. `CoreMethods` + PCI widgets — custom UI, full control
-
-## Critical: secure fields pattern
+Tokenization takes PciFieldState controllers — never raw strings.
 
 ```dart
-// Correct — pass PciFieldState controllers, never raw strings
-final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
-  cardNumber: cardNumberField,     // PciFieldState
-  securityCode: cvvField,          // PciFieldState
-  expirationDate: expirationField, // PciFieldState (MMYY from ExpirationDateField)
-  cardholderName: nameCtrl.text,
+// Correct
+await sdk.coreMethods.createTokenForNewCard(
+  cardNumber: cardNumberController,     // PciFieldState
+  securityCode: cvvController,          // PciFieldState
+  expirationDate: expirationController, // PciFieldState
+  cardholderName: 'JOHN DOE',
 );
+// Wrong — NewCardData removed from public API
+// createTokenForNewCard(NewCardData(cardNumber: rawString, ...))
+```
+
+## Integration paths
+
+```dart
+// Hosted checkout — SDK owns the UI
+MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
+MercadoPagoCheckout.forCardTransaction(amount: 1000.0, payerEmail: '...', onResult: (r) { ... }).build()
+
+// Custom UI — app builds the form with PCI widgets
+final cardNumber = PciFieldState(); // dispose in dispose()
+// render CardNumberField(controller: cardNumber), ...
+await sdk.coreMethods.createTokenForNewCard(cardNumber: cardNumber, ...);
 ```
 
 ## Result handling
 
 ```dart
 switch (result) {
-  case Success(:final data): // data.token.token → backend
-  case Failure(:final error): // see MercadoPagoError variants in ai/sdk-context.md
-  case Cancelled(): break;
+  case Success(:final data):   // send data.token.token to backend
+  case Failure(:final error):  // show error to user
+  case Cancelled():             // user dismissed — reset state
 }
 ```
+
+## Initialization
+
+```dart
+MercadoPagoSDK.shared.initialize(
+  publicKey: 'APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+  countryCode: 'ARG', // ARG | BRA | CHL | COL | MEX | PER | URY
+);
+```
+
+## Android: required for integrators
+
+```gradle
+maven {
+    url 'https://artifacts.mercadolibre.com/repository/android-releases'
+    content { includeGroup 'com.mercadolibre.android.device' }
+}
+```
+
+## Test cards (Argentina)
+
+Visa: `4509 9535 6623 3704` · CVV `123` · exp `11/30` · BIN-8 `45099535`
+
+## Never generate
+
+- `NewCardData(cardNumber: rawString)` — removed from public API
+- `field.rawValue` in integrator code
+- `pluginClass: none` in pubspec.yaml — invalid Flutter syntax
+- Riverpod/Bloc imports in SDK code
+
+## Commit rules
+
+No AI co-author lines. No AI mentions. Branch: `feature/001-mercadopago-flutter-sdk`

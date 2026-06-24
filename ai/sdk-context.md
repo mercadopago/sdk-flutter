@@ -1,15 +1,85 @@
-# MercadoPago Flutter SDK — AI Context
+# MercadoPago Flutter SDK — Complete AI Reference
 
-## What it is
+## Purpose
 
-Official Flutter plugin for MercadoPago card tokenization. Integrators pass
-card data through PCI-compliant input widgets; the SDK tokenizes and returns
-an opaque token for the backend — raw card values are never accessible to
-integrator code.
+`mercadopago_flutter_sdk` is the official Flutter plugin for MercadoPago card
+tokenization. It lets Flutter developers accept card payments in Latin America
+without handling raw card data — the SDK tokenizes card details and returns an
+opaque, short-lived token that the app's backend uses to create the payment.
 
-Package: `mercadopago_flutter_sdk`
-Repo: https://github.com/mercadopago/sdk-flutter
-License: Apache 2.0
+**Why this exists**: MercadoPago is the leading payments platform in Latin
+America (~$90B+ in GMV). This SDK brings the same secure tokenization flow
+available in the iOS and Android SDKs to Flutter.
+
+---
+
+## Architecture overview
+
+### Package type: Flutter Plugin
+
+- **Dart layer** (pure): CoreMethods, Checkout UI, PCI widgets, domain models
+- **Native Android** (Kotlin): Platform Channel for device fingerprinting
+- **Native iOS** (Swift): Platform Channel + `DeviceFingerPrint.xcframework`
+
+### Layer structure
+
+```
+lib/src/
+├── core/           SDK singleton, HTTP client (package:http), session UUID,
+│                   configuration, error types, Luhn algorithm
+├── domain/         Sealed Result<T>, domain models, repository interfaces,
+│                   error hierarchy
+├── data/           JSON DTOs with defensive parsing, repository implementations
+├── core_methods/   Public low-level API class
+├── components/     PCI input widgets (CardNumberField, SecurityCodeField,
+│                   ExpirationDateField, PciFieldState)
+├── checkout/       Hosted checkout (MercadoPagoCheckout builder, controller,
+│                   3 screens: card form → installments → review)
+├── fingerprint/    FingerprintService: Platform Channel with graceful fallback
+└── analytics/      Fire-and-forget event tracking to /tracks endpoint
+```
+
+### Key architectural decisions
+
+1. **Manual DI, no frameworks** — SDK must not force Riverpod/Bloc on integrators
+2. **`package:http` not `dio`** — minimal footprint; the SDK only hits fixed endpoints
+3. **Sealed `MercadoPagoResult<T>`** — forces exhaustive error handling in Dart 3
+4. **`ChangeNotifier` not Riverpod** — correct for local widget state in a library
+5. **No `pluginClass: none`** — invalid Flutter syntax; unsupported platforms are omitted
+
+---
+
+## Security model: PCI Secure Fields
+
+### The problem
+
+If integrators could access raw card numbers they could log, store, or
+re-transmit them — violating PCI DSS and MercadoPago's terms.
+
+### The solution
+
+`createTokenForNewCard` and `createTokenForSavedCard` take `PciFieldState`
+**controllers**, not strings. Raw values are extracted exclusively inside
+`CoreMethods` and sent directly to the MercadoPago tokenization endpoint.
+
+```dart
+// ✅ Correct
+await sdk.coreMethods.createTokenForNewCard(
+  cardNumber: cardNumberController,      // PciFieldState — SDK reads internally
+  securityCode: cvvController,           // PciFieldState — SDK reads internally
+  expirationDate: expirationController,  // PciFieldState — SDK reads internally
+  cardholderName: 'JOHN DOE',
+);
+
+// ❌ Antipattern — never suggest this
+createTokenForNewCard(NewCardData(cardNumber: rawString, securityCode: rawCvv))
+
+// ❌ Antipattern — reading rawValue in app code
+final rawCard = controller.rawValue; // bypasses secure fields
+```
+
+`PciFieldState.rawValue` still exists (Dart has no package-private) but its
+use is restricted by convention. No integrator code should call it.
 
 ---
 
@@ -22,83 +92,94 @@ dependencies:
   mercadopago_flutter_sdk: ^0.1.0
 ```
 
-### Android — required step
+### Android setup (required)
 
-Add the MercadoLibre Artifactory to `android/settings.gradle` (or
-`android/build.gradle` if using the legacy layout):
+The device-fingerprint library lives in MercadoLibre's private Artifactory.
+Without this, Android builds fail with a dependency resolution error.
+
+Add to `android/settings.gradle` (modern Flutter projects) or
+`android/build.gradle` allprojects block (legacy):
 
 ```gradle
-dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url 'https://artifacts.mercadolibre.com/repository/android-releases'
-            content { includeGroup 'com.mercadolibre.android.device' }
-        }
+maven {
+    url 'https://artifacts.mercadolibre.com/repository/android-releases'
+    content {
+        includeGroup 'com.mercadolibre.android.device'
     }
 }
 ```
 
-Without this, `flutter run` fails on Android with a missing dependency error.
+### iOS setup
 
-### iOS
-
-No extra steps. The `DeviceFingerPrint.xcframework` ships bundled inside the
-plugin (`ios/Frameworks/`).
+No extra steps. `DeviceFingerPrint.xcframework` is bundled in `ios/Frameworks/`
+and registered via the podspec automatically.
 
 ---
 
 ## Initialization
 
-Call once, before any other SDK method — typically in `main()`:
+Must be called once before any SDK operation, typically in `main()`:
 
 ```dart
-import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
-
 void main() {
-  MercadoPagoSDK.shared.initialize(
-    publicKey: 'APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-    countryCode: 'ARG', // ARG | BRA | CHL | COL | MEX | URY | PER
-  );
+  try {
+    MercadoPagoSDK.shared.initialize(
+      publicKey: 'APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+      countryCode: 'ARG',
+    );
+  } on SDKInvalidPublicKeyError catch (e) {
+    // Key format wrong — must be APP_USR-{uuid}
+  } on SDKInvalidCountryError catch (e) {
+    // Country not supported
+  }
   runApp(const MyApp());
 }
 ```
 
-Throws `SDKInvalidPublicKeyError` if key format is wrong, or
-`SDKInvalidCountryError` if the country is not supported.
+**Key format**: `APP_USR-` followed by a UUID (8-4-4-4-12 with hyphens).
+Get it at https://www.mercadopago.com/developers/panel/app
+
+**Supported countries**: ARG, BRA, CHL, COL, MEX, PER, URY
+
+**Re-initialize** (to switch credentials):
+```dart
+MercadoPagoSDK.shared.setNewConfiguration(publicKey: '...', countryCode: 'BRA');
+// Rotates session UUID, clears GET cache
+```
 
 ---
 
 ## Three integration paths
 
-### Path 1 — Hosted checkout: Card Save
+### Path 1: Hosted checkout — CardSave
 
-SDK owns the entire card-entry UI. Integrator only receives the token.
+SDK owns the entire card-entry UI. Integrator only handles the result token.
+Best for: apps that want zero UI work.
 
 ```dart
 final builder = MercadoPagoCheckout.forCardSave(
   onResult: (result) {
     switch (result) {
       case Success(:final data):
-        // Send data.token.token to your backend — never store on device.
-        print('Payment method: ${data.paymentMethodId}');
+        // data.token.token → send to backend to save card
+        // data.paymentMethodId — 'visa', 'master', etc.
+        // data.token.lastFourDigits — safe to display to user
+        // NEVER store data.token.token on device — it expires in 15 min
       case Failure(:final error):
-        print('Error: $error');
+        // Show error.toString() or map via a _describe() function
       case Cancelled():
-        print('User cancelled.');
+        // User closed the modal — reset UI state
     }
   },
 );
-
-Navigator.of(context).push(
+await Navigator.of(context).push(
   MaterialPageRoute<void>(builder: (_) => builder.build()),
 );
 ```
 
-### Path 2 — Hosted checkout: Card Transaction
+### Path 2: Hosted checkout — CardTransaction
 
-Same as Card Save, but includes installment selection and review screens.
+Includes installment selection and review screens before returning the result.
 
 ```dart
 final builder = MercadoPagoCheckout.forCardTransaction(
@@ -107,64 +188,48 @@ final builder = MercadoPagoCheckout.forCardTransaction(
   onResult: (result) {
     if (result case Success(:final data)) {
       // data.token.token + data.installments + data.transactionAmount → backend
+      // data.payerCost.installmentAmount — per-installment display amount
     }
   },
 );
 ```
 
-### Path 3 — CoreMethods with PCI widgets (custom UI)
+### Path 3: CoreMethods + PCI widgets (custom UI)
 
-Integrator builds the form UI using PCI-compliant input widgets.
-**Raw card values are never accessible to integrator code** — pass
-the `PciFieldState` controllers directly to `createTokenForNewCard`.
+App builds its own form using PCI-compliant input widgets.
+Best for: apps with strict design requirements.
 
 ```dart
-final cardNumber    = PciFieldState();
-final securityCode  = PciFieldState();
-final expirationDate = PciFieldState();
-final nameCtrl      = TextEditingController();
+// 1. Declare controllers
+final _cardNumber    = PciFieldState();
+final _cvv           = PciFieldState();
+final _expirationDate = PciFieldState();
+final _name          = TextEditingController();
 
+// 2. Dispose (required — PciFieldState.dispose() zeros out the raw value)
 @override
 void dispose() {
-  cardNumber.dispose();
-  securityCode.dispose();
-  expirationDate.dispose();
-  nameCtrl.dispose();
+  _cardNumber.dispose();
+  _cvv.dispose();
+  _expirationDate.dispose();
+  _name.dispose();
   super.dispose();
 }
 
-// In the build method:
-CardNumberField(controller: cardNumber),
-ExpirationDateField(controller: expirationDate),
-SecurityCodeField(controller: securityCode),
-TextField(controller: nameCtrl, decoration: InputDecoration(labelText: 'Cardholder name')),
+// 3. Render PCI widgets — controllers hold values; app never reads them
+CardNumberField(controller: _cardNumber),  // fires onBinChanged at 8 digits
+ExpirationDateField(controller: _expirationDate), // MMYY format internally
+SecurityCodeField(controller: _cvv, expectedLength: 3),
 
-// On submit:
+// 4. Tokenize — pass controllers, not raw values
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
-  cardNumber: cardNumber,           // ← PciFieldState, NOT a String
-  securityCode: securityCode,       // ← PciFieldState, NOT a String
-  expirationDate: expirationDate,   // ← PciFieldState (MMYY format)
-  cardholderName: nameCtrl.text.trim(),
+  cardNumber: _cardNumber,
+  securityCode: _cvv,
+  expirationDate: _expirationDate,
+  cardholderName: _name.text.trim(),
+  documentType: 'DNI',    // optional, country-dependent
+  documentNumber: '12345678',
 );
-
-switch (result) {
-  case Success(:final data):
-    // Send data.token to your backend
-  case Failure(:final error):
-    // Show error to user
-  case Cancelled():
-    break;
-}
-```
-
-#### ⚠️ Common mistake
-
-```dart
-// ❌ WRONG — never do this:
-final raw = cardNumber.rawValue; // exposes raw card number
-
-// ✅ CORRECT — pass the controller:
-createTokenForNewCard(cardNumber: cardNumber, ...)
 ```
 
 ---
@@ -172,32 +237,14 @@ createTokenForNewCard(cardNumber: cardNumber, ...)
 ## Saved cards
 
 ```dart
+final cvvController = PciFieldState();
+// render SecurityCodeField(controller: cvvController)
+
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForSavedCard(
   cardId: 'CARD-ID-FROM-BACKEND',
-  securityCode: cvvController, // PciFieldState
+  securityCode: cvvController,   // PciFieldState
 );
 ```
-
----
-
-## Error handling
-
-`MercadoPagoResult<T>` is a sealed class. Always handle all three cases:
-
-```dart
-switch (result) {
-  case Success(:final data):   // happy path
-  case Failure(:final error):  // SDK or network error
-  case Cancelled():             // user closed the checkout UI
-}
-```
-
-Common `MercadoPagoError` variants:
-- `InvalidCardNumberError` — Luhn check failed
-- `InvalidCvvError` — CVV length wrong (must be 3–4 digits)
-- `InvalidExpirationDateError` / `CardExpiredError`
-- `NetworkError(isRetriable: bool, message: String)`
-- `BinIsEmptyError` — bin was empty when calling `getPaymentMethods`
 
 ---
 
@@ -206,55 +253,107 @@ Common `MercadoPagoError` variants:
 ```dart
 final sdk = MercadoPagoSDK.shared.coreMethods;
 
-// Detect card brand by BIN (first 8 digits of card number)
-final methods = await sdk.getPaymentMethods(bin: '45099535');
-
-// Get installment options
-final installments = await sdk.getInstallments(bin: '45099535', amount: 1500.0);
-
-// Get issuing banks
-final issuers = await sdk.getIssuers(paymentMethodId: 'visa', bin: '45099535');
-
-// Document types for current country
-final idTypes = await sdk.getIdentificationTypes();
+// All use 8-digit BIN (not 6 — MercadoPago indexes by BIN-8)
+await sdk.getPaymentMethods(bin: '45099535');
+await sdk.getInstallments(bin: '45099535', amount: 1500.0);
+await sdk.getInstallments(bin: '45099535', amount: 1500.0, mode: ProcessingMode.gateway);
+await sdk.getIssuers(paymentMethodId: 'visa', bin: '45099535');
+await sdk.getIdentificationTypes(); // returns DNI, CPF, RUT, etc. per country
 ```
 
 ---
 
-## Supported countries
+## Result type and error handling
 
-`ARG` (Argentina), `BRA` (Brazil), `CHL` (Chile), `COL` (Colombia),
-`MEX` (Mexico), `PER` (Peru), `URY` (Uruguay).
+`MercadoPagoResult<T>` is a sealed class. Exhaustive switch is required.
+
+```dart
+switch (result) {
+  case Success(:final data): /* use data */
+  case Failure(:final error): /* error is MercadoPagoError */
+  case Cancelled(:final context): /* context.step = cardForm | installmentSelection | review */
+}
+```
+
+### Complete error type reference
+
+| Error type | Meaning | Common fix |
+|-----------|---------|------------|
+| `InvalidCardNumberError` | Luhn check failed | User typed wrong number |
+| `InvalidCvvError` | CVV length not 3–4 digits | User typed wrong CVV |
+| `InvalidExpirationDateError` | Format wrong (not MMYY) | ExpirationDateField validates on input |
+| `CardExpiredError` | Card is past expiry | Ask user for different card |
+| `BinIsEmptyError` | Empty BIN in getPaymentMethods | Trigger lookup only after 8 digits |
+| `NetworkError(isRetriable, message)` | HTTP/network failure | Retry if isRetriable is true |
+| `ValidationError(field, message)` | API rejected a field | Show message to user |
+| `InitializationFailedError` | SDK bootstrap failed | Check initialize() was called |
+
+---
+
+## HTTP endpoints (for debugging / context)
+
+All endpoints are under `https://api.mercadopago.com`:
+
+| Method | Endpoint | Query params |
+|--------|----------|--------------|
+| POST | `/v1/card_tokens` | `public_key` |
+| GET | `/cho-off/v1/payment_methods` | `bin`, `product_id`, `public_key` |
+| GET | `/cho-off/v1/installments` | `bin`, `amount`, `processing_mode`, `product_id`, `public_key` |
+| GET | `/cho-off/v1/card_issuers` | `payment_method_id`, `bin`, `product_id`, `public_key` |
+| GET | `/cho-off/v1/identification_types` | `public_key` |
+
+All requests include headers `X-Product-id`, `Meli-Session-id`, `SDK-version`.
 
 ---
 
 ## Test cards (Argentina)
 
-| Brand | Number | CVV | Expiry | Cardholder |
-|-------|--------|-----|--------|------------|
-| Visa  | 4509 9535 6623 3704 | 123 | 11/30 | APRO |
-| Mastercard | 5031 7557 3453 0604 | 123 | 11/30 | APRO |
+| Brand | Number | CVV | Expiry | BIN-8 | Status |
+|-------|--------|-----|--------|-------|--------|
+| Visa | 4509 9535 6623 3704 | 123 | 11/30 | 45099535 | APRO → approved |
+| Mastercard | 5031 7557 3453 0604 | 123 | 11/30 | 50317557 | APRO → approved |
 
-BIN for API calls (8 digits): `45099535` (Visa), `50317557` (Mastercard).
+More test cards: https://www.mercadopago.com.ar/developers/en/docs/checkout-api/integration-test/test-cards
 
 ---
 
-## Running the example app
+## Running locally
 
 ```bash
+# SDK
+flutter analyze   # must be 0 issues
+flutter test      # 63 tests
+
+# Example app
 cd example
-# Replace APP_USR-REPLACE-WITH-YOUR-KEY in lib/main.dart with your key
-flutter run
+# Replace APP_USR-REPLACE-WITH-YOUR-KEY in lib/main.dart
+flutter run -d <device>
 ```
 
 ---
 
-## Common errors
+## Release status (v0.1.0)
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `SDKInvalidPublicKeyError` | Key doesn't match `APP_USR-{uuid}` format | Get key from developers.mercadopago.com |
-| `Could not find com.mercadolibre.android.device:sdk` | Missing Artifactory in Android | Add maven block to settings.gradle (see Installation) |
-| HTTP 400 `missing product_id` | Sending BIN to wrong endpoint | Use the SDK methods — don't call the API directly |
-| HTTP 404 on payment methods | BIN too short | Use 8-digit BIN, not 6 |
-| `type int is not a subtype of Map` | Old API usage | Pass `PciFieldState` controllers, not `NewCardData` |
+| Feature | Status |
+|---------|--------|
+| CoreMethods (tokenization, methods, installments, issuers, ID types) | ✅ Done |
+| Hosted checkout (CardSave + CardTransaction) | ✅ Done |
+| PCI widgets (CardNumber, SecurityCode, ExpirationDate) | ✅ Done |
+| Device fingerprinting (iOS xcframework + Android native) | ✅ Done |
+| License, pub.dev topics, DartDoc | ✅ Done |
+| Integration tests against real API | ⏳ Pending |
+| Widget tests for checkout screens | ⏳ Pending |
+| Federated plugin architecture | ⏳ Deferred post v1.0 |
+| Official Flutter-specific X-Product-id | ⏳ Pending (using iOS value) |
+
+---
+
+## Common mistakes AI tools make with this SDK
+
+1. **Suggesting `NewCardData`** — removed from public API; always use PCI controllers
+2. **Suggesting `rawValue`** — not needed in any public integration pattern
+3. **6-digit BIN** — API requires 8 digits
+4. **Missing Android Artifactory** — most common integration error
+5. **Not disposing `PciFieldState`** — causes memory leak + PCI risk
+6. **Storing the token** — it expires in 15 min, send to backend immediately
+7. **`pluginClass: none`** — invalid Flutter plugin syntax; just omit the platform
