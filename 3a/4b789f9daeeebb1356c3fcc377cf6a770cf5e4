@@ -1,0 +1,19 @@
+ai/sdk-context.md
+  s_b84497818435cb::t_3e297f48c7f5ec 289
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "3a4b789f9daeeebb1356c3fcc377cf6a770cf5e4",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
