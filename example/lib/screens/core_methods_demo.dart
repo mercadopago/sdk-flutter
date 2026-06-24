@@ -28,7 +28,9 @@ class _CoreMethodsDemoState extends State<CoreMethodsDemo> {
   }
 
   Future<void> _tokenize() async {
-    if (_exp.rawValue.length != 4) return;
+    // Use .length (not .rawValue) to check readiness — avoids touching the
+    // raw card value before it reaches the SDK.
+    if (_exp.length != 4 || _number.length < 13 || _cvv.length < 3) return;
 
     setState(() {
       _busy = true;
@@ -49,7 +51,8 @@ class _CoreMethodsDemoState extends State<CoreMethodsDemo> {
       _status = switch (result) {
         Success(:final data) => 'Token: ${data.token}',
         Failure(:final error) => 'Error: $error',
-        Cancelled() => 'Cancelled.',
+        // CoreMethods never emits Cancelled; required for exhaustive switch.
+        Cancelled() => 'Unexpected state.',
       };
     });
   }
