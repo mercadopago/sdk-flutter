@@ -1,0 +1,27 @@
+example/lib/screens/card_save_demo.dart
+  s_b84497818435cb::t_f8dfcebec34bc2 4-9,18-23,27,30,32,34,38,42-47,55,59-62,64-80,87-216
+example/lib/screens/card_transaction_demo.dart
+  s_b84497818435cb::t_495f26b57eb737 4-9,18-26,29-30,32,35,37,39,43,47-50,58,62-81,83-84,91-222
+example/lib/main.dart
+  s_b84497818435cb::t_f0fbf4b7777f0f 8-16,18-27,31-33,38-39,44,49-52,57-65,67-69,71-135,138-170,173-174
+  s_b84497818435cb::t_91e8c0ef308c31 66,136-137
+example/lib/screens/core_methods_demo.dart
+  s_b84497818435cb::t_d66bc177778a70 193-197
+  s_b84497818435cb::t_9a3abd7ef84538 4-12,21,25-28,30-31,38,42-47,49-59,63-64,72,76-91,94-104,110,112-121,133-134,137-143,145-146,150-192,198-247,249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "ce67f28f86a660f117b6d42a61c37ca525e9ea48",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
