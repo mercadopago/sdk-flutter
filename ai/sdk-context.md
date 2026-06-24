@@ -286,7 +286,7 @@ switch (result) {
 | `BinIsEmptyError` | Empty BIN in getPaymentMethods | Trigger lookup only after 8 digits |
 | `NetworkError(isRetriable, message)` | HTTP/network failure | Retry if isRetriable is true |
 | `ValidationError(field, message)` | API rejected a field | Show message to user |
-| `InitializationFailedError` | SDK bootstrap failed | Check initialize() was called |
+| `InitializationFailedError` | Internal checkout state incomplete | SDK internal — not triggered by integrator code |
 
 ---
 
