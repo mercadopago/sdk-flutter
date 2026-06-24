@@ -1,0 +1,33 @@
+lib/src/checkout/checkout_controller.dart
+  s_b84497818435cb::t_c11bc063a07dbe 7
+  s_b84497818435cb::t_cd258bbf6b4005 97-104,115-122
+test/checkout/checkout_controller_test.dart
+  s_b84497818435cb::t_42b0c0b8e86406 25-26,28-36,46,57-58,72,83,87,102,117,147-148,186
+  s_b84497818435cb::t_4ba36db0286c9c 27
+lib/mercadopago_flutter_sdk.dart
+  s_b84497818435cb::t_554073e3b457e7 25-28
+lib/src/checkout/screens/card_form_screen.dart
+  s_b84497818435cb::t_d1dc3a849da9d1 51-53,65-70
+test/core_methods/core_methods_test.dart
+  s_b84497818435cb::t_cd0a874a5bc4ec 28-30,36-39,47-50,60-63,73-76,90-93
+lib/src/core_methods/core_methods.dart
+  s_b84497818435cb::t_8d35e47bb3d179 3,20-24,51-70,76-81,86-92,104-114,123-124,132-135,235-241,245-246,249-255,259-260,264
+example/lib/screens/core_methods_demo.dart
+  s_b84497818435cb::t_5678d320920d7a 31,38-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "b630044ce988b31c9b98590c07c1e3a421f9917d",
+  "prompts": {},
+  "sessions": {
+    "s_b84497818435cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a3b49024-c66a-426b-b71e-efd4254011a2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "sheredia_meli <samuel.heredia@mercadolibre.cl>"
+    }
+  }
+}
