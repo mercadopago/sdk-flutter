@@ -34,7 +34,7 @@ class _CardTransactionDemoState extends State<CardTransactionDemo> {
           _status = switch (result) {
             Success(:final data) =>
               '✓ Ready to pay.\n'
-                  '${data.installments}x ${data.payerCost.installmentAmount.toStringAsFixed(2)}'
+                  '${data.installments}x ${data.installment.installmentAmount.toStringAsFixed(2)}'
                   '  •  Total: ${data.transactionAmount.toStringAsFixed(2)}\n\n'
                   'Send data.token.token + data.installments to your backend.',
             Failure(:final error) => '✗ $error',

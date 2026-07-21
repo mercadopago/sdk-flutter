@@ -186,7 +186,7 @@ Only these 7. `Country.fromCode()` throws `SDKInvalidCountryError` for anything 
 
 ```bash
 flutter analyze   # must be 0 issues before any commit
-flutter test      # 63 tests — all must pass
+flutter test      # 84 tests — all must pass
 ```
 
 Test files live in `test/` mirroring `lib/src/`. Fakes are in `test/_fakes/`.

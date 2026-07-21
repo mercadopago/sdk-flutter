@@ -1,14 +1,19 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
+
 import '../analytics/analytics_event.dart';
 import '../analytics/analytics_service.dart';
 import '../core_methods/core_methods.dart';
+import '../data/repositories/card_form_repository_impl.dart';
 import '../data/repositories/card_token_repository_impl.dart';
 import '../data/repositories/identification_repository_impl.dart';
 import '../data/repositories/installment_repository_impl.dart';
 import '../data/repositories/issuer_repository_impl.dart';
 import '../data/repositories/payment_method_repository_impl.dart';
 import '../fingerprint/fingerprint_service.dart';
+import '../domain/repositories.dart';
 import 'api_client.dart';
 import 'configuration.dart';
+import 'constants.dart';
 import 'sdk_error.dart';
 import 'session_manager.dart';
 
@@ -26,6 +31,7 @@ class MercadoPagoSDK {
   SessionManager? _sessionManager;
   ApiClient? _apiClient;
   CoreMethods? _coreMethods;
+  CardFormRepository? _cardFormRepository;
   AnalyticsService? _analytics;
   FingerprintService? _fingerprint;
 
@@ -49,6 +55,14 @@ class MercadoPagoSDK {
     final c = _coreMethods;
     if (c == null) throw const SDKNotInitializedError();
     return c;
+  }
+
+  /// Server-driven hosted-checkout card-form data source. Used internally by
+  /// `MercadoPagoCheckout`.
+  CardFormRepository get cardFormRepository {
+    final r = _cardFormRepository;
+    if (r == null) throw const SDKNotInitializedError();
+    return r;
   }
 
   AnalyticsService get analytics {
@@ -83,7 +97,7 @@ class MercadoPagoSDK {
         locale: locale,
       ),
     );
-    _analytics?.track(const AnalyticsEvent.sdkInitialize());
+    _trackInitialize();
   }
 
   /// Replaces the active configuration. A new session UUID is generated.
@@ -101,7 +115,19 @@ class MercadoPagoSDK {
         locale: locale,
       ),
     );
-    _analytics?.track(const AnalyticsEvent.sdkInitialize());
+    _trackInitialize();
+  }
+
+  void _trackInitialize() {
+    final c = configuration;
+    _analytics?.track(
+      AnalyticsEvent.sdkInitialize(
+        locale: c.locale,
+        publicKey: c.publicKey,
+        developerMode: kDebugMode,
+        sdkVersion: kSdkVersion,
+      ),
+    );
   }
 
   /// Releases held resources. The SDK becomes uninitialized after this call.
@@ -117,7 +143,11 @@ class MercadoPagoSDK {
       publicKey: configuration.publicKey,
     );
     final fingerprint = FingerprintService();
-    final analytics = AnalyticsService(sessionManager: sessionManager);
+    final analytics = AnalyticsService(
+      sessionManager: sessionManager,
+      publicKey: configuration.publicKey,
+      siteId: configuration.country.siteId,
+    );
 
     final tokenRepo = CardTokenRepositoryImpl(apiClient);
     final paymentMethodRepo = PaymentMethodRepositoryImpl(apiClient);
@@ -130,6 +160,7 @@ class MercadoPagoSDK {
     _apiClient = apiClient;
     _fingerprint = fingerprint;
     _analytics = analytics;
+    _cardFormRepository = CardFormRepositoryImpl(apiClient);
     _coreMethods = CoreMethods(
       tokenRepository: tokenRepo,
       paymentMethodRepository: paymentMethodRepo,
@@ -148,6 +179,7 @@ class MercadoPagoSDK {
     _sessionManager = null;
     _apiClient = null;
     _coreMethods = null;
+    _cardFormRepository = null;
     _analytics = null;
     _fingerprint = null;
   }

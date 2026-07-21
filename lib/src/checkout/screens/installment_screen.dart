@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../checkout_controller.dart';
 
 /// Step 2 of CardTransaction flows: pick an installment plan.
+///
+/// Options come from the aggregated `card_payment_brick/card` call; the primary
+/// and secondary lines are server-rendered.
 class InstallmentScreen extends StatelessWidget {
   const InstallmentScreen({
     required this.controller,
@@ -17,40 +20,43 @@ class InstallmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final installment = controller.installments.isEmpty
-        ? null
-        : controller.installments.first;
-    final payerCosts = installment?.payerCosts ?? const [];
+    final options = controller.installments;
+    final headerTitle = controller.translations?.installmentsHeaderTitle;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Installments'),
+        title: Text(
+          (headerTitle != null && headerTitle.isNotEmpty)
+              ? headerTitle
+              : 'Installments',
+        ),
         leading: BackButton(onPressed: onBack),
       ),
-      body: payerCosts.isEmpty
+      body: options.isEmpty
           ? const Center(child: Text('No installment options available.'))
           : ListView.separated(
               padding: const EdgeInsets.all(16),
-              itemCount: payerCosts.length,
+              itemCount: options.length,
               separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, i) {
-                final cost = payerCosts[i];
-                final selected = controller.selectedPayerCost == cost;
+                final option = options[i];
+                final selected = controller.selectedInstallment == option;
                 return ListTile(
-                  key: ValueKey(cost.paymentMethodOptionId),
+                  key: ValueKey('installment_${option.installments}'),
                   selected: selected,
                   title: Text(
-                    '${cost.installments}x ${cost.installmentAmount.toStringAsFixed(2)}',
+                    option.primaryLabel.isNotEmpty
+                        ? option.primaryLabel
+                        : '${option.installments}x '
+                            '${option.installmentAmount.toStringAsFixed(2)}',
                   ),
-                  subtitle: Text(
-                    cost.installmentRate == 0
-                        ? 'No interest · Total ${cost.totalAmount.toStringAsFixed(2)}'
-                        : '${cost.installmentRate}% · Total ${cost.totalAmount.toStringAsFixed(2)}',
-                  ),
+                  subtitle: option.secondaryLabel.isNotEmpty
+                      ? Text(option.secondaryLabel)
+                      : null,
                   trailing: selected
                       ? const Icon(Icons.check_circle)
                       : const Icon(Icons.circle_outlined),
-                  onTap: () => controller.selectPayerCost(cost),
+                  onTap: () => controller.selectInstallment(option),
                 );
               },
             ),
@@ -59,7 +65,7 @@ class InstallmentScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: FilledButton(
             onPressed:
-                controller.selectedPayerCost == null ? null : onContinue,
+                controller.selectedInstallment == null ? null : onContinue,
             child: const Text('Continue'),
           ),
         ),

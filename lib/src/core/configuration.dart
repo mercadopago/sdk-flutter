@@ -17,6 +17,20 @@ enum Country {
 
   final String code;
 
+  /// MercadoLibre site identifier for this country, used in the analytics
+  /// `application.site_id` field. Mirrors the native Android `SiteIdMapper`
+  /// (the authoritative mapping — note the native iOS SDK maps `COL` to `MLC`,
+  /// which is a bug: it collides with Chile; the correct value is `MCO`).
+  String get siteId => switch (this) {
+        Country.argentina => 'MLA',
+        Country.brazil => 'MLB',
+        Country.chile => 'MLC',
+        Country.colombia => 'MCO',
+        Country.mexico => 'MLM',
+        Country.peru => 'MPE',
+        Country.uruguay => 'MLU',
+      };
+
   /// Resolves a [Country] from its ISO 3-letter code. Case-insensitive.
   ///
   /// Throws [SDKInvalidCountryError] if the code is not supported.

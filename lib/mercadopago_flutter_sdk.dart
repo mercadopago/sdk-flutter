@@ -60,6 +60,7 @@ export 'src/domain/models/identification_type.dart' show IdentificationType;
 export 'src/domain/models/card_save_result.dart' show CardSaveResult;
 export 'src/domain/models/card_transaction_result.dart'
     show CardTransactionResult;
+export 'src/domain/models/card_bin_data.dart' show CheckoutInstallment;
 export 'src/domain/models/mp_cancel_context.dart'
     show MPCancelContext, CheckoutStep;
 
@@ -76,3 +77,4 @@ export 'src/checkout/mercadopago_checkout.dart'
         CardSaveCheckoutBuilder,
         CardTransactionCheckoutBuilder;
 export 'src/checkout/checkout_appearance.dart' show MPCheckoutAppearance;
+export 'src/checkout/payment_method_config.dart' show MPCardType, MPCardBrand;

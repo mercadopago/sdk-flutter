@@ -69,7 +69,13 @@ class CoreMethods {
       cardholderName: cardholderName,
     );
     if (validation != null) {
-      _analytics.track(const AnalyticsEvent.tokenizeFailed());
+      _analytics.track(
+        AnalyticsEvent.tokenizeFailed(
+          isSavedCard: false,
+          identityDocumentType: documentType,
+          errorType: validation.runtimeType.toString(),
+        ),
+      );
       return Failure<CardToken>(validation);
     }
 
@@ -93,11 +99,23 @@ class CoreMethods {
         ),
         device,
       );
-      _analytics.track(const AnalyticsEvent.tokenizeSuccess());
+      _analytics.track(
+        AnalyticsEvent.tokenizeSuccess(
+          isSavedCard: false,
+          identityDocumentType: documentType,
+        ),
+      );
       return Success<CardToken>(token);
     } catch (e) {
-      _analytics.track(const AnalyticsEvent.tokenizeFailed());
-      return Failure<CardToken>(mapApiError(e, ErrorLocation.tokenization));
+      final error = mapApiError(e, ErrorLocation.tokenization);
+      _analytics.track(
+        AnalyticsEvent.tokenizeFailed(
+          isSavedCard: false,
+          identityDocumentType: documentType,
+          errorType: error.runtimeType.toString(),
+        ),
+      );
+      return Failure<CardToken>(error);
     }
   }
 
@@ -136,11 +154,19 @@ class CoreMethods {
         ),
         device,
       );
-      _analytics.track(const AnalyticsEvent.tokenizeSuccess());
+      _analytics.track(
+        AnalyticsEvent.tokenizeSuccess(isSavedCard: true),
+      );
       return Success<CardToken>(token);
     } catch (e) {
-      _analytics.track(const AnalyticsEvent.tokenizeFailed());
-      return Failure<CardToken>(mapApiError(e, ErrorLocation.tokenization));
+      final error = mapApiError(e, ErrorLocation.tokenization);
+      _analytics.track(
+        AnalyticsEvent.tokenizeFailed(
+          isSavedCard: true,
+          errorType: error.runtimeType.toString(),
+        ),
+      );
+      return Failure<CardToken>(error);
     }
   }
 
