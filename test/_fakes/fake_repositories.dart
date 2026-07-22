@@ -1,4 +1,8 @@
 import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
+import 'package:mercadopago_flutter_sdk/src/data/dtos/card_form_parsers.dart'
+    show emptyCardFormTranslations;
+import 'package:mercadopago_flutter_sdk/src/domain/models/card_bin_data.dart';
+import 'package:mercadopago_flutter_sdk/src/domain/models/card_form_config.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/models/device_data.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/repositories.dart' as repos;
 
@@ -102,4 +106,54 @@ class FakeIdentificationRepository implements repos.IdentificationRepository {
     if (error != null) throw error!;
     return response;
   }
+}
+
+class FakeCardFormRepository implements repos.CardFormRepository {
+  FakeCardFormRepository({
+    this.config,
+    this.binData,
+    this.initError,
+    this.binError,
+  });
+
+  CardFormConfig? config;
+  CardBinData? binData;
+  Object? initError;
+  Object? binError;
+
+  repos.CardFormInitParams? lastInitParams;
+  repos.CardBinParams? lastBinParams;
+
+  @override
+  Future<CardFormConfig> initialize(repos.CardFormInitParams params) async {
+    lastInitParams = params;
+    if (initError != null) throw initError!;
+    return config ?? _defaultConfig();
+  }
+
+  @override
+  Future<CardBinData> getCardBin(repos.CardBinParams params) async {
+    lastBinParams = params;
+    if (binError != null) throw binError!;
+    return binData ?? const CardBinData(paymentMethods: []);
+  }
+
+  static CardFormConfig _defaultConfig() => const CardFormConfig(
+        cardNumber: CardFieldSpec(
+          type: 'number',
+          minLength: 16,
+          maxLength: 16,
+          mask: '#### #### #### ####',
+        ),
+        securityCode: SecurityCodeSpec(type: 'number', length: 3),
+        holderName: CardFieldSpec(type: 'string', minLength: 1, maxLength: 30),
+        expirationDate: CardFieldSpec(
+          type: 'number',
+          minLength: 4,
+          maxLength: 4,
+          mask: 'MM/YY',
+        ),
+        identificationTypes: [],
+        translations: emptyCardFormTranslations,
+      );
 }

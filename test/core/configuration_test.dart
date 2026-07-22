@@ -46,4 +46,22 @@ void main() {
       expect(Country.fromCode('Bra'), Country.brazil);
     });
   });
+
+  group('Country.siteId', () {
+    test('maps every supported country to its MercadoLibre site id', () {
+      expect(Country.argentina.siteId, 'MLA');
+      expect(Country.brazil.siteId, 'MLB');
+      expect(Country.chile.siteId, 'MLC');
+      // Colombia must be MCO (the correct value); the native iOS SDK has a bug
+      // mapping COL to MLC, which collides with Chile.
+      expect(Country.colombia.siteId, 'MCO');
+      expect(Country.mexico.siteId, 'MLM');
+      expect(Country.peru.siteId, 'MPE');
+      expect(Country.uruguay.siteId, 'MLU');
+    });
+
+    test('Colombia and Chile do not share a site id', () {
+      expect(Country.colombia.siteId, isNot(Country.chile.siteId));
+    });
+  });
 }

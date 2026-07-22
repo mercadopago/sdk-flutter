@@ -32,7 +32,8 @@ class CardTokenRepositoryImpl implements TokenRepository {
       if (!device.isEmpty) 'device': device.toJson(),
     };
 
-    final response = await _api.post(_path, body: body);
+    final response =
+        await _api.post(_path, body: body, sendProductIdHeader: true);
     return CardTokenDto.fromJson(response).toDomain();
   }
 
@@ -51,7 +52,8 @@ class CardTokenRepositoryImpl implements TokenRepository {
       if (!device.isEmpty) 'device': device.toJson(),
     };
 
-    final response = await _api.post(_path, body: body);
+    final response =
+        await _api.post(_path, body: body, sendProductIdHeader: true);
     return CardTokenDto.fromJson(response).toDomain();
   }
 }

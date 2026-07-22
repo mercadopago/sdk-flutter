@@ -18,15 +18,18 @@ class ReviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final token = controller.token;
-    final cost = controller.selectedPayerCost;
+    final installment = controller.selectedInstallment;
     final method = controller.selectedMethod;
 
-    if (token == null || cost == null) {
+    if (token == null || installment == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Review')),
         body: const Center(child: Text('Missing checkout state.')),
       );
     }
+
+    final brandLabel =
+        (method != null && method.id.isNotEmpty) ? method.id.toUpperCase() : 'Card';
 
     return Scaffold(
       appBar: AppBar(
@@ -39,24 +42,27 @@ class ReviewScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.credit_card),
             title: Text('•••• •••• •••• ${token.lastFourDigits}'),
-            subtitle: Text(method?.name ?? 'Card'),
+            subtitle: Text(brandLabel),
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.payments),
-            title: Text('${cost.installments}× ${cost.installmentAmount.toStringAsFixed(2)}'),
-            subtitle: Text(
-              cost.installmentRate == 0
-                  ? 'No interest'
-                  : '${cost.installmentRate}% interest',
+            title: Text(
+              installment.primaryLabel.isNotEmpty
+                  ? installment.primaryLabel
+                  : '${installment.installments}× '
+                      '${installment.installmentAmount.toStringAsFixed(2)}',
             ),
+            subtitle: installment.secondaryLabel.isNotEmpty
+                ? Text(installment.secondaryLabel)
+                : null,
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.attach_money),
             title: const Text('Total'),
             trailing: Text(
-              cost.totalAmount.toStringAsFixed(2),
+              installment.totalAmount.toStringAsFixed(2),
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),

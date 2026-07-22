@@ -1,5 +1,5 @@
+import 'card_bin_data.dart';
 import 'card_token.dart';
-import 'installment.dart';
 
 /// Result returned by the CardTransaction checkout flow.
 class CardTransactionResult {
@@ -8,7 +8,7 @@ class CardTransactionResult {
     required this.paymentMethodId,
     required this.paymentTypeId,
     required this.issuerId,
-    required this.payerCost,
+    required this.installment,
     required this.transactionAmount,
   });
 
@@ -25,12 +25,12 @@ class CardTransactionResult {
   /// Identifier of the card's issuing bank.
   final String issuerId;
 
-  /// Installment plan selected by the user.
-  final PayerCost payerCost;
+  /// Installment option selected by the user (from the aggregated BFF lookup).
+  final CheckoutInstallment installment;
 
-  /// Final amount the user accepted (matches `payerCost.totalAmount`).
+  /// Final amount the user accepted (matches `installment.totalAmount`).
   final double transactionAmount;
 
   /// Convenience accessor for the number of installments selected.
-  int get installments => payerCost.installments;
+  int get installments => installment.installments;
 }

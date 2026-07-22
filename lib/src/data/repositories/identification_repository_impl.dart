@@ -12,7 +12,10 @@ class IdentificationRepositoryImpl implements IdentificationRepository {
 
   @override
   Future<List<IdentificationType>> getAll() async {
-    final list = await _api.getList(_path);
+    // `identification_types` takes neither `product_id` query nor header, per
+    // the native SDK contract (Android CoreMethodsService.getIdentificationTypes
+    // declares no params).
+    final list = await _api.getList(_path, sendProductId: false);
     return list
         .whereType<Map<String, dynamic>>()
         .map(IdentificationTypeDto.fromJson)

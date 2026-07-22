@@ -36,35 +36,91 @@ void main() {
       );
     }
 
-    test('sends mandatory headers on GET requests', () async {
+    test('GET sends public_key + product_id query, no X-Product-id header',
+        () async {
       final client = buildClient(
         (_) async => http.Response('{"ok":true}', 200),
       );
-      await client.get('/v1/identification_types');
+      await client.get('/cho-off/v1/payment_methods');
 
       final req = sentRequests.single;
-      expect(req.headers[kHeaderProductId], kProductId);
+      // Always-on headers.
       expect(req.headers[kHeaderSessionId], session.sessionId);
       expect(req.headers[kHeaderSdkVersion], kSdkVersion);
+      // CoreMethods GETs authenticate with public_key + product_id as query
+      // params — never the X-Product-id header (that is POST card_tokens only).
       expect(req.url.queryParameters['public_key'], 'APP_USR-test');
-      // GETs MUST include product_id as a query parameter — the API
-      // returns 400 'missing product_id' otherwise.
+      expect(req.url.queryParameters['product_id'], kProductId);
+      expect(req.headers[kHeaderProductId], isNull);
+      expect(req.headers[kHeaderPublicKey], isNull);
+    });
+
+    test('GET with sendProductId:false omits the product_id query', () async {
+      final client = buildClient(
+        (_) async => http.Response('[]', 200),
+      );
+      await client.getList(
+        '/cho-off/v1/identification_types',
+        sendProductId: false,
+      );
+
+      final req = sentRequests.single;
+      // identification_types takes neither product_id query nor header.
+      expect(req.url.queryParameters['product_id'], isNull);
+      expect(req.headers[kHeaderProductId], isNull);
+      // public_key still travels as a query param.
+      expect(req.url.queryParameters['public_key'], 'APP_USR-test');
+    });
+
+    test('GET with publicKeyHeader auth uses X-Public-Key header', () async {
+      final client = buildClient(
+        (_) async => http.Response('{"ok":true}', 200),
+      );
+      await client.get(
+        '/cho-off/v1/card_payment_brick/initialization',
+        authMode: AuthMode.publicKeyHeader,
+        queryParameters: {'checkout_type': 'card_save'},
+      );
+
+      final req = sentRequests.single;
+      // BFF: public_key travels in the X-Public-Key header, NOT the query.
+      expect(req.headers[kHeaderPublicKey], 'APP_USR-test');
+      expect(req.url.queryParameters['public_key'], isNull);
+      // product_id remains a query param on the BFF.
       expect(req.url.queryParameters['product_id'], kProductId);
     });
 
-    test('sends mandatory headers on POST requests', () async {
+    test('GET forwards extra headers (e.g. Authorization Bearer)', () async {
+      final client = buildClient(
+        (_) async => http.Response('{"ok":true}', 200),
+      );
+      await client.get(
+        '/cho-off/v1/card_payment_brick/initialization',
+        authMode: AuthMode.publicKeyHeader,
+        extraHeaders: const {kHeaderAuthorization: 'Bearer tok_123'},
+      );
+
+      expect(sentRequests.single.headers[kHeaderAuthorization], 'Bearer tok_123');
+    });
+
+    test('POST card_tokens sends X-Product-id header, no product_id query',
+        () async {
       final client = buildClient(
         (_) async => http.Response('{"id":"abc"}', 200),
       );
-      await client.post('/v1/card_tokens', body: {'card_number': '4111'});
+      await client.post(
+        '/v1/card_tokens',
+        body: {'card_number': '4111'},
+        sendProductIdHeader: true,
+      );
 
       final req = sentRequests.single;
       expect(req.method, 'POST');
       expect(req.headers[kHeaderContentType], kContentTypeJson);
       expect(req.headers[kHeaderProductId], kProductId);
       expect(req.headers[kHeaderSessionId], session.sessionId);
-      // POST card_tokens MUST NOT carry product_id as a query parameter;
-      // it travels only in the X-Product-id header (matches iOS/Android).
+      // public_key travels as a query param; product_id must NOT (header only).
+      expect(req.url.queryParameters['public_key'], 'APP_USR-test');
       expect(req.url.queryParameters['product_id'], isNull);
     });
 

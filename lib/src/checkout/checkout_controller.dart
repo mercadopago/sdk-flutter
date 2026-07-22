@@ -8,27 +8,41 @@ import '../components/pci_field_state.dart';
 import '../core/error_mapper.dart';
 import '../core_methods/core_methods.dart';
 import '../domain/errors.dart';
+import '../domain/models/card_bin_data.dart';
+import '../domain/models/card_form_config.dart';
 import '../domain/models/card_save_result.dart';
 import '../domain/models/card_token.dart';
 import '../domain/models/card_transaction_result.dart';
-import '../domain/models/installment.dart';
 import '../domain/models/mp_cancel_context.dart';
-import '../domain/models/payment_method.dart';
+import '../domain/repositories.dart';
 import '../domain/result.dart';
 
 /// Type of checkout flow the user is performing.
 enum CheckoutKind { cardSave, cardTransaction }
 
 /// Coordinates state between checkout screens (card form → installments →
-/// review) and triggers the underlying [CoreMethods] calls.
+/// review) and the underlying data sources.
+///
+/// The card form is server-driven: [initialize] fetches field configs,
+/// translations and document types from the `card_payment_brick/initialization`
+/// BFF endpoint, and [onBinChanged] resolves payment methods, issuers, CVV
+/// rules and installment options from the aggregated `.../card` endpoint in a
+/// single round-trip. Tokenization still flows through [CoreMethods] so raw
+/// card data never leaves the SDK.
 class CheckoutController extends ChangeNotifier {
   CheckoutController({
     required this.kind,
     required CoreMethods coreMethods,
+    required CardFormRepository cardFormRepository,
     required AnalyticsService analytics,
     this.amount,
     this.payerEmail,
+    this.excludedPaymentTypes = const [],
+    this.excludedPaymentMethods = const [],
+    this.orderId,
+    this.clientToken,
   })  : _coreMethods = coreMethods,
+        _cardForm = cardFormRepository,
         _analytics = analytics,
         assert(
           kind == CheckoutKind.cardSave || amount != null,
@@ -37,26 +51,51 @@ class CheckoutController extends ChangeNotifier {
 
   final CheckoutKind kind;
   final CoreMethods _coreMethods;
+  final CardFormRepository _cardForm;
   final AnalyticsService _analytics;
   final double? amount;
   final String? payerEmail;
+  final List<String> excludedPaymentTypes;
+  final List<String> excludedPaymentMethods;
+  final String? orderId;
+  final String? clientToken;
 
-  CheckoutStep _step = CheckoutStep.cardForm;
+  CheckoutType get _checkoutType => kind == CheckoutKind.cardSave
+      ? CheckoutType.cardSave
+      : CheckoutType.cardTransaction;
+
+  CheckoutStep _step = CheckoutStep.initialization;
   CheckoutStep get step => _step;
 
-  // Card-form state (raw values come from PciFieldState controllers held by
-  // the screen; the controller stores derived data after submission).
+  // Server-driven form configuration (loaded once by [initialize]).
+  CardFormConfig? _config;
+  CardFormConfig? get config => _config;
+
+  // BIN-resolved data (payment methods, issuers, CVV rules, installments).
+  CardBinData? _binData;
+  CardBinMethod? _selectedMethod;
+  List<CheckoutInstallment> _installments = const [];
+  CheckoutInstallment? _selectedInstallment;
   CardToken? _token;
-  PaymentMethod? _selectedMethod;
-  List<Installment> _installments = const [];
-  PayerCost? _selectedPayerCost;
   MercadoPagoError? _lastError;
 
+  CardBinData? get binData => _binData;
+  CardBinMethod? get selectedMethod => _selectedMethod;
+  List<CheckoutInstallment> get installments => _installments;
+
+  /// Active translations, preferring the BIN-refined set over the initial one.
+  CardFormTranslations? get translations =>
+      _binData?.translations ?? _config?.translations;
+  CheckoutInstallment? get selectedInstallment => _selectedInstallment;
   CardToken? get token => _token;
-  PaymentMethod? get selectedMethod => _selectedMethod;
-  List<Installment> get installments => _installments;
-  PayerCost? get selectedPayerCost => _selectedPayerCost;
   MercadoPagoError? get lastError => _lastError;
+
+  /// Effective CVV length for the current selection, preferring the BIN-level
+  /// spec, then the form-level default, then a sensible fallback.
+  int get securityCodeLength =>
+      _selectedMethod?.securityCode?.length ??
+      _config?.securityCode.length ??
+      3;
 
   bool _busy = false;
   bool get isBusy => _busy;
@@ -67,24 +106,69 @@ class CheckoutController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Loads payment methods for the entered BIN. Called as the user types.
-  /// Debounced to 300 ms to avoid flooding the API on rapid keystrokes.
+  /// Loads the server-driven form configuration. Call once when the checkout
+  /// opens. On success the flow advances from [CheckoutStep.initialization] to
+  /// [CheckoutStep.cardForm].
+  Future<void> initialize() async {
+    _analytics.track(
+      AnalyticsEvent.checkoutStart(
+        checkoutType: _checkoutType.value,
+        excludedPaymentTypes: excludedPaymentTypes,
+        excludedPaymentMethods: excludedPaymentMethods,
+        orderId: orderId,
+      ),
+    );
+    try {
+      _config = await _cardForm.initialize(
+        CardFormInitParams(
+          checkoutType: _checkoutType,
+          orderId: orderId,
+          clientToken: clientToken,
+        ),
+      );
+      _lastError = null;
+      _step = CheckoutStep.cardForm;
+    } catch (e) {
+      _lastError = InitializationFailedError(reason: e.toString());
+      _analytics.track(
+        AnalyticsEvent.checkoutInitializeError(
+          errorType: _lastError.runtimeType.toString(),
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
+  /// Amount used for the aggregated BIN lookup. Card save flows send `0`
+  /// (matching the native SDKs); card transactions use the configured amount,
+  /// falling back to the server-resolved order amount when present.
+  double get _binLookupAmount => amount ?? _config?.amount ?? 0;
+
+  /// Resolves payment methods, issuers, CVV config and installments for the
+  /// entered BIN. Called as the user types; debounced to 300 ms.
   void onBinChanged(String bin) {
     _binDebounce?.cancel();
     _binDebounce = Timer(const Duration(milliseconds: 300), () async {
-      final result = await _coreMethods.getPaymentMethods(bin: bin);
-      switch (result) {
-        case Success(:final data):
-          if (data.isNotEmpty) {
-            _selectedMethod = data.first;
-            notifyListeners();
-          }
-        case Failure(:final error):
-          _lastError = error;
-          notifyListeners();
-        case Cancelled():
-          break;
+      try {
+        final data = await _cardForm.getCardBin(
+          CardBinParams(
+            bin: bin,
+            checkoutType: _checkoutType,
+            amount: _binLookupAmount,
+            excludedPaymentTypes: excludedPaymentTypes,
+            excludedPaymentMethods: excludedPaymentMethods,
+          ),
+        );
+        _binData = data;
+        _selectedMethod =
+            data.paymentMethods.isNotEmpty ? data.paymentMethods.first : null;
+        _installments = data.installments;
+        _selectedInstallment = _defaultInstallment(data.installments);
+        _lastError = null;
+      } catch (e) {
+        _lastError = mapApiError(e, ErrorLocation.paymentMethods);
       }
+      notifyListeners();
     });
   }
 
@@ -124,11 +208,9 @@ class CheckoutController extends ChangeNotifier {
         case Success(:final data):
           _token = data;
           _lastError = null;
-          if (kind == CheckoutKind.cardTransaction) {
-            await _loadInstallments(bin: data.bin);
-            if (_installments.isNotEmpty) {
-              _step = CheckoutStep.installmentSelection;
-            }
+          if (kind == CheckoutKind.cardTransaction &&
+              _installments.isNotEmpty) {
+            _step = CheckoutStep.installmentSelection;
           }
         case Failure(:final error):
           _lastError = error;
@@ -141,28 +223,17 @@ class CheckoutController extends ChangeNotifier {
     }
   }
 
-  Future<void> _loadInstallments({required String bin}) async {
-    final amt = amount;
-    if (amt == null) return;
-    final result =
-        await _coreMethods.getInstallments(bin: bin, amount: amt);
-    switch (result) {
-      case Success(:final data):
-        _installments = data;
-        if (data.isNotEmpty && data.first.payerCosts.isNotEmpty) {
-          _selectedPayerCost = data.first.payerCosts.first;
-        }
-      case Failure(:final error):
-        _lastError = error;
-      case Cancelled():
-        break;
+  CheckoutInstallment? _defaultInstallment(List<CheckoutInstallment> options) {
+    for (final option in options) {
+      if (option.selected) return option;
     }
+    return options.isNotEmpty ? options.first : null;
   }
 
-  void selectPayerCost(PayerCost cost) {
-    _selectedPayerCost = cost;
+  void selectInstallment(CheckoutInstallment installment) {
+    _selectedInstallment = installment;
     _analytics.track(
-      AnalyticsEvent.installmentSelected(installments: cost.installments),
+      AnalyticsEvent.installmentSelected(installments: installment.installments),
     );
     notifyListeners();
   }
@@ -184,6 +255,11 @@ class CheckoutController extends ChangeNotifier {
     notifyListeners();
   }
 
+  String get _issuerId {
+    final issuers = _selectedMethod?.issuers ?? const [];
+    return issuers.isNotEmpty ? issuers.first.id : '';
+  }
+
   /// Builds the final CardSave result.
   MercadoPagoResult<CardSaveResult> buildCardSaveResult() {
     final t = _token;
@@ -198,7 +274,7 @@ class CheckoutController extends ChangeNotifier {
         token: t,
         paymentMethodId: m.id,
         paymentTypeId: m.paymentTypeId,
-        issuerId: '',
+        issuerId: _issuerId,
       ),
     );
   }
@@ -207,8 +283,8 @@ class CheckoutController extends ChangeNotifier {
   MercadoPagoResult<CardTransactionResult> buildCardTransactionResult() {
     final t = _token;
     final m = _selectedMethod;
-    final cost = _selectedPayerCost;
-    if (t == null || m == null || cost == null) {
+    final installment = _selectedInstallment;
+    if (t == null || m == null || installment == null) {
       return const Failure(
         InitializationFailedError(reason: 'Required checkout state missing.'),
       );
@@ -218,9 +294,9 @@ class CheckoutController extends ChangeNotifier {
         token: t,
         paymentMethodId: m.id,
         paymentTypeId: m.paymentTypeId,
-        issuerId: '',
-        payerCost: cost,
-        transactionAmount: cost.totalAmount,
+        issuerId: _issuerId,
+        installment: installment,
+        transactionAmount: installment.totalAmount,
       ),
     );
   }
