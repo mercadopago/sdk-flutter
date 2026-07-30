@@ -36,7 +36,7 @@ void main() {
         cardNumber: pci('4111111111111111'),
         securityCode: pci('123'),
         expirationDate: pci('1230'),
-        cardholderName: 'JOHN DOE',
+        identification: const BuyerIdentification(name: 'JOHN DOE'),
       );
       expect(result, isA<Success<CardToken>>());
     });
@@ -47,7 +47,7 @@ void main() {
         cardNumber: pci('4111111111111112'),
         securityCode: pci('123'),
         expirationDate: pci('1230'),
-        cardholderName: 'JOHN DOE',
+        identification: const BuyerIdentification(name: 'JOHN DOE'),
       );
       expect(result, isA<Failure<CardToken>>());
       final failure = result as Failure<CardToken>;
@@ -60,7 +60,7 @@ void main() {
         cardNumber: pci('4111111111111111'),
         securityCode: pci('1'),
         expirationDate: pci('1230'),
-        cardholderName: 'JOHN DOE',
+        identification: const BuyerIdentification(name: 'JOHN DOE'),
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<InvalidCvvError>());
@@ -73,7 +73,7 @@ void main() {
         cardNumber: pci('4111111111111111'),
         securityCode: pci('123'),
         expirationDate: pci('0120'), // January 2020 — expired
-        cardholderName: 'JOHN DOE',
+        identification: const BuyerIdentification(name: 'JOHN DOE'),
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<CardExpiredError>());
@@ -90,11 +90,50 @@ void main() {
         cardNumber: pci('4111111111111111'),
         securityCode: pci('123'),
         expirationDate: pci('1230'),
-        cardholderName: 'JOHN DOE',
+        identification: const BuyerIdentification(name: 'JOHN DOE'),
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<NetworkError>());
       expect((failure.error as NetworkError).isRetriable, isTrue);
+    });
+  });
+
+  group('createTokenForSavedCard', () {
+    test('returns Success with only cardId + CVV (no expiration)', () async {
+      final cm = buildCoreMethods();
+      final result = await cm.createTokenForSavedCard(
+        cardId: 'card_123',
+        securityCode: pci('123'),
+      );
+      expect(result, isA<Success<CardToken>>());
+    });
+
+    test('accepts an optional PCI expiration field (MMYY)', () async {
+      final cm = buildCoreMethods();
+      final result = await cm.createTokenForSavedCard(
+        cardId: 'card_123',
+        securityCode: pci('123'),
+        expirationDate: pci('1230'),
+      );
+      expect(result, isA<Success<CardToken>>());
+    });
+
+    test('rejects an empty cardId', () async {
+      final cm = buildCoreMethods();
+      final result = await cm.createTokenForSavedCard(
+        cardId: '',
+        securityCode: pci('123'),
+      );
+      expect((result as Failure<CardToken>).error, isA<ValidationError>());
+    });
+
+    test('rejects an invalid CVV length', () async {
+      final cm = buildCoreMethods();
+      final result = await cm.createTokenForSavedCard(
+        cardId: 'card_123',
+        securityCode: pci('1'),
+      );
+      expect((result as Failure<CardToken>).error, isA<InvalidCvvError>());
     });
   });
 

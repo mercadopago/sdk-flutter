@@ -123,6 +123,8 @@ class CardBinParams {
     required this.amount,
     this.excludedPaymentTypes = const [],
     this.excludedPaymentMethods = const [],
+    this.minInstallments,
+    this.maxInstallments,
   });
 
   final String bin;
@@ -136,6 +138,12 @@ class CardBinParams {
   /// Payment method/brand ids to exclude (e.g. `visa`), comma-joined on the
   /// wire as `excluded_payment_methods`.
   final List<String> excludedPaymentMethods;
+
+  /// Minimum installments to offer (`min_installments` query); `null` omits it.
+  final int? minInstallments;
+
+  /// Maximum installments to offer (`max_installments` query); `null` omits it.
+  final int? maxInstallments;
 }
 
 /// Hosted-checkout server-driven card form. Backed by the two

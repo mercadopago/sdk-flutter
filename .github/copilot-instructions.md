@@ -14,9 +14,9 @@ import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 // Correct pattern for all card tokenization
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
   cardNumber: cardNumberController,     // PciFieldState from CardNumberField
-  securityCode: cvvController,          // PciFieldState from SecurityCodeField
   expirationDate: expirationController, // PciFieldState from ExpirationDateField (MMYY)
-  cardholderName: nameController.text.trim(),
+  securityCode: cvvController,          // PciFieldState from SecurityCodeField
+  identification: BuyerIdentification(name: nameController.text.trim()),
 );
 ```
 
@@ -60,10 +60,9 @@ switch (result) {
 // Card Save
 MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
 
-// Card Transaction with installments
+// Card Transaction with installments (order-bound; amount from the server)
 MercadoPagoCheckout.forCardTransaction(
-  amount: 1500.0,
-  payerEmail: 'buyer@example.com',
+  order: MPOrder(orderId: '...', clientToken: '...'),
   onResult: (r) { ... },
 ).build()
 ```

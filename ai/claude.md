@@ -18,9 +18,9 @@ The tokenization API takes `PciFieldState` controllers, **never raw strings**.
 // ✅ Correct
 await sdk.coreMethods.createTokenForNewCard(
   cardNumber: cardNumberController,   // PciFieldState
-  securityCode: cvvController,        // PciFieldState
   expirationDate: expController,      // PciFieldState (MMYY)
-  cardholderName: 'JOHN DOE',
+  securityCode: cvvController,        // PciFieldState
+  identification: BuyerIdentification(name: 'JOHN DOE'), // + optional number/type
 );
 
 // ❌ Wrong — never suggest this pattern
@@ -33,7 +33,7 @@ await sdk.coreMethods.createTokenForNewCard(
 
 ```bash
 flutter analyze    # must be 0 issues
-flutter test       # 63 tests
+flutter test       # 105 tests
 ```
 
 ## Running the example

@@ -25,20 +25,24 @@ CheckoutController _build({
   FakeTokenRepository? tokens,
   FakeCardFormRepository? cardForm,
   FakeAnalyticsService? analytics,
-  double? amount,
   List<String> excludedPaymentTypes = const [],
   List<String> excludedPaymentMethods = const [],
+  int? minInstallments,
+  int? maxInstallments,
 }) {
+  final isTransaction = kind == CheckoutKind.cardTransaction;
   return CheckoutController(
     kind: kind,
     coreMethods: _buildCoreMethods(tokens: tokens),
     cardFormRepository: cardForm ?? FakeCardFormRepository(),
     analytics: analytics ?? FakeAnalyticsService(),
-    amount: amount,
-    payerEmail:
-        kind == CheckoutKind.cardTransaction ? 'buyer@example.com' : null,
     excludedPaymentTypes: excludedPaymentTypes,
     excludedPaymentMethods: excludedPaymentMethods,
+    minInstallments: minInstallments,
+    maxInstallments: maxInstallments,
+    // Card transactions are order-bound (amount resolved server-side).
+    orderId: isTransaction ? 'order_1' : null,
+    clientToken: isTransaction ? 'tok_1' : null,
   );
 }
 
@@ -132,20 +136,37 @@ void main() {
       ctrl.dispose();
     });
 
-    test('onBinChanged passes exclusions to the BFF params', () async {
+    test('onBinChanged passes exclusions + installment bounds to the BFF',
+        () async {
       final cardForm = FakeCardFormRepository(binData: _binData);
       final ctrl = _build(
         kind: CheckoutKind.cardTransaction,
-        amount: 100,
         cardForm: cardForm,
         excludedPaymentTypes: const ['debit_card'],
         excludedPaymentMethods: const ['amex'],
+        minInstallments: 1,
+        maxInstallments: 6,
       );
       ctrl.onBinChanged('45099535');
       await _settleDebounce();
       expect(cardForm.lastBinParams?.excludedPaymentTypes, ['debit_card']);
       expect(cardForm.lastBinParams?.excludedPaymentMethods, ['amex']);
-      expect(cardForm.lastBinParams?.amount, 100);
+      expect(cardForm.lastBinParams?.minInstallments, 1);
+      expect(cardForm.lastBinParams?.maxInstallments, 6);
+      ctrl.dispose();
+    });
+
+    test('BIN lookup amount comes from the server config (order-driven)',
+        () async {
+      final cardForm =
+          FakeCardFormRepository(binData: _binData, configAmount: 250);
+      final ctrl =
+          _build(kind: CheckoutKind.cardTransaction, cardForm: cardForm);
+      await ctrl.initialize();
+      ctrl.onBinChanged('45099535');
+      await _settleDebounce();
+      // Amount is never integrator-supplied; it comes from the server config.
+      expect(cardForm.lastBinParams?.amount, 250);
       ctrl.dispose();
     });
   });
@@ -222,7 +243,7 @@ void main() {
   });
 
   group('CheckoutController — CardTransaction', () {
-    test('requires amount', () {
+    test('requires an order (orderId)', () {
       expect(
         () => CheckoutController(
           kind: CheckoutKind.cardTransaction,
@@ -238,7 +259,6 @@ void main() {
         () async {
       final ctrl = _build(
         kind: CheckoutKind.cardTransaction,
-        amount: 100,
         cardForm: FakeCardFormRepository(binData: _binData),
       );
       ctrl.onBinChanged('45099535');
@@ -253,7 +273,6 @@ void main() {
       final analytics = FakeAnalyticsService();
       final ctrl = _build(
         kind: CheckoutKind.cardTransaction,
-        amount: 100,
         cardForm: FakeCardFormRepository(binData: _binData),
         analytics: analytics,
       );

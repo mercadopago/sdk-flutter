@@ -45,9 +45,9 @@ class _CoreMethodsDemoState extends State<CoreMethodsDemo> {
     final result =
         await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
       cardNumber: _cardNumber,
-      securityCode: _securityCode,
       expirationDate: _expirationDate,
-      cardholderName: _nameCtrl.text.trim(),
+      securityCode: _securityCode,
+      identification: BuyerIdentification(name: _nameCtrl.text.trim()),
     );
 
     if (!mounted) return;

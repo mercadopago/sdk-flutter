@@ -72,9 +72,9 @@ to the MercadoPago API. The integrator only ever receives the opaque token.
 // ✅ Correct — the only acceptable pattern
 await sdk.coreMethods.createTokenForNewCard(
   cardNumber: cardNumberController,     // PciFieldState
-  securityCode: cvvController,          // PciFieldState
   expirationDate: expirationController, // PciFieldState (MMYY)
-  cardholderName: 'JOHN DOE',
+  securityCode: cvvController,          // PciFieldState
+  identification: BuyerIdentification(name: 'JOHN DOE'), // + optional number/type
 );
 
 // ❌ Wrong — removed from public API intentionally
@@ -119,10 +119,14 @@ Common `MercadoPagoError` variants:
 ```dart
 // SDK owns the full UI; integrator only handles the result.
 MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
+// Card transactions are order-bound: amount is resolved server-side from the
+// MPOrder (Orders API), never passed by the integrator.
 MercadoPagoCheckout.forCardTransaction(
-  amount: 1500.0, payerEmail: 'user@example.com',
+  order: MPOrder(orderId: orderId, clientToken: clientToken),
   onResult: (r) { ... },
-).build()
+).setPaymentMethodConfiguration([
+  MPPaymentMethodConfig.card(installment: MPInstallment(maxInstallments: 3)),
+]).build()
 ```
 
 ### 2. CoreMethods with custom UI — when app design requires it
@@ -131,9 +135,9 @@ MercadoPagoCheckout.forCardTransaction(
 // Raw card data stays inside the SDK throughout.
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
   cardNumber: _cardNumberCtrl,   // PciFieldState from CardNumberField
-  securityCode: _cvvCtrl,        // PciFieldState from SecurityCodeField
   expirationDate: _expCtrl,      // PciFieldState from ExpirationDateField (MMYY)
-  cardholderName: _nameCtrl.text.trim(),
+  securityCode: _cvvCtrl,        // PciFieldState from SecurityCodeField
+  identification: BuyerIdentification(name: _nameCtrl.text.trim()),
 );
 ```
 
@@ -145,6 +149,34 @@ await sdk.getInstallments(bin: '45099535', amount: 1500.0);
 await sdk.getIssuers(paymentMethodId: 'visa', bin: '45099535');
 await sdk.getIdentificationTypes();
 ```
+
+---
+
+## Native-parity public models
+
+The public API mirrors the native Android/iOS SDKs using typed models instead
+of loose primitives:
+
+- `MPOrder(orderId, clientToken)` — required for `forCardTransaction`. The
+  transaction amount is **server-driven** from the order; it is never an
+  integrator parameter (there is no `amount`/`payerEmail` on the builder).
+- `MPPaymentMethodConfig` — sealed; `MPPaymentMethodConfig.card(excludedTypes,
+  excludedBrands, installment)`. Passed via `setPaymentMethodConfiguration([...])`.
+- `MPInstallment(minInstallments = 1, maxInstallments = 180)` — restricts the
+  installment range; threaded to the BFF `/card` call as `min/max_installments`.
+- `BuyerIdentification(name, number?, type?)` — cardholder identity for
+  `createTokenForNewCard` (name lives inside it, matching Android).
+- `MPPayer(email)` — typed payer model, exported for parity; not wired into the
+  builder (same as both native SDKs).
+- `MPCheckoutAppearance(themeMode, primaryColor)` — `themeMode` is Flutter's
+  `ThemeMode` (system/light/dark); `system` adapts to the device.
+
+**Monetary type (`double`, deliberate):** amounts use `double`, not a decimal
+type. After the order-driven change, integrator-facing money only appears in
+`getInstallments(amount:)`, where it is a pass-through (serialized to a string
+for the query, no arithmetic) — so `double` is safe for LATAM amounts and stays
+idiomatic. The native SDKs use `BigDecimal`/`Decimal`; we intentionally do not
+add a decimal dependency.
 
 ---
 
@@ -186,7 +218,7 @@ Only these 7. `Country.fromCode()` throws `SDKInvalidCountryError` for anything 
 
 ```bash
 flutter analyze   # must be 0 issues before any commit
-flutter test      # 84 tests — all must pass
+flutter test      # 105 tests — all must pass
 ```
 
 Test files live in `test/` mirroring `lib/src/`. Fakes are in `test/_fakes/`.

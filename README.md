@@ -165,12 +165,14 @@ Navigator.of(context).push(
 
 ### Card Transaction
 
-Tokenize a card and let the user choose installments before confirming.
+Tokenize a card and let the user choose installments before confirming. The
+transaction is bound to an [MPOrder] — create the order from your backend via
+the Orders API, then pass its id and client token. **The amount is resolved
+server-side from the order** (not passed here), matching the native SDKs.
 
 ```dart
 MercadoPagoCheckout.forCardTransaction(
-  amount: 1500.00,
-  payerEmail: 'buyer@example.com',
+  order: MPOrder(orderId: orderId, clientToken: clientToken),
   onResult: (result) {
     if (result case Success(:final data)) {
       // data.token.token + data.installments + data.transactionAmount → backend
@@ -179,12 +181,31 @@ MercadoPagoCheckout.forCardTransaction(
 ).build();
 ```
 
+### Restricting card types, brands and installments
+
+Use `setPaymentMethodConfiguration` on either builder:
+
+```dart
+MercadoPagoCheckout.forCardTransaction(order: order, onResult: (r) { ... })
+    .setPaymentMethodConfiguration([
+      MPPaymentMethodConfig.card(
+        excludedTypes: [MPCardType.debit],       // hide debit cards
+        excludedBrands: [MPCardBrand.amex],      // hide American Express
+        installment: MPInstallment(maxInstallments: 3), // cap at 3x
+      ),
+    ])
+    .build();
+```
+
 ### Appearance
+
+`themeMode` mirrors the native `System`/`Light`/`Dark` interface style; the
+default `ThemeMode.system` follows the device automatically.
 
 ```dart
 MercadoPagoCheckout.forCardSave(
   appearance: const MPCheckoutAppearance(
-    brightness: Brightness.dark,
+    themeMode: ThemeMode.system, // or .light / .dark
     primaryColor: Color(0xFF6200EE),
   ),
   onResult: (r) { ... },
@@ -223,12 +244,17 @@ ExpirationDateField(controller: expirationDate),
 SecurityCodeField(controller: securityCode),
 TextField(controller: nameCtrl),
 
-// 3. Tokenize — pass controllers, not raw strings
+// 3. Tokenize — pass controllers, not raw strings. The cardholder name and
+//    optional document go inside BuyerIdentification (matching the native SDKs).
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
   cardNumber: cardNumber,
-  securityCode: securityCode,
   expirationDate: expirationDate,
-  cardholderName: nameCtrl.text.trim(),
+  securityCode: securityCode,
+  identification: BuyerIdentification(
+    name: nameCtrl.text.trim(),
+    number: '012345678', // optional
+    type: 'CPF',         // optional
+  ),
 );
 ```
 
@@ -237,7 +263,8 @@ final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
 ```dart
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForSavedCard(
   cardId: 'CARD-ID-FROM-BACKEND',
-  securityCode: cvvController, // PciFieldState
+  securityCode: cvvController,   // PciFieldState
+  expirationDate: expController, // optional PciFieldState (MMYY)
 );
 ```
 

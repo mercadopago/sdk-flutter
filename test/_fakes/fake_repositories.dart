@@ -114,12 +114,17 @@ class FakeCardFormRepository implements repos.CardFormRepository {
     this.binData,
     this.initError,
     this.binError,
+    this.configAmount,
   });
 
   CardFormConfig? config;
   CardBinData? binData;
   Object? initError;
   Object? binError;
+
+  /// Amount the server resolves from the order (returned in the default config
+  /// when [config] is not supplied). Mirrors the order-driven amount flow.
+  double? configAmount;
 
   repos.CardFormInitParams? lastInitParams;
   repos.CardBinParams? lastBinParams;
@@ -128,7 +133,7 @@ class FakeCardFormRepository implements repos.CardFormRepository {
   Future<CardFormConfig> initialize(repos.CardFormInitParams params) async {
     lastInitParams = params;
     if (initError != null) throw initError!;
-    return config ?? _defaultConfig();
+    return config ?? _defaultConfig(configAmount);
   }
 
   @override
@@ -138,22 +143,24 @@ class FakeCardFormRepository implements repos.CardFormRepository {
     return binData ?? const CardBinData(paymentMethods: []);
   }
 
-  static CardFormConfig _defaultConfig() => const CardFormConfig(
-        cardNumber: CardFieldSpec(
+  static CardFormConfig _defaultConfig(double? amount) => CardFormConfig(
+        cardNumber: const CardFieldSpec(
           type: 'number',
           minLength: 16,
           maxLength: 16,
           mask: '#### #### #### ####',
         ),
-        securityCode: SecurityCodeSpec(type: 'number', length: 3),
-        holderName: CardFieldSpec(type: 'string', minLength: 1, maxLength: 30),
-        expirationDate: CardFieldSpec(
+        securityCode: const SecurityCodeSpec(type: 'number', length: 3),
+        holderName:
+            const CardFieldSpec(type: 'string', minLength: 1, maxLength: 30),
+        expirationDate: const CardFieldSpec(
           type: 'number',
           minLength: 4,
           maxLength: 4,
           mask: 'MM/YY',
         ),
-        identificationTypes: [],
+        identificationTypes: const [],
         translations: emptyCardFormTranslations,
+        amount: amount,
       );
 }

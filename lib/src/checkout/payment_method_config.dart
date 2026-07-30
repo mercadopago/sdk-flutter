@@ -1,3 +1,62 @@
+import 'mp_installment.dart';
+
+/// Per-payment-method configuration for the hosted checkout.
+///
+/// A sealed hierarchy mirroring the native Android sealed class / iOS enum
+/// `MPPaymentMethodConfig`. Only the card configuration exists today; the
+/// sealed shape lets new payment-method configs be added later without
+/// breaking the [MercadoPagoCheckout] builder signatures.
+///
+/// Pass a list to `setPaymentMethodConfiguration` on a checkout builder:
+/// ```dart
+/// MercadoPagoCheckout.forCardSave(onResult: ...)
+///     .setPaymentMethodConfiguration([
+///       MPPaymentMethodConfig.card(
+///         excludedTypes: [MPCardType.debit],
+///         installment: MPInstallment(maxInstallments: 3),
+///       ),
+///     ])
+///     .build();
+/// ```
+sealed class MPPaymentMethodConfig {
+  const MPPaymentMethodConfig();
+
+  /// Card configuration: excluded types/brands and the installment range.
+  const factory MPPaymentMethodConfig.card({
+    List<MPCardType> excludedTypes,
+    List<MPCardBrand> excludedBrands,
+    MPInstallment? installment,
+  }) = MPCardConfig;
+}
+
+/// Card-specific checkout configuration.
+final class MPCardConfig extends MPPaymentMethodConfig {
+  const MPCardConfig({
+    this.excludedTypes = const [],
+    this.excludedBrands = const [],
+    this.installment = const MPInstallment(),
+  });
+
+  /// Card types (credit/debit/prepaid) to hide from the checkout.
+  final List<MPCardType> excludedTypes;
+
+  /// Card brands (visa/master/…) to hide from the checkout.
+  final List<MPCardBrand> excludedBrands;
+
+  /// Installment range to offer; `null` leaves it fully server-driven.
+  final MPInstallment? installment;
+
+  /// Returns the (single) card configuration from [configs], or a default
+  /// [MPCardConfig] when none is present — mirroring the native SDKs, where the
+  /// card form reads the `.card` config from the payment-method-config list.
+  static MPCardConfig from(List<MPPaymentMethodConfig> configs) {
+    for (final config in configs) {
+      if (config is MPCardConfig) return config;
+    }
+    return const MPCardConfig();
+  }
+}
+
 /// Card payment types a seller can exclude from the hosted checkout.
 ///
 /// Serialized (comma-joined) to the `excluded_payment_types` query param of

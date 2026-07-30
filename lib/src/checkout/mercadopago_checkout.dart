@@ -9,6 +9,7 @@ import '../domain/models/mp_cancel_context.dart';
 import '../domain/result.dart';
 import 'checkout_appearance.dart';
 import 'checkout_controller.dart';
+import 'mp_order.dart';
 import 'payment_method_config.dart';
 import 'screens/card_form_screen.dart';
 import 'screens/installment_screen.dart';
@@ -18,13 +19,15 @@ import 'screens/review_screen.dart';
 ///
 /// Two flows are supported:
 /// * [MercadoPagoCheckout.forCardSave] — tokenize a card for later use.
-/// * [MercadoPagoCheckout.forCardTransaction] — tokenize a card and have the
-///   user pick installments for an immediate payment.
+/// * [MercadoPagoCheckout.forCardTransaction] — tokenize a card and let the
+///   user pick installments for a payment bound to an [MPOrder].
 ///
 /// Both flows are server-driven: the card form's fields, labels, document
-/// types and installment options come from the `card_payment_brick` BFF.
-/// Sellers can exclude payment types/brands via [excludedPaymentTypes] and
-/// [excludedPaymentMethods].
+/// types, installment options and (for transactions) the amount come from the
+/// `card_payment_brick` BFF. Sellers restrict card types/brands and the
+/// installment range via [CardSaveCheckoutBuilder.setPaymentMethodConfiguration]
+/// / [CardTransactionCheckoutBuilder.setPaymentMethodConfiguration], matching
+/// the native Android/iOS SDKs.
 ///
 /// Each factory returns a builder. Call `.build()` to get a `Widget` you can
 /// push with `Navigator.push` or show inside a modal.
@@ -34,36 +37,25 @@ sealed class MercadoPagoCheckout {
   static CardSaveCheckoutBuilder forCardSave({
     void Function(MercadoPagoResult<CardSaveResult> result)? onResult,
     MPCheckoutAppearance appearance = const MPCheckoutAppearance(),
-    List<MPCardType> excludedPaymentTypes = const [],
-    List<MPCardBrand> excludedPaymentMethods = const [],
   }) {
     return CardSaveCheckoutBuilder._(
       onResult: onResult,
       appearance: appearance,
-      excludedPaymentTypes: excludedPaymentTypes,
-      excludedPaymentMethods: excludedPaymentMethods,
     );
   }
 
+  /// Starts a card transaction bound to [order]. The amount is resolved
+  /// server-side from the order — it is not passed here (mirroring the native
+  /// SDKs). Create the order from your backend via the Orders API.
   static CardTransactionCheckoutBuilder forCardTransaction({
-    required double amount,
-    required String payerEmail,
+    required MPOrder order,
     void Function(MercadoPagoResult<CardTransactionResult> result)? onResult,
     MPCheckoutAppearance appearance = const MPCheckoutAppearance(),
-    List<MPCardType> excludedPaymentTypes = const [],
-    List<MPCardBrand> excludedPaymentMethods = const [],
-    String? orderId,
-    String? clientToken,
   }) {
     return CardTransactionCheckoutBuilder._(
-      amount: amount,
-      payerEmail: payerEmail,
+      order: order,
       onResult: onResult,
       appearance: appearance,
-      excludedPaymentTypes: excludedPaymentTypes,
-      excludedPaymentMethods: excludedPaymentMethods,
-      orderId: orderId,
-      clientToken: clientToken,
     );
   }
 }
@@ -72,55 +64,57 @@ class CardSaveCheckoutBuilder {
   CardSaveCheckoutBuilder._({
     required this.onResult,
     required this.appearance,
-    required this.excludedPaymentTypes,
-    required this.excludedPaymentMethods,
   });
 
   final void Function(MercadoPagoResult<CardSaveResult> result)? onResult;
   final MPCheckoutAppearance appearance;
-  final List<MPCardType> excludedPaymentTypes;
-  final List<MPCardBrand> excludedPaymentMethods;
+  MPCardConfig _cardConfig = const MPCardConfig();
+
+  /// Restricts card types/brands (installment range does not apply to card
+  /// save). Returns `this` for chaining.
+  CardSaveCheckoutBuilder setPaymentMethodConfiguration(
+    List<MPPaymentMethodConfig> configs,
+  ) {
+    _cardConfig = MPCardConfig.from(configs);
+    return this;
+  }
 
   Widget build() => _CheckoutHost(
         kind: CheckoutKind.cardSave,
         appearance: appearance,
-        excludedPaymentTypes: excludedPaymentTypes,
-        excludedPaymentMethods: excludedPaymentMethods,
+        cardConfig: _cardConfig,
         onCardSaveResult: onResult,
       );
 }
 
 class CardTransactionCheckoutBuilder {
   CardTransactionCheckoutBuilder._({
-    required this.amount,
-    required this.payerEmail,
+    required this.order,
     required this.onResult,
     required this.appearance,
-    required this.excludedPaymentTypes,
-    required this.excludedPaymentMethods,
-    required this.orderId,
-    required this.clientToken,
   });
 
-  final double amount;
-  final String payerEmail;
+  final MPOrder order;
   final void Function(MercadoPagoResult<CardTransactionResult> result)?
       onResult;
   final MPCheckoutAppearance appearance;
-  final List<MPCardType> excludedPaymentTypes;
-  final List<MPCardBrand> excludedPaymentMethods;
-  final String? orderId;
-  final String? clientToken;
+  MPCardConfig _cardConfig = const MPCardConfig();
+
+  /// Restricts card types/brands and the installment range offered. Returns
+  /// `this` for chaining.
+  CardTransactionCheckoutBuilder setPaymentMethodConfiguration(
+    List<MPPaymentMethodConfig> configs,
+  ) {
+    _cardConfig = MPCardConfig.from(configs);
+    return this;
+  }
 
   Widget build() => _CheckoutHost(
         kind: CheckoutKind.cardTransaction,
-        amount: amount,
-        payerEmail: payerEmail,
         appearance: appearance,
-        excludedPaymentTypes: excludedPaymentTypes,
-        excludedPaymentMethods: excludedPaymentMethods,
-        orderId: orderId,
-        clientToken: clientToken,
+        cardConfig: _cardConfig,
+        orderId: order.orderId,
+        clientToken: order.clientToken,
         onCardTransactionResult: onResult,
       );
 }
@@ -129,10 +123,7 @@ class _CheckoutHost extends StatefulWidget {
   const _CheckoutHost({
     required this.kind,
     required this.appearance,
-    required this.excludedPaymentTypes,
-    required this.excludedPaymentMethods,
-    this.amount,
-    this.payerEmail,
+    required this.cardConfig,
     this.orderId,
     this.clientToken,
     this.onCardSaveResult,
@@ -141,10 +132,7 @@ class _CheckoutHost extends StatefulWidget {
 
   final CheckoutKind kind;
   final MPCheckoutAppearance appearance;
-  final List<MPCardType> excludedPaymentTypes;
-  final List<MPCardBrand> excludedPaymentMethods;
-  final double? amount;
-  final String? payerEmail;
+  final MPCardConfig cardConfig;
   final String? orderId;
   final String? clientToken;
   final void Function(MercadoPagoResult<CardSaveResult>)? onCardSaveResult;
@@ -165,17 +153,18 @@ class _CheckoutHostState extends State<_CheckoutHost> {
     super.initState();
     final sdk = MercadoPagoSDK.shared;
     _analytics = sdk.analytics;
+    final installment = widget.cardConfig.installment;
     _controller = CheckoutController(
       kind: widget.kind,
       coreMethods: sdk.coreMethods,
       cardFormRepository: sdk.cardFormRepository,
       analytics: _analytics,
-      amount: widget.amount,
-      payerEmail: widget.payerEmail,
       excludedPaymentTypes:
-          widget.excludedPaymentTypes.map((t) => t.value).toList(),
+          widget.cardConfig.excludedTypes.map((t) => t.value).toList(),
       excludedPaymentMethods:
-          widget.excludedPaymentMethods.map((b) => b.value).toList(),
+          widget.cardConfig.excludedBrands.map((b) => b.value).toList(),
+      minInstallments: installment?.minInstallments,
+      maxInstallments: installment?.maxInstallments,
       orderId: widget.orderId,
       clientToken: widget.clientToken,
     );
@@ -256,7 +245,7 @@ class _CheckoutHostState extends State<_CheckoutHost> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: widget.appearance.toTheme(),
+      data: widget.appearance.themeFor(MediaQuery.platformBrightnessOf(context)),
       child: _stepWidget(),
     );
   }

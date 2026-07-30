@@ -4,6 +4,7 @@ import '../components/pci_field_state.dart';
 import '../core/error_mapper.dart';
 import '../core/luhn.dart';
 import '../domain/errors.dart';
+import '../domain/models/buyer_identification.dart';
 import '../domain/models/card_token.dart';
 import '../domain/models/identification_type.dart';
 import '../domain/models/installment.dart';
@@ -54,19 +55,21 @@ class CoreMethods {
   ///
   /// [expirationDate] must have been populated by [ExpirationDateField] in
   /// MMYY format (4 digits, e.g. `"1230"` for December 2030).
+  ///
+  /// [identification] carries the cardholder's name plus an optional
+  /// identification document (matching the native `BuyerIdentification`).
   Future<MercadoPagoResult<CardToken>> createTokenForNewCard({
     required PciFieldState cardNumber,
-    required PciFieldState securityCode,
     required PciFieldState expirationDate,
-    required String cardholderName,
-    String? documentType,
-    String? documentNumber,
+    required PciFieldState securityCode,
+    required BuyerIdentification identification,
   }) async {
+    final documentType = identification.type;
     final validation = _validateNewCard(
       cardNumber: cardNumber,
       securityCode: securityCode,
       expirationDate: expirationDate,
-      cardholderName: cardholderName,
+      cardholderName: identification.name,
     );
     if (validation != null) {
       _analytics.track(
@@ -90,12 +93,12 @@ class CoreMethods {
       final token = await _tokens.createTokenForNewCard(
         NewCardInput(
           cardNumber: rawNumber,
-          cardholderName: cardholderName,
+          cardholderName: identification.name,
           expirationMonth: month,
           expirationYear: year,
           securityCode: rawCvv,
-          documentType: documentType,
-          documentNumber: documentNumber,
+          documentType: identification.type,
+          documentNumber: identification.number,
         ),
         device,
       );
@@ -122,12 +125,13 @@ class CoreMethods {
   /// Tokenizes a previously-saved card (identified by [cardId]).
   ///
   /// The [securityCode] (CVV) is supplied as a [PciFieldState] controller —
-  /// the raw value is read internally by the SDK.
+  /// the raw value is read internally by the SDK. [expirationDate] is an
+  /// optional [PciFieldState] in MMYY format (mirroring the native SDKs, which
+  /// take an optional PCI expiration field, not raw month/year integers).
   Future<MercadoPagoResult<CardToken>> createTokenForSavedCard({
     required String cardId,
     required PciFieldState securityCode,
-    int? expirationMonth,
-    int? expirationYear,
+    PciFieldState? expirationDate,
   }) async {
     if (cardId.isEmpty) {
       return const Failure<CardToken>(
@@ -142,6 +146,8 @@ class CoreMethods {
     if (rawCvv.length < 3 || rawCvv.length > 4) {
       return const Failure<CardToken>(InvalidCvvError());
     }
+
+    final (expirationMonth, expirationYear) = _parseExpiry(expirationDate);
 
     try {
       final device = await _fingerprint.collect();
@@ -298,4 +304,16 @@ class CoreMethods {
   }
 
   String _stripSpaces(String value) => value.replaceAll(RegExp(r'\s+'), '');
+
+  /// Parses an optional MMYY PCI expiration field into `(month, year)` ints.
+  /// Returns `(null, null)` when absent or malformed (a saved card may not
+  /// require the expiration date).
+  (int?, int?) _parseExpiry(PciFieldState? expirationDate) {
+    final exp = expirationDate?.rawValue ?? '';
+    if (exp.length != 4) return (null, null);
+    final month = int.tryParse(exp.substring(0, 2));
+    final year = int.tryParse(exp.substring(2, 4));
+    if (month == null || year == null) return (null, null);
+    return (month, 2000 + year);
+  }
 }

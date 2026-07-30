@@ -8,6 +8,7 @@ import '../components/pci_field_state.dart';
 import '../core/error_mapper.dart';
 import '../core_methods/core_methods.dart';
 import '../domain/errors.dart';
+import '../domain/models/buyer_identification.dart';
 import '../domain/models/card_bin_data.dart';
 import '../domain/models/card_form_config.dart';
 import '../domain/models/card_save_result.dart';
@@ -35,28 +36,28 @@ class CheckoutController extends ChangeNotifier {
     required CoreMethods coreMethods,
     required CardFormRepository cardFormRepository,
     required AnalyticsService analytics,
-    this.amount,
-    this.payerEmail,
     this.excludedPaymentTypes = const [],
     this.excludedPaymentMethods = const [],
+    this.minInstallments,
+    this.maxInstallments,
     this.orderId,
     this.clientToken,
   })  : _coreMethods = coreMethods,
         _cardForm = cardFormRepository,
         _analytics = analytics,
         assert(
-          kind == CheckoutKind.cardSave || amount != null,
-          'CardTransaction requires an amount.',
+          kind == CheckoutKind.cardSave || orderId != null,
+          'CardTransaction requires an order (orderId).',
         );
 
   final CheckoutKind kind;
   final CoreMethods _coreMethods;
   final CardFormRepository _cardForm;
   final AnalyticsService _analytics;
-  final double? amount;
-  final String? payerEmail;
   final List<String> excludedPaymentTypes;
   final List<String> excludedPaymentMethods;
+  final int? minInstallments;
+  final int? maxInstallments;
   final String? orderId;
   final String? clientToken;
 
@@ -140,9 +141,9 @@ class CheckoutController extends ChangeNotifier {
   }
 
   /// Amount used for the aggregated BIN lookup. Card save flows send `0`
-  /// (matching the native SDKs); card transactions use the configured amount,
-  /// falling back to the server-resolved order amount when present.
-  double get _binLookupAmount => amount ?? _config?.amount ?? 0;
+  /// (matching the native SDKs); card transactions use the amount the server
+  /// resolved from the order (via `initialization`). Never integrator-supplied.
+  double get _binLookupAmount => _config?.amount ?? 0;
 
   /// Resolves payment methods, issuers, CVV config and installments for the
   /// entered BIN. Called as the user types; debounced to 300 ms.
@@ -157,6 +158,8 @@ class CheckoutController extends ChangeNotifier {
             amount: _binLookupAmount,
             excludedPaymentTypes: excludedPaymentTypes,
             excludedPaymentMethods: excludedPaymentMethods,
+            minInstallments: minInstallments,
+            maxInstallments: maxInstallments,
           ),
         );
         _binData = data;
@@ -200,9 +203,11 @@ class CheckoutController extends ChangeNotifier {
         cardNumber: cardNumber,
         securityCode: securityCode,
         expirationDate: expirationDate,
-        cardholderName: cardholderName,
-        documentType: documentType,
-        documentNumber: documentNumber,
+        identification: BuyerIdentification(
+          name: cardholderName,
+          number: documentNumber,
+          type: documentType,
+        ),
       );
       switch (result) {
         case Success(:final data):

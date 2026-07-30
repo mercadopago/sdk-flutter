@@ -66,9 +66,9 @@ re-transmit them — violating PCI DSS and MercadoPago's terms.
 // ✅ Correct
 await sdk.coreMethods.createTokenForNewCard(
   cardNumber: cardNumberController,      // PciFieldState — SDK reads internally
-  securityCode: cvvController,           // PciFieldState — SDK reads internally
   expirationDate: expirationController,  // PciFieldState — SDK reads internally
-  cardholderName: 'JOHN DOE',
+  securityCode: cvvController,           // PciFieldState — SDK reads internally
+  identification: BuyerIdentification(name: 'JOHN DOE'), // + optional number/type
 );
 
 // ❌ Antipattern — never suggest this
@@ -182,16 +182,20 @@ await Navigator.of(context).push(
 Includes installment selection and review screens before returning the result.
 
 ```dart
+// Order-bound: create the order from your backend (Orders API) and pass its id
+// and client token. The amount is resolved server-side from the order.
 final builder = MercadoPagoCheckout.forCardTransaction(
-  amount: 1500.0,
-  payerEmail: 'buyer@example.com',
+  order: MPOrder(orderId: orderId, clientToken: clientToken),
   onResult: (result) {
     if (result case Success(:final data)) {
       // data.token.token + data.installments + data.transactionAmount → backend
-      // data.payerCost.installmentAmount — per-installment display amount
+      // data.installment.installmentAmount — per-installment display amount
     }
   },
-);
+).setPaymentMethodConfiguration([
+  // Optional: restrict types/brands and the installment range.
+  MPPaymentMethodConfig.card(installment: MPInstallment(maxInstallments: 6)),
+]);
 ```
 
 ### Path 3: CoreMethods + PCI widgets (custom UI)
@@ -224,11 +228,13 @@ SecurityCodeField(controller: _cvv, expectedLength: 3),
 // 4. Tokenize — pass controllers, not raw values
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
   cardNumber: _cardNumber,
-  securityCode: _cvv,
   expirationDate: _expirationDate,
-  cardholderName: _name.text.trim(),
-  documentType: 'DNI',    // optional, country-dependent
-  documentNumber: '12345678',
+  securityCode: _cvv,
+  identification: BuyerIdentification(
+    name: _name.text.trim(),
+    type: 'DNI',            // optional, country-dependent
+    number: '12345678',     // optional
+  ),
 );
 ```
 
@@ -322,7 +328,7 @@ More test cards: https://www.mercadopago.com.ar/developers/en/docs/checkout-api/
 ```bash
 # SDK
 flutter analyze   # must be 0 issues
-flutter test      # 63 tests
+flutter test      # 105 tests
 
 # Example app
 cd example

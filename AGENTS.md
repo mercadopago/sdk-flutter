@@ -13,7 +13,7 @@ Package: `mercadopago_flutter_sdk: ^0.1.0`
 
 ```bash
 flutter analyze   # must be 0 issues
-flutter test      # 63 tests, all must pass
+flutter test      # 105 tests, all must pass
 ```
 Do not commit if either fails.
 
@@ -25,9 +25,9 @@ Tokenization takes PciFieldState controllers — never raw strings.
 // Correct
 await sdk.coreMethods.createTokenForNewCard(
   cardNumber: cardNumberController,     // PciFieldState
-  securityCode: cvvController,          // PciFieldState
   expirationDate: expirationController, // PciFieldState
-  cardholderName: 'JOHN DOE',
+  securityCode: cvvController,          // PciFieldState
+  identification: BuyerIdentification(name: 'JOHN DOE'),
 );
 // Wrong — NewCardData removed from public API
 // createTokenForNewCard(NewCardData(cardNumber: rawString, ...))
@@ -38,7 +38,8 @@ await sdk.coreMethods.createTokenForNewCard(
 ```dart
 // Hosted checkout — SDK owns the UI
 MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
-MercadoPagoCheckout.forCardTransaction(amount: 1000.0, payerEmail: '...', onResult: (r) { ... }).build()
+// Card transaction: order-bound, amount resolved server-side (no amount param)
+MercadoPagoCheckout.forCardTransaction(order: MPOrder(orderId: '...', clientToken: '...'), onResult: (r) { ... }).build()
 
 // Custom UI — app builds the form with PCI widgets
 final cardNumber = PciFieldState(); // dispose in dispose()

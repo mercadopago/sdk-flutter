@@ -33,6 +33,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (ARG, BRA, CHL, COL, MEX, PER, URY).
 - Example app demonstrating all three integration paths.
 
+### Changed (public API parity with native Android/iOS SDKs)
+
+- `MercadoPagoCheckout.forCardTransaction` now requires an `MPOrder(orderId,
+  clientToken)`; `amount` and `payerEmail` were removed — the amount is resolved
+  server-side from the order (matching the native SDKs).
+- Payment-method configuration moved to a sealed `MPPaymentMethodConfig.card(...)`
+  supplied via `setPaymentMethodConfiguration([...])`, carrying `excludedTypes`,
+  `excludedBrands` and an `MPInstallment(minInstallments, maxInstallments)` range.
+- `CoreMethods.createTokenForNewCard` now takes a typed `BuyerIdentification`
+  (name + optional document) instead of loose `cardholderName`/`documentType`/
+  `documentNumber` params.
+- `CoreMethods.createTokenForSavedCard` now takes an optional
+  `expirationDate` `PciFieldState` instead of raw month/year integers.
+- `MPCheckoutAppearance` now uses `themeMode` (Flutter's `ThemeMode`
+  system/light/dark, default `system` — adaptive) instead of a fixed `brightness`.
+- Added typed models `MPOrder`, `MPInstallment`, `MPPayer` and
+  `BuyerIdentification`.
+
 ### Known limitations
 
 - `X-Product-id` header uses a placeholder (`MP_FLUTTER_SDK_001`) pending official assignment.

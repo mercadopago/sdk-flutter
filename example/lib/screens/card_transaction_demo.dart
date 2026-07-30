@@ -25,8 +25,13 @@ class _CardTransactionDemoState extends State<CardTransactionDemo> {
     });
 
     final builder = MercadoPagoCheckout.forCardTransaction(
-      amount: 1000,
-      payerEmail: 'buyer@example.com',
+      // Create the order from YOUR backend via the Orders API, then pass its
+      // id and client token here. The amount is resolved server-side from the
+      // order — you do not pass it. These are placeholders.
+      order: const MPOrder(
+        orderId: '<ORDER_ID_FROM_ORDERS_API>',
+        clientToken: '<CLIENT_TOKEN_FROM_ORDERS_API>',
+      ),
       onResult: (result) {
         if (!mounted) return;
         setState(() {
@@ -42,7 +47,12 @@ class _CardTransactionDemoState extends State<CardTransactionDemo> {
           };
         });
       },
-    );
+    ).setPaymentMethodConfiguration([
+      // Optional: restrict card types/brands and the installment range.
+      const MPPaymentMethodConfig.card(
+        installment: MPInstallment(maxInstallments: 6),
+      ),
+    ]);
 
     await Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => builder.build()),

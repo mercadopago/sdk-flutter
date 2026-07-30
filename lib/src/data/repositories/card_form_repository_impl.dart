@@ -54,6 +54,10 @@ class CardFormRepositoryImpl implements CardFormRepository {
           'excluded_payment_types': params.excludedPaymentTypes.join(','),
         if (params.excludedPaymentMethods.isNotEmpty)
           'excluded_payment_methods': params.excludedPaymentMethods.join(','),
+        if (params.minInstallments != null)
+          'min_installments': params.minInstallments!.toString(),
+        if (params.maxInstallments != null)
+          'max_installments': params.maxInstallments!.toString(),
       },
     );
     return CardBinDto.parse(json);

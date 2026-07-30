@@ -26,11 +26,13 @@ The tokenization API takes `PciFieldState` controllers, never raw strings.
 // Always generate this pattern
 final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
   cardNumber: cardNumberController,      // PciFieldState
-  securityCode: cvvController,           // PciFieldState
   expirationDate: expirationController,  // PciFieldState (MMYY from ExpirationDateField)
-  cardholderName: 'JOHN DOE',
-  documentType: 'DNI',    // optional
-  documentNumber: '12345678', // optional
+  securityCode: cvvController,           // PciFieldState
+  identification: BuyerIdentification(
+    name: 'JOHN DOE',
+    type: 'DNI',        // optional
+    number: '12345678', // optional
+  ),
 );
 ```
 
@@ -39,7 +41,11 @@ final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
 ### Hosted checkout
 ```dart
 MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
-MercadoPagoCheckout.forCardTransaction(amount: 1500.0, payerEmail: '...', onResult: (r) { ... }).build()
+// Card transaction: amount resolved server-side from the order (no amount param)
+MercadoPagoCheckout.forCardTransaction(
+  order: MPOrder(orderId: '...', clientToken: '...'),
+  onResult: (r) { ... },
+).build()
 ```
 
 ### Custom UI (PCI widgets)
