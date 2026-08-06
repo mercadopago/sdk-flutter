@@ -33,7 +33,7 @@ await sdk.coreMethods.createTokenForNewCard(
 
 ```bash
 flutter analyze    # must be 0 issues
-flutter test       # 105 tests
+flutter test       # 112 tests
 ```
 
 ## Running the example

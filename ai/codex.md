@@ -40,12 +40,12 @@ final result = await MercadoPagoSDK.shared.coreMethods.createTokenForNewCard(
 
 ### Hosted checkout
 ```dart
-MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
-// Card transaction: amount resolved server-side from the order (no amount param)
-MercadoPagoCheckout.forCardTransaction(
-  order: MPOrder(orderId: '...', clientToken: '...'),
-  onResult: (r) { ... },
-).build()
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(context, onResult: (r) { ... });
+// Card transaction: order-bound; the SDK processes the payment, returns orderStatus.
+MercadoPagoCheckout(
+  MPCheckoutType.cardTransaction(MPOrder(orderId: '...', clientToken: '...')),
+).show(context, onResult: (r) { ... });
+// result cases: CheckoutSuccess / CheckoutError / CheckoutUserCancelled
 ```
 
 ### Custom UI (PCI widgets)

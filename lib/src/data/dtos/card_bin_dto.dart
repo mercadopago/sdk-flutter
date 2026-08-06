@@ -20,6 +20,7 @@ abstract final class CardBinDto {
       paymentMethods: methods,
       installments: quotas,
       translations: parseTranslations(json['translations'] as Map<String, dynamic>?),
+      selectionType: installment?['selection_type'] as String?,
     );
   }
 

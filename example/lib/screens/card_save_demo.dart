@@ -17,37 +17,30 @@ class _CardSaveDemoState extends State<CardSaveDemo> {
   bool _loading = false;
   String _status = '';
 
-  Future<void> _open() async {
+  void _open() {
     if (_loading) return; // prevent double-tap
     setState(() {
       _loading = true;
       _status = '';
     });
 
-    final builder = MercadoPagoCheckout.forCardSave(
+    MercadoPagoCheckout(MPCheckoutType.cardSave()).show(
+      context,
       onResult: (result) {
         if (!mounted) return;
         setState(() {
           _loading = false;
           _status = switch (result) {
-            Success(:final data) =>
-              '✓ Card saved.\n'
-                  'Method: ${data.paymentMethodId}  •  '
-                  'Last 4: ${data.token.lastFourDigits}\n\n'
-                  'Send data.token.token to your backend.',
-            Failure(:final error) => '✗ $error',
-            Cancelled() => 'Cancelled.',
+            CheckoutSuccess(:final data) => '✓ Card saved.\n'
+                'Method: ${data.paymentMethodId}  •  '
+                'Last 4: ${data.token.lastFourDigits}\n\n'
+                'Send data.token.token to your backend.',
+            CheckoutError(:final error) => '✗ $error',
+            CheckoutUserCancelled() => 'Cancelled.',
           };
         });
       },
     );
-
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => builder.build()),
-    );
-
-    // User closed the modal without a result (e.g. swipe-back on iOS).
-    if (mounted && _loading) setState(() => _loading = false);
   }
 
   @override

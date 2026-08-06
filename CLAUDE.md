@@ -117,16 +117,23 @@ Common `MercadoPagoError` variants:
 
 ### 1. Hosted checkout — recommended for most use cases
 ```dart
-// SDK owns the full UI; integrator only handles the result.
-MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
+// One unified builder adapts to the MPCheckoutType; `.show(context, ...)` pushes
+// it and delivers a typed MercadoPagoCheckoutResult.
+MercadoPagoCheckout(MPCheckoutType.cardSave())
+    .show(context, onResult: (r) { ... });
 // Card transactions are order-bound: amount is resolved server-side from the
-// MPOrder (Orders API), never passed by the integrator.
-MercadoPagoCheckout.forCardTransaction(
-  order: MPOrder(orderId: orderId, clientToken: clientToken),
-  onResult: (r) { ... },
-).setPaymentMethodConfiguration([
-  MPPaymentMethodConfig.card(installment: MPInstallment(maxInstallments: 3)),
-]).build()
+// MPOrder (Orders API); the SDK PROCESSES the payment and returns orderStatus.
+MercadoPagoCheckout(MPCheckoutType.cardTransaction(order))
+    .setPaymentMethodConfiguration([
+      MPPaymentMethodConfig.card(installment: MPInstallment(maxInstallments: 3)),
+    ])
+    .show(context, onResult: (r) {
+      switch (r) {
+        case CheckoutSuccess(:final data): // data.orderStatus
+        case CheckoutError(:final error): // ...
+        case CheckoutUserCancelled(:final context): // fields + screens
+      }
+    });
 ```
 
 ### 2. CoreMethods with custom UI — when app design requires it
@@ -157,9 +164,15 @@ await sdk.getIdentificationTypes();
 The public API mirrors the native Android/iOS SDKs using typed models instead
 of loose primitives:
 
-- `MPOrder(orderId, clientToken)` — required for `forCardTransaction`. The
-  transaction amount is **server-driven** from the order; it is never an
-  integrator parameter (there is no `amount`/`payerEmail` on the builder).
+- `MPCheckoutType` — sealed; `MPCheckoutType.cardSave()` /
+  `MPCheckoutType.cardTransaction(order)`. One `MercadoPagoCheckout` builder +
+  `.show(context, onResult:)` adapts to it (mirrors the native unified Builder).
+- `MPOrder(orderId, clientToken)` — required by `cardTransaction`. The amount is
+  **server-driven** from the order; never an integrator parameter (no
+  `amount`/`payerEmail`). The SDK processes the order (`/orders/{id}/process`)
+  and the result (`MPCardTransactionData`) carries `orderId` + `orderStatus`.
+- `MercadoPagoCheckoutResult` — sealed: `CheckoutSuccess` / `CheckoutError` /
+  `CheckoutUserCancelled`. Cancel carries per-field state + visited screens.
 - `MPPaymentMethodConfig` — sealed; `MPPaymentMethodConfig.card(excludedTypes,
   excludedBrands, installment)`. Passed via `setPaymentMethodConfiguration([...])`.
 - `MPInstallment(minInstallments = 1, maxInstallments = 180)` — restricts the
@@ -218,7 +231,7 @@ Only these 7. `Country.fromCode()` throws `SDKInvalidCountryError` for anything 
 
 ```bash
 flutter analyze   # must be 0 issues before any commit
-flutter test      # 105 tests — all must pass
+flutter test      # 112 tests — all must pass
 ```
 
 Test files live in `test/` mirroring `lib/src/`. Fakes are in `test/_fakes/`.

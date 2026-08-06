@@ -12,7 +12,13 @@ class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
 
   @override
   Future<List<PaymentMethod>> getByBin(String bin) async {
-    final list = await _api.getList(_path, queryParameters: {'bin': bin});
+    final list = await _api.getList(
+      _path,
+      queryParameters: {
+        'bin': bin,
+        'processing_mode': ProcessingMode.aggregator.value,
+      },
+    );
     return list
         .whereType<Map<String, dynamic>>()
         .map(PaymentMethodDto.fromJson)

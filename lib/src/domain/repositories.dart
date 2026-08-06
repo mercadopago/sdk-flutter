@@ -5,6 +5,7 @@ import 'models/device_data.dart';
 import 'models/identification_type.dart';
 import 'models/installment.dart';
 import 'models/issuer.dart';
+import 'models/order_process_result.dart';
 import 'models/payment_method.dart';
 
 /// Input describing a brand-new card to tokenize.
@@ -157,4 +158,40 @@ abstract interface class CardFormRepository {
   /// Aggregated BIN lookup: payment methods (+ issuers, CVV config) and
   /// installment options in a single call.
   Future<CardBinData> getCardBin(CardBinParams params);
+}
+
+/// Parameters for processing an order (`POST /orders/{orderId}/process`).
+class OrderProcessParams {
+  const OrderProcessParams({
+    required this.orderId,
+    required this.clientToken,
+    required this.paymentMethodId,
+    required this.paymentTypeId,
+    required this.token,
+    required this.installments,
+    required this.amount,
+  });
+
+  final String orderId;
+
+  /// Short-lived client token; sent as `Authorization: Bearer`.
+  final String clientToken;
+  final String paymentMethodId;
+
+  /// Encoded on the wire under `payment_method_type` (native quirk).
+  final String paymentTypeId;
+
+  /// The card token from tokenization.
+  final String token;
+  final int installments;
+
+  /// Sent as a 2-decimal string.
+  final double amount;
+}
+
+/// Processes a hosted-checkout order after tokenization + installment
+/// selection, backed by `POST /cho-off/v1/orders/{orderId}/process`
+/// (`X-Public-Key` header + `Authorization: Bearer <clientToken>`).
+abstract interface class OrderRepository {
+  Future<OrderProcessResult> process(OrderProcessParams params);
 }

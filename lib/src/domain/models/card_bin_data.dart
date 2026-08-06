@@ -80,10 +80,15 @@ class CardBinData {
     required this.paymentMethods,
     this.installments = const [],
     this.translations,
+    this.selectionType,
   });
 
   final List<CardBinMethod> paymentMethods;
   final List<CheckoutInstallment> installments;
+
+  /// How installments are presented (`"chevron"` / `"radio_button"`); reported
+  /// in the installments/initialize analytics track. `null` when absent.
+  final String? selectionType;
 
   /// Refined translations for this BIN (BFF may override the initialization
   /// ones, e.g. the card-number mask); `null` when not present.

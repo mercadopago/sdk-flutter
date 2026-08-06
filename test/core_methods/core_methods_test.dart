@@ -12,6 +12,7 @@ CoreMethods buildCoreMethods({
   FakeInstallmentRepository? installments,
   FakeIssuerRepository? issuers,
   FakeIdentificationRepository? identification,
+  FakeAnalyticsService? analytics,
 }) {
   return CoreMethods(
     tokenRepository: tokens ?? FakeTokenRepository(),
@@ -21,9 +22,27 @@ CoreMethods buildCoreMethods({
     identificationRepository:
         identification ?? FakeIdentificationRepository(),
     fingerprintService: FakeFingerprintService(),
-    analytics: FakeAnalyticsService(),
+    analytics: analytics ?? FakeAnalyticsService(),
   );
 }
+
+/// A payment method that requires a 4-digit CVV (like Amex).
+PaymentMethod _fourDigitCvvMethod() => const PaymentMethod(
+      id: 'amex',
+      name: 'American Express',
+      paymentTypeId: 'credit_card',
+      status: 'active',
+      thumbnail: '',
+      secureThumbnail: '',
+      minAllowedAmount: 0,
+      maxAllowedAmount: double.infinity,
+      accreditationTime: 0,
+      additionalInfoNeeded: [],
+      binLengthMin: 15,
+      binLengthMax: 15,
+      securityCodeLength: 4,
+      securityCodeLocation: 'front',
+    );
 
 /// Helper: creates a [PciFieldState] pre-filled with [value].
 PciFieldState pci(String value) => PciFieldState()..update(value);
@@ -64,6 +83,22 @@ void main() {
       );
       final failure = result as Failure<CardToken>;
       expect(failure.error, isA<InvalidCvvError>());
+    });
+
+    test('rejects a CVV whose length != the card securityCodeLength',
+        () async {
+      // The card (Amex) requires 4 digits; a 3-digit CVV must be rejected.
+      final cm = buildCoreMethods(
+        paymentMethods:
+            FakePaymentMethodRepository(response: [_fourDigitCvvMethod()]),
+      );
+      final result = await cm.createTokenForNewCard(
+        cardNumber: pci('4111111111111111'),
+        securityCode: pci('123'),
+        expirationDate: pci('1230'),
+        identification: const BuyerIdentification(name: 'JOHN DOE'),
+      );
+      expect((result as Failure<CardToken>).error, isA<InvalidCvvError>());
     });
 
     test('returns Failure(CardExpiredError) when expiry is in the past',
@@ -153,6 +188,18 @@ void main() {
       );
       final result = await cm.getPaymentMethods(bin: '423456');
       expect(result, isA<Success<List<PaymentMethod>>>());
+    });
+
+    test('fires the payment_methods analytics track', () async {
+      final analytics = FakeAnalyticsService();
+      final cm = buildCoreMethods(analytics: analytics);
+      await cm.getPaymentMethods(bin: '45099535');
+      expect(
+        analytics.events.any(
+          (e) => e.path == '/checkout_api_native/core_methods/payment_methods',
+        ),
+        isTrue,
+      );
     });
   });
 

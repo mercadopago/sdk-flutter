@@ -4,6 +4,7 @@ import 'package:mercadopago_flutter_sdk/src/data/dtos/card_form_parsers.dart'
 import 'package:mercadopago_flutter_sdk/src/domain/models/card_bin_data.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/models/card_form_config.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/models/device_data.dart';
+import 'package:mercadopago_flutter_sdk/src/domain/models/order_process_result.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/repositories.dart' as repos;
 
 class FakeTokenRepository implements repos.TokenRepository {
@@ -163,4 +164,22 @@ class FakeCardFormRepository implements repos.CardFormRepository {
         translations: emptyCardFormTranslations,
         amount: amount,
       );
+}
+
+class FakeOrderRepository implements repos.OrderRepository {
+  FakeOrderRepository({
+    this.result = const OrderProcessResult(id: 'order_1', status: 'processed'),
+    this.error,
+  });
+
+  OrderProcessResult result;
+  Object? error;
+  repos.OrderProcessParams? lastParams;
+
+  @override
+  Future<OrderProcessResult> process(repos.OrderProcessParams params) async {
+    lastParams = params;
+    if (error != null) throw error!;
+    return result;
+  }
 }

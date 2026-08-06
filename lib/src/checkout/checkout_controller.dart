@@ -11,12 +11,12 @@ import '../domain/errors.dart';
 import '../domain/models/buyer_identification.dart';
 import '../domain/models/card_bin_data.dart';
 import '../domain/models/card_form_config.dart';
-import '../domain/models/card_save_result.dart';
 import '../domain/models/card_token.dart';
-import '../domain/models/card_transaction_result.dart';
 import '../domain/models/mp_cancel_context.dart';
 import '../domain/repositories.dart';
 import '../domain/result.dart';
+import 'mp_payment_data.dart';
+import 'mp_user_cancelled_context.dart';
 
 /// Type of checkout flow the user is performing.
 enum CheckoutKind { cardSave, cardTransaction }
@@ -24,18 +24,20 @@ enum CheckoutKind { cardSave, cardTransaction }
 /// Coordinates state between checkout screens (card form → installments →
 /// review) and the underlying data sources.
 ///
-/// The card form is server-driven: [initialize] fetches field configs,
-/// translations and document types from the `card_payment_brick/initialization`
-/// BFF endpoint, and [onBinChanged] resolves payment methods, issuers, CVV
-/// rules and installment options from the aggregated `.../card` endpoint in a
-/// single round-trip. Tokenization still flows through [CoreMethods] so raw
-/// card data never leaves the SDK.
+/// The card form is server-driven (`card_payment_brick` BFF). For card
+/// transactions the controller also **processes** the order via
+/// [OrderRepository] after tokenization + installment selection, so the result
+/// carries the resolved order status. Tokenization flows through [CoreMethods]
+/// so raw card data never leaves the SDK.
 class CheckoutController extends ChangeNotifier {
   CheckoutController({
     required this.kind,
     required CoreMethods coreMethods,
     required CardFormRepository cardFormRepository,
+    required OrderRepository orderRepository,
     required AnalyticsService analytics,
+    this.appearanceStyle = 'system',
+    this.sellerCustomization = const [],
     this.excludedPaymentTypes = const [],
     this.excludedPaymentMethods = const [],
     this.minInstallments,
@@ -44,6 +46,7 @@ class CheckoutController extends ChangeNotifier {
     this.clientToken,
   })  : _coreMethods = coreMethods,
         _cardForm = cardFormRepository,
+        _orders = orderRepository,
         _analytics = analytics,
         assert(
           kind == CheckoutKind.cardSave || orderId != null,
@@ -53,7 +56,12 @@ class CheckoutController extends ChangeNotifier {
   final CheckoutKind kind;
   final CoreMethods _coreMethods;
   final CardFormRepository _cardForm;
+  final OrderRepository _orders;
   final AnalyticsService _analytics;
+
+  /// `system` / `light` / `dark` — reported in the card_form/initialize track.
+  final String appearanceStyle;
+  final List<String> sellerCustomization;
   final List<String> excludedPaymentTypes;
   final List<String> excludedPaymentMethods;
   final int? minInstallments;
@@ -68,17 +76,18 @@ class CheckoutController extends ChangeNotifier {
   CheckoutStep _step = CheckoutStep.initialization;
   CheckoutStep get step => _step;
 
-  // Server-driven form configuration (loaded once by [initialize]).
   CardFormConfig? _config;
   CardFormConfig? get config => _config;
 
-  // BIN-resolved data (payment methods, issuers, CVV rules, installments).
   CardBinData? _binData;
   CardBinMethod? _selectedMethod;
   List<CheckoutInstallment> _installments = const [];
   CheckoutInstallment? _selectedInstallment;
   CardToken? _token;
   MercadoPagoError? _lastError;
+
+  final List<CheckoutScreen> _visitedScreens = [];
+  List<MPCancelledFieldState> _fieldStates = const [];
 
   CardBinData? get binData => _binData;
   CardBinMethod? get selectedMethod => _selectedMethod;
@@ -91,8 +100,7 @@ class CheckoutController extends ChangeNotifier {
   CardToken? get token => _token;
   MercadoPagoError? get lastError => _lastError;
 
-  /// Effective CVV length for the current selection, preferring the BIN-level
-  /// spec, then the form-level default, then a sensible fallback.
+  /// Effective CVV length for the current selection (BIN spec → form default → 3).
   int get securityCodeLength =>
       _selectedMethod?.securityCode?.length ??
       _config?.securityCode.length ??
@@ -107,13 +115,23 @@ class CheckoutController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Loads the server-driven form configuration. Call once when the checkout
-  /// opens. On success the flow advances from [CheckoutStep.initialization] to
-  /// [CheckoutStep.cardForm].
+  void _markScreen(CheckoutScreen screen) {
+    if (!_visitedScreens.contains(screen)) _visitedScreens.add(screen);
+  }
+
+  /// Records the latest per-field state of the card form for the cancel context.
+  /// Called by the card-form screen.
+  void setFieldStates(List<MPCancelledFieldState> states) {
+    _fieldStates = states;
+  }
+
+  /// Loads the server-driven form config and tracks `card_form/initialize`.
   Future<void> initialize() async {
     _analytics.track(
       AnalyticsEvent.checkoutStart(
         checkoutType: _checkoutType.value,
+        appearance: appearanceStyle,
+        sellerCustomization: sellerCustomization,
         excludedPaymentTypes: excludedPaymentTypes,
         excludedPaymentMethods: excludedPaymentMethods,
         orderId: orderId,
@@ -129,6 +147,7 @@ class CheckoutController extends ChangeNotifier {
       );
       _lastError = null;
       _step = CheckoutStep.cardForm;
+      _markScreen(CheckoutScreen.cardForm);
     } catch (e) {
       _lastError = InitializationFailedError(reason: e.toString());
       _analytics.track(
@@ -140,13 +159,10 @@ class CheckoutController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Amount used for the aggregated BIN lookup. Card save flows send `0`
-  /// (matching the native SDKs); card transactions use the amount the server
-  /// resolved from the order (via `initialization`). Never integrator-supplied.
+  /// BIN-lookup amount — server-resolved from the order (never integrator-supplied).
   double get _binLookupAmount => _config?.amount ?? 0;
 
-  /// Resolves payment methods, issuers, CVV config and installments for the
-  /// entered BIN. Called as the user types; debounced to 300 ms.
+  /// Resolves methods/issuers/CVV/installments for the BIN. Debounced 300 ms.
   void onBinChanged(String bin) {
     _binDebounce?.cancel();
     _binDebounce = Timer(const Duration(milliseconds: 300), () async {
@@ -175,12 +191,7 @@ class CheckoutController extends ChangeNotifier {
     });
   }
 
-  /// Submits the card form. Performs tokenization and, for CardTransaction
-  /// flows, advances to installment selection. For CardSave flows the result
-  /// is delivered immediately to the caller via the screen's callback.
-  ///
-  /// Returns immediately with a [Failure] if a submission is already in
-  /// progress — callers must not call this concurrently.
+  /// Tokenizes the card. For CardTransaction, advances to installment selection.
   Future<MercadoPagoResult<CardToken>> submitCardForm({
     required PciFieldState cardNumber,
     required PciFieldState securityCode,
@@ -201,8 +212,8 @@ class CheckoutController extends ChangeNotifier {
     try {
       final result = await _coreMethods.createTokenForNewCard(
         cardNumber: cardNumber,
-        securityCode: securityCode,
         expirationDate: expirationDate,
+        securityCode: securityCode,
         identification: BuyerIdentification(
           name: cardholderName,
           number: documentNumber,
@@ -216,6 +227,8 @@ class CheckoutController extends ChangeNotifier {
           if (kind == CheckoutKind.cardTransaction &&
               _installments.isNotEmpty) {
             _step = CheckoutStep.installmentSelection;
+            _markScreen(CheckoutScreen.installments);
+            _trackInstallmentsInitialize();
           }
         case Failure(:final error):
           _lastError = error;
@@ -226,6 +239,20 @@ class CheckoutController extends ChangeNotifier {
     } finally {
       _setBusy(false);
     }
+  }
+
+  void _trackInstallmentsInitialize() {
+    _analytics.track(
+      AnalyticsEvent.installmentsInitialize(
+        checkoutType: _checkoutType.value,
+        paymentMethodId: _selectedMethod?.id ?? '',
+        paymentType: _selectedMethod?.paymentTypeId ?? '',
+        selectionType: _binData?.selectionType ?? '',
+        quotasCount: _installments.length,
+        transactionAmount: _config?.amount ?? 0,
+        orderId: orderId,
+      ),
+    );
   }
 
   CheckoutInstallment? _defaultInstallment(List<CheckoutInstallment> options) {
@@ -245,6 +272,7 @@ class CheckoutController extends ChangeNotifier {
 
   void goToReview() {
     _step = CheckoutStep.review;
+    _markScreen(CheckoutScreen.review);
     notifyListeners();
   }
 
@@ -260,49 +288,95 @@ class CheckoutController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Installments screen dismissed — fires the cancel track and returns to the
+  /// card form.
+  void cancelInstallments({String reason = 'back_pressed'}) {
+    _analytics.track(AnalyticsEvent.installmentsCancel(reason: reason));
+    backToCardForm();
+  }
+
   String get _issuerId {
     final issuers = _selectedMethod?.issuers ?? const [];
     return issuers.isNotEmpty ? issuers.first.id : '';
   }
 
-  /// Builds the final CardSave result.
-  MercadoPagoResult<CardSaveResult> buildCardSaveResult() {
+  /// Builds the CardSave payment data (tokenized card). `null` if state missing.
+  MPCardSaveData? buildCardSaveData() {
     final t = _token;
     final m = _selectedMethod;
     if (t == null || m == null) {
-      return const Failure(
-        InitializationFailedError(reason: 'Token or payment method missing.'),
+      _lastError = const InitializationFailedError(
+        reason: 'Token or payment method missing.',
       );
+      return null;
     }
-    return Success(
-      CardSaveResult(
-        token: t,
-        paymentMethodId: m.id,
-        paymentTypeId: m.paymentTypeId,
-        issuerId: _issuerId,
-      ),
+    return MPCardSaveData(
+      token: t,
+      paymentMethodId: m.id,
+      paymentTypeId: m.paymentTypeId,
+      issuerId: _issuerId,
     );
   }
 
-  /// Builds the final CardTransaction result.
-  MercadoPagoResult<CardTransactionResult> buildCardTransactionResult() {
+  /// Fires the installments submit track and processes the order via the BFF.
+  /// Returns the transaction data on success, or `null` (with [lastError] set).
+  Future<MPCardTransactionData?> processTransaction() async {
     final t = _token;
     final m = _selectedMethod;
-    final installment = _selectedInstallment;
-    if (t == null || m == null || installment == null) {
-      return const Failure(
-        InitializationFailedError(reason: 'Required checkout state missing.'),
+    final inst = _selectedInstallment;
+    final order = orderId;
+    if (t == null || m == null || inst == null || order == null) {
+      _lastError = const InitializationFailedError(
+        reason: 'Required checkout state missing.',
       );
+      return null;
     }
-    return Success(
-      CardTransactionResult(
-        token: t,
+    _analytics.track(
+      AnalyticsEvent.installmentsSubmit(
+        installments: inst.installments,
+        installmentAmount: inst.installmentAmount,
+        totalAmount: inst.totalAmount,
+      ),
+    );
+    _setBusy(true);
+    try {
+      final result = await _orders.process(
+        OrderProcessParams(
+          orderId: order,
+          clientToken: clientToken ?? '',
+          paymentMethodId: m.id,
+          paymentTypeId: m.paymentTypeId,
+          token: t.token,
+          installments: inst.installments,
+          amount: _config?.amount ?? inst.totalAmount,
+        ),
+      );
+      _lastError = null;
+      return MPCardTransactionData(
+        orderId: result.id,
+        orderStatus: result.status,
         paymentMethodId: m.id,
         paymentTypeId: m.paymentTypeId,
-        issuerId: _issuerId,
-        installment: installment,
-        transactionAmount: installment.totalAmount,
-      ),
+        transactionAmount: inst.totalAmount,
+        installments: inst.installments,
+      );
+    } catch (e) {
+      _lastError = mapApiError(e, ErrorLocation.installments);
+      return null;
+    } finally {
+      _setBusy(false);
+    }
+  }
+
+  /// Builds the cancel context (per-field state + visited screens).
+  MPUserCancelledContext buildCancelContext() {
+    final fields = List<MPCancelledFieldState>.of(_fieldStates);
+    if (kind == CheckoutKind.cardSave) {
+      return MPCardSaveCancelled(fields: fields);
+    }
+    return MPCardTransactionCancelled(
+      fields: fields,
+      screens: List<CheckoutScreen>.of(_visitedScreens),
     );
   }
 

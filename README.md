@@ -125,18 +125,19 @@ void main() {
 }
 
 // In any widget:
-MercadoPagoCheckout.forCardSave(
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(
+  context,
   onResult: (result) {
     switch (result) {
-      case Success(:final data):
+      case CheckoutSuccess(:final data):
         sendToBackend(data.token.token); // opaque token → your server
-      case Failure(:final error):
+      case CheckoutError(:final error):
         showError(error.toString());
-      case Cancelled():
+      case CheckoutUserCancelled():
         break;
     }
   },
-).build(); // returns a Widget; push it with Navigator
+);
 ```
 
 ---
@@ -149,44 +150,46 @@ Tokenize a card for future payments. The SDK owns the entire card-entry UI;
 your app only receives the token.
 
 ```dart
-final builder = MercadoPagoCheckout.forCardSave(
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(
+  context,
   onResult: (result) {
-    if (result case Success(:final data)) {
+    if (result case CheckoutSuccess(:final data)) {
       // Send data.token.token to your backend — never store on device.
       // Token expires in ~15 minutes.
     }
   },
 );
-
-Navigator.of(context).push(
-  MaterialPageRoute<void>(builder: (_) => builder.build()),
-);
 ```
 
 ### Card Transaction
 
-Tokenize a card and let the user choose installments before confirming. The
-transaction is bound to an [MPOrder] — create the order from your backend via
-the Orders API, then pass its id and client token. **The amount is resolved
-server-side from the order** (not passed here), matching the native SDKs.
+Tokenize a card, let the user choose installments, and **process the payment**.
+The transaction is bound to an `MPOrder` — create the order from your backend
+via the Orders API, then pass its id and client token. **The amount is resolved
+server-side from the order** (not passed here). The SDK calls the process
+endpoint and returns the resulting order status.
 
 ```dart
-MercadoPagoCheckout.forCardTransaction(
-  order: MPOrder(orderId: orderId, clientToken: clientToken),
+MercadoPagoCheckout(
+  MPCheckoutType.cardTransaction(
+    MPOrder(orderId: orderId, clientToken: clientToken),
+  ),
+).show(
+  context,
   onResult: (result) {
-    if (result case Success(:final data)) {
-      // data.token.token + data.installments + data.transactionAmount → backend
+    if (result case CheckoutSuccess(:final data)) {
+      // data.orderId + data.orderStatus (the processed order).
     }
   },
-).build();
+);
 ```
 
 ### Restricting card types, brands and installments
 
-Use `setPaymentMethodConfiguration` on either builder:
+Use `setPaymentMethodConfiguration` on the builder:
 
 ```dart
-MercadoPagoCheckout.forCardTransaction(order: order, onResult: (r) { ... })
+MercadoPagoCheckout(MPCheckoutType.cardTransaction(order))
     .setPaymentMethodConfiguration([
       MPPaymentMethodConfig.card(
         excludedTypes: [MPCardType.debit],       // hide debit cards
@@ -194,7 +197,7 @@ MercadoPagoCheckout.forCardTransaction(order: order, onResult: (r) { ... })
         installment: MPInstallment(maxInstallments: 3), // cap at 3x
       ),
     ])
-    .build();
+    .show(context, onResult: (result) { ... });
 ```
 
 ### Appearance
@@ -203,13 +206,13 @@ MercadoPagoCheckout.forCardTransaction(order: order, onResult: (r) { ... })
 default `ThemeMode.system` follows the device automatically.
 
 ```dart
-MercadoPagoCheckout.forCardSave(
+MercadoPagoCheckout(
+  MPCheckoutType.cardSave(),
   appearance: const MPCheckoutAppearance(
     themeMode: ThemeMode.system, // or .light / .dark
     primaryColor: Color(0xFF6200EE),
   ),
-  onResult: (r) { ... },
-);
+).show(context, onResult: (r) { ... });
 ```
 
 ---

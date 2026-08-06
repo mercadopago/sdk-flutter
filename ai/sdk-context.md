@@ -157,45 +157,49 @@ SDK owns the entire card-entry UI. Integrator only handles the result token.
 Best for: apps that want zero UI work.
 
 ```dart
-final builder = MercadoPagoCheckout.forCardSave(
+// One unified builder + MPCheckoutType; `.show(context, ...)` pushes it.
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(
+  context,
   onResult: (result) {
     switch (result) {
-      case Success(:final data):
+      case CheckoutSuccess(:final data):
         // data.token.token → send to backend to save card
         // data.paymentMethodId — 'visa', 'master', etc.
         // data.token.lastFourDigits — safe to display to user
         // NEVER store data.token.token on device — it expires in 15 min
-      case Failure(:final error):
+      case CheckoutError(:final error):
         // Show error.toString() or map via a _describe() function
-      case Cancelled():
-        // User closed the modal — reset UI state
+      case CheckoutUserCancelled(:final context):
+        // context.fields — per-field state where the user dropped off
     }
   },
-);
-await Navigator.of(context).push(
-  MaterialPageRoute<void>(builder: (_) => builder.build()),
 );
 ```
 
 ### Path 2: Hosted checkout — CardTransaction
 
-Includes installment selection and review screens before returning the result.
+Includes installment selection + review, and the SDK PROCESSES the payment
+(POST /orders/{id}/process) before returning the order status.
 
 ```dart
 // Order-bound: create the order from your backend (Orders API) and pass its id
 // and client token. The amount is resolved server-side from the order.
-final builder = MercadoPagoCheckout.forCardTransaction(
-  order: MPOrder(orderId: orderId, clientToken: clientToken),
-  onResult: (result) {
-    if (result case Success(:final data)) {
-      // data.token.token + data.installments + data.transactionAmount → backend
-      // data.installment.installmentAmount — per-installment display amount
-    }
-  },
+MercadoPagoCheckout(
+  MPCheckoutType.cardTransaction(
+    MPOrder(orderId: orderId, clientToken: clientToken),
+  ),
 ).setPaymentMethodConfiguration([
   // Optional: restrict types/brands and the installment range.
   MPPaymentMethodConfig.card(installment: MPInstallment(maxInstallments: 6)),
-]);
+]).show(
+  context,
+  onResult: (result) {
+    if (result case CheckoutSuccess(:final data)) {
+      // data.orderId + data.orderStatus — the processed order
+      // data.installments + data.transactionAmount — what the user paid
+    }
+  },
+);
 ```
 
 ### Path 3: CoreMethods + PCI widgets (custom UI)
@@ -328,7 +332,7 @@ More test cards: https://www.mercadopago.com.ar/developers/en/docs/checkout-api/
 ```bash
 # SDK
 flutter analyze   # must be 0 issues
-flutter test      # 105 tests
+flutter test      # 112 tests
 
 # Example app
 cd example

@@ -72,8 +72,15 @@ class ReviewScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: FilledButton(
-            onPressed: onConfirm,
-            child: const Text('Confirm payment'),
+            // Disabled while the order is being processed.
+            onPressed: controller.isBusy ? null : onConfirm,
+            child: controller.isBusy
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Confirm payment'),
           ),
         ),
       ),

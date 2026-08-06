@@ -88,6 +88,21 @@ class CoreMethods {
     final month = int.parse(exp.substring(0, 2));
     final year = 2000 + int.parse(exp.substring(2, 4));
 
+    // Validate the CVV length against the card's securityCodeLength resolved
+    // from a BIN lookup (exact match, fallback 3) — mirrors the native SDKs,
+    // whose tokenization use cases reject e.g. a 3-digit CVV on a 4-digit Amex.
+    final expectedCvvLength = await _securityCodeLengthForBin(rawNumber);
+    if (rawCvv.length != expectedCvvLength) {
+      _analytics.track(
+        AnalyticsEvent.tokenizeFailed(
+          isSavedCard: false,
+          identityDocumentType: documentType,
+          errorType: 'InvalidCvvError',
+        ),
+      );
+      return const Failure<CardToken>(InvalidCvvError());
+    }
+
     try {
       final device = await _fingerprint.collect();
       final token = await _tokens.createTokenForNewCard(
@@ -184,11 +199,23 @@ class CoreMethods {
     }
     try {
       final methods = await _paymentMethods.getByBin(bin);
+      final first = methods.isNotEmpty ? methods.first : null;
+      _analytics.track(
+        AnalyticsEvent.paymentMethods(
+          cardBrand: first?.id ?? '',
+          paymentType: first?.paymentTypeId ?? '',
+          securityLength: first?.securityCodeLength ?? 0,
+        ),
+      );
       return Success<List<PaymentMethod>>(methods);
     } catch (e) {
-      return Failure<List<PaymentMethod>>(
-        mapApiError(e, ErrorLocation.paymentMethods),
+      final error = mapApiError(e, ErrorLocation.paymentMethods);
+      _analytics.track(
+        AnalyticsEvent.paymentMethodsError(
+          errorType: error.runtimeType.toString(),
+        ),
       );
+      return Failure<List<PaymentMethod>>(error);
     }
   }
 
@@ -215,11 +242,23 @@ class CoreMethods {
         amount: amount,
         mode: mode,
       );
+      _analytics.track(
+        AnalyticsEvent.installments(
+          paymentType:
+              installments.isNotEmpty ? installments.first.paymentTypeId : '',
+          transactionAmount: amount,
+        ),
+      );
       return Success<List<Installment>>(installments);
     } catch (e) {
-      return Failure<List<Installment>>(
-        mapApiError(e, ErrorLocation.installments),
+      final error = mapApiError(e, ErrorLocation.installments);
+      _analytics.track(
+        AnalyticsEvent.installmentsError(
+          errorType: error.runtimeType.toString(),
+          transactionAmount: amount,
+        ),
       );
+      return Failure<List<Installment>>(error);
     }
   }
 
@@ -244,11 +283,18 @@ class CoreMethods {
         paymentMethodId: paymentMethodId,
         bin: bin,
       );
+      _analytics.track(
+        AnalyticsEvent.issuers(
+          issuers: issuers.map((i) => i.id).toList(growable: false),
+        ),
+      );
       return Success<List<Issuer>>(issuers);
     } catch (e) {
-      return Failure<List<Issuer>>(
-        mapApiError(e, ErrorLocation.issuer),
+      final error = mapApiError(e, ErrorLocation.issuer);
+      _analytics.track(
+        AnalyticsEvent.issuersError(errorType: error.runtimeType.toString()),
       );
+      return Failure<List<Issuer>>(error);
     }
   }
 
@@ -256,11 +302,20 @@ class CoreMethods {
       getIdentificationTypes() async {
     try {
       final types = await _identification.getAll();
+      _analytics.track(
+        AnalyticsEvent.identificationTypes(
+          documentTypes: types.map((t) => t.name).toList(growable: false),
+        ),
+      );
       return Success<List<IdentificationType>>(types);
     } catch (e) {
-      return Failure<List<IdentificationType>>(
-        mapApiError(e, ErrorLocation.identification),
+      final error = mapApiError(e, ErrorLocation.identification);
+      _analytics.track(
+        AnalyticsEvent.identificationTypesError(
+          errorType: error.runtimeType.toString(),
+        ),
       );
+      return Failure<List<IdentificationType>>(error);
     }
   }
 
@@ -274,8 +329,9 @@ class CoreMethods {
     if (number.isEmpty || !isValidLuhn(number)) {
       return const InvalidCardNumberError();
     }
-    final cvv = securityCode.rawValue;
-    if (cvv.length < 3 || cvv.length > 4) {
+    // Only a presence check here; the exact length is validated against the
+    // card's securityCodeLength (from the BIN lookup) in createTokenForNewCard.
+    if (securityCode.rawValue.isEmpty) {
       return const InvalidCvvError();
     }
     final exp = expirationDate.rawValue;
@@ -304,6 +360,20 @@ class CoreMethods {
   }
 
   String _stripSpaces(String value) => value.replaceAll(RegExp(r'\s+'), '');
+
+  /// Resolves the expected CVV length for a card number from a BIN lookup
+  /// (BIN-8), returning the payment method's `securityCodeLength` or `3` as a
+  /// fallback when the lookup misses or errors — matching the native SDKs.
+  Future<int> _securityCodeLengthForBin(String cardNumber) async {
+    final bin = cardNumber.length >= 8 ? cardNumber.substring(0, 8) : cardNumber;
+    try {
+      final methods = await _paymentMethods.getByBin(bin);
+      final length = methods.isNotEmpty ? methods.first.securityCodeLength : 0;
+      return length > 0 ? length : 3;
+    } catch (_) {
+      return 3;
+    }
+  }
 
   /// Parses an optional MMYY PCI expiration field into `(month, year)` ints.
   /// Returns `(null, null)` when absent or malformed (a saved card may not

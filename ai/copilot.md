@@ -32,7 +32,9 @@ switch (result) {
 ## Hosted checkout (preferred for most integrations)
 
 ```dart
-MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
-// amount resolved server-side from the order
-MercadoPagoCheckout.forCardTransaction(order: MPOrder(orderId: '...', clientToken: '...'), onResult: (r) { ... }).build()
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(context, onResult: (r) { ... });
+// Card transaction: order-bound; SDK processes the payment and returns orderStatus.
+MercadoPagoCheckout(MPCheckoutType.cardTransaction(MPOrder(orderId: '...', clientToken: '...')))
+    .show(context, onResult: (r) { ... });
+// result: CheckoutSuccess / CheckoutError / CheckoutUserCancelled
 ```

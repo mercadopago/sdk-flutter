@@ -50,6 +50,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   system/light/dark, default `system` — adaptive) instead of a fixed `brightness`.
 - Added typed models `MPOrder`, `MPInstallment`, `MPPayer` and
   `BuyerIdentification`.
+- **Unified checkout entry:** a single `MercadoPagoCheckout(MPCheckoutType)`
+  builder replaces `forCardSave`/`forCardTransaction`; display with
+  `.show(context, onResult:)` (mirrors the native `Builder` + `show`).
+- **Typed checkout result:** `MercadoPagoCheckoutResult` (`CheckoutSuccess` /
+  `CheckoutError` / `CheckoutUserCancelled`) with `MPPaymentData`
+  (`MPCardSaveData` / `MPCardTransactionData`), replacing the old
+  `CardSaveResult` / `CardTransactionResult`.
+- **Card Transaction now processes the payment:** after tokenization +
+  installment selection the SDK calls `POST /orders/{id}/process`; the result
+  carries `orderId` + `orderStatus` (no longer just the token).
+- **Rich cancel context:** `MPUserCancelledContext` reports per-field state and
+  (for transactions) the visited screens.
+- **CVV length** is validated against the card's `securityCodeLength` from a BIN
+  lookup (exact match), not a fixed 3–4 range.
+- `getPaymentMethods` now sends `processing_mode`; the CoreMethods getters and
+  the installments screen emit their analytics tracks; `identity_document_type`
+  is always present in tokenization tracks.
+
+### Not applied
+
+- Review point 11 (`product_id` as a header on the GET endpoints) was **not**
+  applied: it contradicts the verified native contract, where `product_id` is a
+  query param on GETs and absent on `identification_types`.
 
 ### Known limitations
 

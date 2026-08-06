@@ -76,15 +76,16 @@ void main() {
       expect(req.url.path, '/tracks');
     });
 
-    test('omits null event_data fields', () async {
-      // No identityDocumentType provided → the key must be absent, not null.
+    test('always sends identity_document_type (empty when absent)', () async {
+      // The field is always present (empty string when no document) so the
+      // track stays valid — matching iOS. See review point 13.
       final req = await capture(
         AnalyticsEvent.tokenizeSuccess(isSavedCard: false),
       );
       final body = jsonDecode(req.body) as Map<String, dynamic>;
       final track = (body['tracks'] as List).single as Map<String, dynamic>;
       final data = track['event_data'] as Map<String, dynamic>;
-      expect(data.containsKey('identity_document_type'), isFalse);
+      expect(data['identity_document_type'], '');
       expect(data['is_saved_card'], isFalse);
       expect(data['type_wallet'], 'coremethods');
     });

@@ -45,8 +45,8 @@ class AnalyticsEvent {
         path: '$_base/core_methods/tokenization',
         data: {
           'is_saved_card': isSavedCard,
-          if (identityDocumentType != null)
-            'identity_document_type': identityDocumentType,
+          // Always sent (empty when absent) to keep the track valid, matching iOS.
+          'identity_document_type': identityDocumentType ?? '',
           'type_wallet': 'coremethods',
         },
       );
@@ -63,8 +63,7 @@ class AnalyticsEvent {
         data: {
           if (errorType != null) 'error_type': errorType,
           'is_saved_card': isSavedCard,
-          if (identityDocumentType != null)
-            'identity_document_type': identityDocumentType,
+          'identity_document_type': identityDocumentType ?? '',
           'type_wallet': 'coremethods',
         },
       );
@@ -73,6 +72,8 @@ class AnalyticsEvent {
   /// `/checkout_api_native/checkout/card_form/initialize`.
   factory AnalyticsEvent.checkoutStart({
     required String checkoutType,
+    required String appearance,
+    List<String> sellerCustomization = const [],
     List<String> excludedPaymentTypes = const [],
     List<String> excludedPaymentMethods = const [],
     String? orderId,
@@ -81,11 +82,13 @@ class AnalyticsEvent {
         path: '$_base/checkout/card_form/initialize',
         data: {
           'checkout_type': checkoutType,
+          'appearance': appearance,
+          'seller_customization': sellerCustomization,
           if (excludedPaymentTypes.isNotEmpty)
             'excluded_payment_types': excludedPaymentTypes,
           if (excludedPaymentMethods.isNotEmpty)
             'excluded_payment_methods': excludedPaymentMethods,
-          if (orderId != null) 'order_id': orderId,
+          'order_id': orderId ?? 'NOT_APPLY',
         },
       );
 
@@ -146,6 +149,137 @@ class AnalyticsEvent {
       AnalyticsEvent(
         path: '$_base/checkout/card_form/dropdown_selection',
         data: {'dropdown_selection_type': dropdownSelectionType},
+      );
+
+  // ---- CoreMethods query tracks (fired by the low-level getters) ----
+
+  /// `getPaymentMethods` succeeded — `/core_methods/payment_methods`.
+  factory AnalyticsEvent.paymentMethods({
+    String issuer = '',
+    String cardBrand = '',
+    String paymentType = '',
+    int securityLength = 0,
+  }) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/payment_methods',
+        data: {
+          'issuer': issuer,
+          'card_brand': cardBrand,
+          'payment_type': paymentType,
+          'security_length': securityLength,
+        },
+      );
+
+  /// `getPaymentMethods` failed — `/core_methods/payment_methods/error`.
+  factory AnalyticsEvent.paymentMethodsError({required String errorType}) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/payment_methods/error',
+        data: {'error_type': errorType, 'issuer': '', 'card_brand': ''},
+      );
+
+  /// `getInstallments` succeeded — `/core_methods/installments`.
+  factory AnalyticsEvent.installments({
+    String paymentType = '',
+    required double transactionAmount,
+  }) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/installments',
+        data: {
+          'payment_type': paymentType,
+          'transaction_amount': transactionAmount,
+        },
+      );
+
+  /// `getInstallments` failed — `/core_methods/installments/error`.
+  factory AnalyticsEvent.installmentsError({
+    required String errorType,
+    required double transactionAmount,
+  }) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/installments/error',
+        data: {'error_type': errorType, 'transaction_amount': transactionAmount},
+      );
+
+  /// `getIssuers` succeeded — `/core_methods/issuers`.
+  factory AnalyticsEvent.issuers({required List<String> issuers}) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/issuers',
+        data: {'issuers': issuers},
+      );
+
+  /// `getIssuers` failed — `/core_methods/issuers/error`.
+  factory AnalyticsEvent.issuersError({required String errorType}) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/issuers/error',
+        data: {'error_type': errorType, 'issuers': <String>[]},
+      );
+
+  /// `getIdentificationTypes` succeeded — `/core_methods/identification_types`.
+  factory AnalyticsEvent.identificationTypes({
+    required List<String> documentTypes,
+  }) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/identification_types',
+        data: {'document_types': documentTypes},
+      );
+
+  /// `getIdentificationTypes` failed — `.../identification_types/error`.
+  factory AnalyticsEvent.identificationTypesError({required String errorType}) =>
+      AnalyticsEvent(
+        path: '$_base/core_methods/identification_types/error',
+        data: {'error_type': errorType, 'document_types': <String>[]},
+      );
+
+  // ---- Installments screen tracks ----
+
+  /// Installments screen shown — `/checkout/installments/initialize` (a view).
+  factory AnalyticsEvent.installmentsInitialize({
+    required String checkoutType,
+    required String paymentMethodId,
+    required String paymentType,
+    required String selectionType,
+    required int quotasCount,
+    required double transactionAmount,
+    String? orderId,
+  }) =>
+      AnalyticsEvent(
+        type: TrackType.view,
+        path: '$_base/checkout/installments/initialize',
+        data: {
+          'checkout_type': checkoutType,
+          'payment_method_id': paymentMethodId,
+          'payment_type': paymentType,
+          'selection_type': selectionType,
+          'quotas_count': quotasCount,
+          'transaction_amount': transactionAmount,
+          'order_id': orderId ?? 'NOT_APPLY',
+        },
+      );
+
+  /// Installments confirmed — `/checkout/installments/submit`.
+  factory AnalyticsEvent.installmentsSubmit({
+    required int installments,
+    required double installmentAmount,
+    required double totalAmount,
+  }) =>
+      AnalyticsEvent(
+        path: '$_base/checkout/installments/submit',
+        data: {
+          'installments': installments,
+          'installment_amount': installmentAmount,
+          'total_amount': totalAmount,
+        },
+      );
+
+  /// Installments screen cancelled —
+  /// `/checkout/installments/user_canceled_error`. [reason] is
+  /// `back_pressed` or `user_dismissed`.
+  factory AnalyticsEvent.installmentsCancel({
+    String reason = 'user_dismissed',
+  }) =>
+      AnalyticsEvent(
+        path: '$_base/checkout/installments/user_canceled_error',
+        data: {'error_type': reason},
       );
 
   static const String _base = '/checkout_api_native';

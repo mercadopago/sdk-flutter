@@ -17,48 +17,46 @@ class _CardTransactionDemoState extends State<CardTransactionDemo> {
   bool _loading = false;
   String _status = '';
 
-  Future<void> _open() async {
+  void _open() {
     if (_loading) return; // prevent double-tap
     setState(() {
       _loading = true;
       _status = '';
     });
 
-    final builder = MercadoPagoCheckout.forCardTransaction(
+    MercadoPagoCheckout(
       // Create the order from YOUR backend via the Orders API, then pass its
       // id and client token here. The amount is resolved server-side from the
       // order — you do not pass it. These are placeholders.
-      order: const MPOrder(
-        orderId: '<ORDER_ID_FROM_ORDERS_API>',
-        clientToken: '<CLIENT_TOKEN_FROM_ORDERS_API>',
+      MPCheckoutType.cardTransaction(
+        const MPOrder(
+          orderId: '<ORDER_ID_FROM_ORDERS_API>',
+          clientToken: '<CLIENT_TOKEN_FROM_ORDERS_API>',
+        ),
       ),
-      onResult: (result) {
-        if (!mounted) return;
-        setState(() {
-          _loading = false;
-          _status = switch (result) {
-            Success(:final data) =>
-              '✓ Ready to pay.\n'
-                  '${data.installments}x ${data.installment.installmentAmount.toStringAsFixed(2)}'
-                  '  •  Total: ${data.transactionAmount.toStringAsFixed(2)}\n\n'
-                  'Send data.token.token + data.installments to your backend.',
-            Failure(:final error) => '✗ $error',
-            Cancelled() => 'Cancelled.',
-          };
-        });
-      },
     ).setPaymentMethodConfiguration([
       // Optional: restrict card types/brands and the installment range.
       const MPPaymentMethodConfig.card(
         installment: MPInstallment(maxInstallments: 6),
       ),
-    ]);
-
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => builder.build()),
+    ]).show(
+      context,
+      onResult: (result) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _status = switch (result) {
+            // The SDK processed the order; you receive its status.
+            CheckoutSuccess(:final data) => '✓ Order ${data.orderStatus}.\n'
+                '${data.installments}x  •  '
+                'Total: ${data.transactionAmount?.toStringAsFixed(2)}\n\n'
+                'Order id: ${data.orderId}',
+            CheckoutError(:final error) => '✗ $error',
+            CheckoutUserCancelled() => 'Cancelled.',
+          };
+        });
+      },
     );
-
-    if (mounted && _loading) setState(() => _loading = false);
   }
 
   @override

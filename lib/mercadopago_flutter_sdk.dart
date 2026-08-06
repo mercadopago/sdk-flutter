@@ -58,9 +58,6 @@ export 'src/domain/models/installment.dart'
 export 'src/domain/models/issuer.dart' show Issuer;
 export 'src/domain/models/identification_type.dart' show IdentificationType;
 export 'src/domain/models/buyer_identification.dart' show BuyerIdentification;
-export 'src/domain/models/card_save_result.dart' show CardSaveResult;
-export 'src/domain/models/card_transaction_result.dart'
-    show CardTransactionResult;
 export 'src/domain/models/card_bin_data.dart' show CheckoutInstallment;
 export 'src/domain/models/mp_cancel_context.dart'
     show MPCancelContext, CheckoutStep;
@@ -72,14 +69,29 @@ export 'src/components/expiration_date_field.dart' show ExpirationDateField;
 export 'src/components/pci_field_state.dart' show PciFieldState;
 
 // Hosted checkout UI.
-export 'src/checkout/mercadopago_checkout.dart'
-    show
-        MercadoPagoCheckout,
-        CardSaveCheckoutBuilder,
-        CardTransactionCheckoutBuilder;
+export 'src/checkout/mercadopago_checkout.dart' show MercadoPagoCheckout;
 export 'src/checkout/checkout_appearance.dart' show MPCheckoutAppearance;
 export 'src/checkout/payment_method_config.dart'
     show MPCardType, MPCardBrand, MPPaymentMethodConfig, MPCardConfig;
 export 'src/checkout/mp_order.dart' show MPOrder;
 export 'src/checkout/mp_installment.dart' show MPInstallment;
 export 'src/checkout/mp_payer.dart' show MPPayer;
+export 'src/checkout/mp_checkout_type.dart'
+    show MPCheckoutType, MPCardSaveCheckout, MPCardTransactionCheckout;
+export 'src/checkout/mp_payment_data.dart'
+    show MPPaymentData, MPCardSaveData, MPCardTransactionData;
+export 'src/checkout/mp_checkout_result.dart'
+    show
+        MercadoPagoCheckoutResult,
+        CheckoutSuccess,
+        CheckoutError,
+        CheckoutUserCancelled;
+export 'src/checkout/mp_user_cancelled_context.dart'
+    show
+        MPUserCancelledContext,
+        MPCardSaveCancelled,
+        MPCardTransactionCancelled,
+        MPCancelledFieldState,
+        CheckoutField,
+        CancelFieldState,
+        CheckoutScreen;

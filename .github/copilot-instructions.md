@@ -57,14 +57,14 @@ switch (result) {
 ## Hosted checkout (preferred when UI flexibility not needed)
 
 ```dart
-// Card Save
-MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
+// Card Save — one unified builder + MPCheckoutType + .show(context)
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(context, onResult: (r) { ... });
 
-// Card Transaction with installments (order-bound; amount from the server)
-MercadoPagoCheckout.forCardTransaction(
-  order: MPOrder(orderId: '...', clientToken: '...'),
-  onResult: (r) { ... },
-).build()
+// Card Transaction (order-bound; amount from the server; SDK processes the payment)
+MercadoPagoCheckout(
+  MPCheckoutType.cardTransaction(MPOrder(orderId: '...', clientToken: '...')),
+).show(context, onResult: (r) { ... });
+// result cases: CheckoutSuccess / CheckoutError / CheckoutUserCancelled
 ```
 
 ## Initialization

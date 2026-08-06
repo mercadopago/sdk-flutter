@@ -9,6 +9,7 @@ import '../../domain/models/card_form_config.dart';
 import '../../domain/models/identification_type.dart';
 import '../../domain/result.dart';
 import '../checkout_controller.dart';
+import '../mp_user_cancelled_context.dart';
 
 /// First step of every checkout flow: collect card data.
 ///
@@ -54,10 +55,18 @@ class _CardFormScreenState extends State<CardFormScreen> {
   List<IdentificationType> get _docTypes =>
       widget.controller.config?.identificationTypes ?? const [];
 
+  /// Snapshots per-field state and forwards the cancellation to the host, so
+  /// the cancel context reports where the user dropped off.
+  void _onClose() {
+    widget.controller.setFieldStates(_snapshotFieldStates());
+    widget.onCancel();
+  }
+
   Future<void> _onSubmit() async {
     if (_submitting) return;
+    // CVV must match the exact length required by the card brand (from the BIN).
     if (_numberCtrl.rawValue.isEmpty ||
-        _cvvCtrl.rawValue.length < 3 ||
+        _cvvCtrl.rawValue.length != widget.controller.securityCodeLength ||
         _expCtrl.rawValue.length != 4 ||
         _nameCtrl.text.trim().isEmpty) {
       setState(() => _localError = 'Please complete all required fields.');
@@ -118,7 +127,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
         title: Text(_nonEmpty(t?.title) ?? 'Card details'),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: widget.onCancel,
+          onPressed: _onClose,
         ),
       ),
       body: ListView(
@@ -226,4 +235,42 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
   String? _nonEmpty(String? value) =>
       (value == null || value.isEmpty) ? null : value;
+
+  /// Best-effort per-field state for the cancel context (empty / incomplete /
+  /// valid, derived from the raw lengths).
+  List<MPCancelledFieldState> _snapshotFieldStates() {
+    final cvvLength = widget.controller.securityCodeLength;
+    return [
+      MPCancelledFieldState(
+        field: CheckoutField.cardNumber,
+        state: _lengthState(_numberCtrl.rawValue, 13),
+      ),
+      MPCancelledFieldState(
+        field: CheckoutField.expirationDate,
+        state: _lengthState(_expCtrl.rawValue, 4),
+      ),
+      MPCancelledFieldState(
+        field: CheckoutField.securityCode,
+        state: _lengthState(_cvvCtrl.rawValue, cvvLength),
+      ),
+      MPCancelledFieldState(
+        field: CheckoutField.cardHolder,
+        state: _nameCtrl.text.trim().isEmpty
+            ? CancelFieldState.empty
+            : CancelFieldState.valid,
+      ),
+      MPCancelledFieldState(
+        field: CheckoutField.document,
+        state: _docCtrl.text.trim().isEmpty
+            ? CancelFieldState.empty
+            : CancelFieldState.valid,
+      ),
+    ];
+  }
+
+  CancelFieldState _lengthState(String value, int expectedLength) {
+    if (value.isEmpty) return CancelFieldState.empty;
+    if (value.length < expectedLength) return CancelFieldState.incomplete;
+    return CancelFieldState.valid;
+  }
 }

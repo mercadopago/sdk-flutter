@@ -8,6 +8,7 @@ import '../data/repositories/card_token_repository_impl.dart';
 import '../data/repositories/identification_repository_impl.dart';
 import '../data/repositories/installment_repository_impl.dart';
 import '../data/repositories/issuer_repository_impl.dart';
+import '../data/repositories/order_repository_impl.dart';
 import '../data/repositories/payment_method_repository_impl.dart';
 import '../fingerprint/fingerprint_service.dart';
 import '../domain/repositories.dart';
@@ -32,6 +33,7 @@ class MercadoPagoSDK {
   ApiClient? _apiClient;
   CoreMethods? _coreMethods;
   CardFormRepository? _cardFormRepository;
+  OrderRepository? _orderRepository;
   AnalyticsService? _analytics;
   FingerprintService? _fingerprint;
 
@@ -61,6 +63,13 @@ class MercadoPagoSDK {
   /// `MercadoPagoCheckout`.
   CardFormRepository get cardFormRepository {
     final r = _cardFormRepository;
+    if (r == null) throw const SDKNotInitializedError();
+    return r;
+  }
+
+  /// Processes hosted-checkout orders. Used internally by `MercadoPagoCheckout`.
+  OrderRepository get orderRepository {
+    final r = _orderRepository;
     if (r == null) throw const SDKNotInitializedError();
     return r;
   }
@@ -161,6 +170,7 @@ class MercadoPagoSDK {
     _fingerprint = fingerprint;
     _analytics = analytics;
     _cardFormRepository = CardFormRepositoryImpl(apiClient);
+    _orderRepository = OrderRepositoryImpl(apiClient);
     _coreMethods = CoreMethods(
       tokenRepository: tokenRepo,
       paymentMethodRepository: paymentMethodRepo,
@@ -180,6 +190,7 @@ class MercadoPagoSDK {
     _apiClient = null;
     _coreMethods = null;
     _cardFormRepository = null;
+    _orderRepository = null;
     _analytics = null;
     _fingerprint = null;
   }

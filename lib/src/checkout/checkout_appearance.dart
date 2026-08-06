@@ -19,6 +19,18 @@ class MPCheckoutAppearance {
   /// Seed color for the Material 3 scheme. Defaults to MercadoPago blue.
   final Color? primaryColor;
 
+  /// Analytics value for the `appearance` track field (`system`/`light`/`dark`).
+  String get analyticsStyle => switch (themeMode) {
+        ThemeMode.system => 'system',
+        ThemeMode.light => 'light',
+        ThemeMode.dark => 'dark',
+      };
+
+  /// Analytics `seller_customization` list: `['customized_token']` when a custom
+  /// [primaryColor] is set, otherwise empty (mirrors the native SDKs).
+  List<String> get sellerCustomization =>
+      primaryColor != null ? const ['customized_token'] : const [];
+
   /// Builds the effective [ThemeData], resolving [ThemeMode.system] against the
   /// supplied [platformBrightness] (the device setting).
   ThemeData themeFor(Brightness platformBrightness) {

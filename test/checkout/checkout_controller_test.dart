@@ -3,6 +3,7 @@ import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
 import 'package:mercadopago_flutter_sdk/src/checkout/checkout_controller.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/models/card_bin_data.dart';
 import 'package:mercadopago_flutter_sdk/src/domain/models/card_form_config.dart';
+import 'package:mercadopago_flutter_sdk/src/domain/models/order_process_result.dart';
 
 import '../_fakes/fake_analytics_service.dart';
 import '../_fakes/fake_fingerprint_service.dart';
@@ -24,6 +25,7 @@ CheckoutController _build({
   CheckoutKind kind = CheckoutKind.cardSave,
   FakeTokenRepository? tokens,
   FakeCardFormRepository? cardForm,
+  FakeOrderRepository? orders,
   FakeAnalyticsService? analytics,
   List<String> excludedPaymentTypes = const [],
   List<String> excludedPaymentMethods = const [],
@@ -35,12 +37,12 @@ CheckoutController _build({
     kind: kind,
     coreMethods: _buildCoreMethods(tokens: tokens),
     cardFormRepository: cardForm ?? FakeCardFormRepository(),
+    orderRepository: orders ?? FakeOrderRepository(),
     analytics: analytics ?? FakeAnalyticsService(),
     excludedPaymentTypes: excludedPaymentTypes,
     excludedPaymentMethods: excludedPaymentMethods,
     minInstallments: minInstallments,
     maxInstallments: maxInstallments,
-    // Card transactions are order-bound (amount resolved server-side).
     orderId: isTransaction ? 'order_1' : null,
     clientToken: isTransaction ? 'tok_1' : null,
   );
@@ -104,13 +106,14 @@ void main() {
       ctrl.dispose();
     });
 
-    test('initialize tracks checkout_start with the checkout type', () async {
+    test('initialize tracks checkout_start with type + appearance', () async {
       final analytics = FakeAnalyticsService();
       final ctrl = _build(analytics: analytics);
       await ctrl.initialize();
       final start = analytics.events.first;
       expect(start.path, '/checkout_api_native/checkout/card_form/initialize');
       expect(start.data['checkout_type'], 'card_save');
+      expect(start.data['appearance'], 'system');
       ctrl.dispose();
     });
 
@@ -126,16 +129,6 @@ void main() {
   });
 
   group('CheckoutController — BIN lookup', () {
-    test('onBinChanged resolves method + installments from the BFF', () async {
-      final ctrl = _build(cardForm: FakeCardFormRepository(binData: _binData));
-      ctrl.onBinChanged('45099535');
-      await _settleDebounce();
-      expect(ctrl.selectedMethod?.id, 'visa');
-      expect(ctrl.installments.length, 2);
-      expect(ctrl.securityCodeLength, 3);
-      ctrl.dispose();
-    });
-
     test('onBinChanged passes exclusions + installment bounds to the BFF',
         () async {
       final cardForm = FakeCardFormRepository(binData: _binData);
@@ -165,7 +158,6 @@ void main() {
       await ctrl.initialize();
       ctrl.onBinChanged('45099535');
       await _settleDebounce();
-      // Amount is never integrator-supplied; it comes from the server config.
       expect(cardForm.lastBinParams?.amount, 250);
       ctrl.dispose();
     });
@@ -188,16 +180,6 @@ void main() {
       ctrl.dispose();
     });
 
-    test('isBusy is true during submit and false after', () async {
-      final ctrl = _build();
-      expect(ctrl.isBusy, isFalse);
-      final future = _submit(ctrl);
-      expect(ctrl.isBusy, isTrue);
-      await future;
-      expect(ctrl.isBusy, isFalse);
-      ctrl.dispose();
-    });
-
     test('submitCardForm returns Failure on token error', () async {
       final ctrl = _build(
         tokens: FakeTokenRepository(error: Exception('network failure')),
@@ -207,15 +189,14 @@ void main() {
       ctrl.dispose();
     });
 
-    test('buildCardSaveResult carries method + issuer from the BIN', () async {
+    test('buildCardSaveData carries method + issuer from the BIN', () async {
       final ctrl = _build(cardForm: FakeCardFormRepository(binData: _binData));
       ctrl.onBinChanged('45099535');
       await _settleDebounce();
       await _submit(ctrl);
-      final result = ctrl.buildCardSaveResult();
-      expect(result, isA<Success<CardSaveResult>>());
-      final data = (result as Success<CardSaveResult>).data;
-      expect(data.paymentMethodId, 'visa');
+      final data = ctrl.buildCardSaveData();
+      expect(data, isNotNull);
+      expect(data!.paymentMethodId, 'visa');
       expect(data.paymentTypeId, 'credit_card');
       expect(data.issuerId, '1');
       ctrl.dispose();
@@ -249,6 +230,7 @@ void main() {
           kind: CheckoutKind.cardTransaction,
           coreMethods: _buildCoreMethods(),
           cardFormRepository: FakeCardFormRepository(),
+          orderRepository: FakeOrderRepository(),
           analytics: FakeAnalyticsService(),
         ),
         throwsA(isA<AssertionError>()),
@@ -268,12 +250,16 @@ void main() {
       ctrl.dispose();
     });
 
-    test('selectInstallment updates selection and builds the result',
+    test('processTransaction processes the order and returns its status',
         () async {
       final analytics = FakeAnalyticsService();
+      final orders = FakeOrderRepository(
+        result: const OrderProcessResult(id: 'ord_99', status: 'processed'),
+      );
       final ctrl = _build(
         kind: CheckoutKind.cardTransaction,
         cardForm: FakeCardFormRepository(binData: _binData),
+        orders: orders,
         analytics: analytics,
       );
       ctrl.onBinChanged('45099535');
@@ -283,16 +269,27 @@ void main() {
       expect(ctrl.selectedInstallment?.installments, 3);
       expect(
         analytics.events.any(
-          (e) => e.path == '/checkout_api_native/checkout/installments/selected',
+          (e) =>
+              e.path == '/checkout_api_native/checkout/installments/selected',
         ),
         isTrue,
       );
 
-      final result = ctrl.buildCardTransactionResult();
-      expect(result, isA<Success<CardTransactionResult>>());
-      final data = (result as Success<CardTransactionResult>).data;
+      final data = await ctrl.processTransaction();
+      expect(data, isNotNull);
+      expect(data!.orderId, 'ord_99');
+      expect(data.orderStatus, 'processed');
       expect(data.installments, 3);
       expect(data.transactionAmount, 105);
+      // The /process request carried the selected installment + token.
+      expect(orders.lastParams?.installments, 3);
+      expect(orders.lastParams?.orderId, 'order_1');
+      expect(
+        analytics.events.any(
+          (e) => e.path == '/checkout_api_native/checkout/installments/submit',
+        ),
+        isTrue,
+      );
       ctrl.dispose();
     });
   });

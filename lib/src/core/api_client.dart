@@ -150,13 +150,15 @@ class ApiClient {
   /// Performs a POST request with a JSON body. Responses are never cached.
   ///
   /// [sendProductIdHeader] attaches `X-Product-id` — required by
-  /// `POST /v1/card_tokens`, matching the native SDK.
+  /// `POST /v1/card_tokens`, matching the native SDK. [extraHeaders] carries
+  /// optional headers such as an `Authorization: Bearer` client token.
   Future<Map<String, dynamic>> post(
     String path, {
     required Map<String, dynamic> body,
     Map<String, String>? queryParameters,
     AuthMode authMode = AuthMode.publicKeyQuery,
     bool sendProductIdHeader = false,
+    Map<String, String>? extraHeaders,
   }) async {
     final uri = _buildUri(
       path,
@@ -168,6 +170,7 @@ class ApiClient {
       ..._headers(
         publicKeyHeader: authMode == AuthMode.publicKeyHeader,
         productIdHeader: sendProductIdHeader,
+        extra: extraHeaders,
       ),
       kHeaderContentType: kContentTypeJson,
     };

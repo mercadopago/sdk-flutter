@@ -13,7 +13,7 @@ Package: `mercadopago_flutter_sdk: ^0.1.0`
 
 ```bash
 flutter analyze   # must be 0 issues
-flutter test      # 105 tests, all must pass
+flutter test      # 112 tests, all must pass
 ```
 Do not commit if either fails.
 
@@ -36,10 +36,12 @@ await sdk.coreMethods.createTokenForNewCard(
 ## Integration paths
 
 ```dart
-// Hosted checkout — SDK owns the UI
-MercadoPagoCheckout.forCardSave(onResult: (r) { ... }).build()
-// Card transaction: order-bound, amount resolved server-side (no amount param)
-MercadoPagoCheckout.forCardTransaction(order: MPOrder(orderId: '...', clientToken: '...'), onResult: (r) { ... }).build()
+// Hosted checkout — SDK owns the UI. One builder + MPCheckoutType + .show(context).
+MercadoPagoCheckout(MPCheckoutType.cardSave()).show(context, onResult: (r) { ... });
+// Card transaction: order-bound; SDK processes the payment, returns orderStatus.
+MercadoPagoCheckout(MPCheckoutType.cardTransaction(MPOrder(orderId: '...', clientToken: '...')))
+    .show(context, onResult: (r) { ... });
+// result: CheckoutSuccess / CheckoutError / CheckoutUserCancelled
 
 // Custom UI — app builds the form with PCI widgets
 final cardNumber = PciFieldState(); // dispose in dispose()
