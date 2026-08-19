@@ -4,7 +4,7 @@
 
 ## Working in this repo
 
-- Package name: `mercadopago_flutter_sdk`
+- Package name: `mercadopago`
 - The SDK is a Flutter plugin (native Android + iOS for fingerprinting,
   pure Dart for everything else)
 - Feature branch: `feature/001-mercadopago-flutter-sdk` → merges to `main`

@@ -6,7 +6,7 @@ Full reference: `ai/sdk-context.md`
 
 Flutter plugin for MercadoPago card tokenization. Raw card data stays inside
 the SDK — integrators receive only an opaque token. Package:
-`mercadopago_flutter_sdk: ^0.1.0`.
+`mercadopago: ^0.1.0`.
 
 Architecture:
 - `lib/src/core/` — HTTP, session, config, errors
@@ -15,7 +15,7 @@ Architecture:
 - `lib/src/core_methods/` — public low-level tokenization API
 - `lib/src/components/` — PCI input widgets
 - `lib/src/checkout/` — hosted checkout flow
-- `lib/mercadopago_flutter_sdk.dart` — public barrel (only export from here)
+- `lib/mercadopago.dart` — public barrel (only export from here)
 
 ## Critical rule: PCI secure fields
 

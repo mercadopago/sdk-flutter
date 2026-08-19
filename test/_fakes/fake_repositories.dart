@@ -1,11 +1,11 @@
-import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
-import 'package:mercadopago_flutter_sdk/src/data/dtos/card_form_parsers.dart'
+import 'package:mercadopago/mercadopago.dart';
+import 'package:mercadopago/src/data/dtos/card_form_parsers.dart'
     show emptyCardFormTranslations;
-import 'package:mercadopago_flutter_sdk/src/domain/models/card_bin_data.dart';
-import 'package:mercadopago_flutter_sdk/src/domain/models/card_form_config.dart';
-import 'package:mercadopago_flutter_sdk/src/domain/models/device_data.dart';
-import 'package:mercadopago_flutter_sdk/src/domain/models/order_process_result.dart';
-import 'package:mercadopago_flutter_sdk/src/domain/repositories.dart' as repos;
+import 'package:mercadopago/src/domain/models/card_bin_data.dart';
+import 'package:mercadopago/src/domain/models/card_form_config.dart';
+import 'package:mercadopago/src/domain/models/device_data.dart';
+import 'package:mercadopago/src/domain/models/order_process_result.dart';
+import 'package:mercadopago/src/domain/repositories.dart' as repos;
 
 class FakeTokenRepository implements repos.TokenRepository {
   FakeTokenRepository({this.response, this.error});

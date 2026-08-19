@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`mercadopago_flutter_sdk` is the official Flutter plugin for MercadoPago card
+`mercadopago` is the official Flutter plugin for MercadoPago card
 tokenization. It lets Flutter developers accept card payments in Latin America
 without handling raw card data — the SDK tokenizes card details and returns an
 opaque, short-lived token that the app's backend uses to create the payment.
@@ -89,7 +89,7 @@ use is restricted by convention. No integrator code should call it.
 
 ```yaml
 dependencies:
-  mercadopago_flutter_sdk: ^0.1.0
+  mercadopago: ^0.1.0
 ```
 
 ### Android setup (required)

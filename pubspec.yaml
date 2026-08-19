@@ -1,4 +1,4 @@
-name: mercadopago_flutter_sdk
+name: mercadopago
 description: Official MercadoPago SDK for Flutter — card tokenization, payment methods, installments, and complete checkout UI for Latin America.
 version: 0.1.0
 homepage: https://github.com/mercadopago/sdk-flutter

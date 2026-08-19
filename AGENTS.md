@@ -4,10 +4,10 @@ Full reference: `ai/sdk-context.md`
 
 ## What this is
 
-`mercadopago_flutter_sdk` — Flutter plugin for MercadoPago card tokenization.
+`mercadopago` — Flutter plugin for MercadoPago card tokenization.
 Architecture: Clean Architecture, Dart layer (pure) + native Android/iOS for
 device fingerprinting. No third-party state management or DI frameworks.
-Package: `mercadopago_flutter_sdk: ^0.1.0`
+Package: `mercadopago: ^0.1.0`
 
 ## Before making changes
 

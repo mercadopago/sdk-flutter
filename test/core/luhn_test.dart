@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago_flutter_sdk/src/core/luhn.dart';
+import 'package:mercadopago/src/core/luhn.dart';
 
 void main() {
   group('isValidLuhn', () {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago_flutter_sdk/src/data/dtos/payment_method_dto.dart';
+import 'package:mercadopago/src/data/dtos/payment_method_dto.dart';
 
 void main() {
   group('PaymentMethodDto.fromJson', () {

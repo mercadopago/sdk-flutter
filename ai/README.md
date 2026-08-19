@@ -1,7 +1,7 @@
 # AI Context Files
 
 This directory provides context for AI coding tools working with the
-`mercadopago_flutter_sdk` repository.
+`mercadopago` repository.
 
 ## Files
 

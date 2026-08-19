@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
+import 'package:mercadopago/mercadopago.dart';
 
 /// Demonstrates the CardTransaction hosted checkout.
 ///

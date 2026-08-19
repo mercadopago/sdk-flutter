@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = 'mercadopago_flutter_sdk'
+  s.name             = 'mercadopago'
   s.version          = '0.1.0'
   s.summary          = 'Official MercadoPago SDK for Flutter.'
   s.description      = <<-DESC

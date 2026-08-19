@@ -5,7 +5,7 @@
 ## Suggest this import
 
 ```dart
-import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
+import 'package:mercadopago/mercadopago.dart';
 ```
 
 ## Tokenization pattern (always use PciFieldState, never raw strings)

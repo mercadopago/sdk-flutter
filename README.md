@@ -1,4 +1,4 @@
-# mercadopago_flutter_sdk
+# mercadopago
 
 **Official Flutter plugin for MercadoPago card payments across Latin America.**
 
@@ -70,7 +70,7 @@ Android and iOS applications.
 ```yaml
 # pubspec.yaml
 dependencies:
-  mercadopago_flutter_sdk: ^0.1.0
+  mercadopago: ^0.1.0
 ```
 
 ```bash
@@ -114,7 +114,7 @@ Initialize once at app startup, then open a hosted checkout:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:mercadopago_flutter_sdk/mercadopago_flutter_sdk.dart';
+import 'package:mercadopago/mercadopago.dart';
 
 void main() {
   MercadoPagoSDK.shared.initialize(

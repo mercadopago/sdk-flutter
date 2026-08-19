@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago_flutter_sdk/src/data/dtos/order_process_dto.dart';
-import 'package:mercadopago_flutter_sdk/src/domain/repositories.dart';
+import 'package:mercadopago/src/data/dtos/order_process_dto.dart';
+import 'package:mercadopago/src/domain/repositories.dart';
 
 void main() {
   group('OrderProcessDto', () {
