@@ -1,20 +1,31 @@
-name: mercadopago_sdk
-description: Official MercadoPago SDK for Flutter — card tokenization, payment methods, installments, and complete checkout UI.
+name: mercadopago
+description: Official MercadoPago SDK for Flutter — secure card tokenization, payment methods, installments, and PCI input widgets for Latin America.
 version: 0.1.0
 homepage: https://github.com/mercadopago/sdk-flutter
+repository: https://github.com/mercadopago/sdk-flutter
+issue_tracker: https://github.com/mercadopago/sdk-flutter/issues
+
+topics:
+  - payments
+  - mercadopago
+  - tokenization
+  - fintech
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.10.0'
+  sdk: ">=3.12.0 <4.0.0"
+  flutter: ">=3.44.2"
 
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.1.0
+  meta: ^1.18.0
+  uuid: ^4.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   plugin:

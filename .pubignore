@@ -1,0 +1,54 @@
+# Build artifacts — never belong in a published package.
+build/
+.dart_tool/
+coverage/
+pubspec.lock
+.DS_Store
+.vscode/
+android/.gradle/
+android/build/
+android/local.properties
+ios/.symlinks/
+ios/Pods/
+ios/Flutter/ephemeral/
+example/.dart_tool/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+example/build/
+example/pubspec.lock
+example/android/.gradle/
+example/android/local.properties
+example/ios/.symlinks/
+example/ios/Pods/
+example/ios/Flutter/ephemeral/
+example/ios/Flutter/Generated.xcconfig
+example/ios/Flutter/flutter_export_environment.sh
+
+# Development-only specification docs — not relevant for pub.dev consumers.
+specs/
+
+# Internal SDK reference snapshots used during development.
+sdk-ios-reference.md
+sdk-android-reference.md
+
+# Removed hosted-checkout surface — never publish stale remnants from a dirty
+# migration checkout.
+lib/src/checkout/
+test/checkout/
+example/lib/screens/card_save_demo.dart
+example/lib/screens/card_transaction_demo.dart
+
+# IDE files.
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# AI context files — for repo contributors, not SDK consumers.
+ai/
+AGENTS.md
+CLAUDE.md
+.github/
+
+# Keep README.md, CHANGELOG.md, LICENSE, CONTRIBUTING.md and SECURITY.md in the
+# archive because the published README links to them.

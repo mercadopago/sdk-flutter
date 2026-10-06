@@ -1,0 +1,26 @@
+import '../../core/api_client.dart';
+import '../../domain/models/identification_type.dart';
+import '../../domain/repositories.dart';
+import '../dtos/identification_type_dto.dart';
+import '../dtos/json_value.dart';
+
+class IdentificationRepositoryImpl implements IdentificationRepository {
+  IdentificationRepositoryImpl(this._api);
+
+  static const String _path = '/cho-off/v1/identification_types';
+
+  final ApiClient _api;
+
+  @override
+  Future<List<IdentificationType>> getAll() async {
+    // `identification_types` takes neither `product_id` query nor header, per
+    // the native SDK contract (Android CoreMethodsService.getIdentificationTypes
+    // declares no params).
+    final list = await _api.getList(_path, sendProductId: false);
+    return mapJsonObjectList(
+      list,
+      'identification_types',
+      IdentificationTypeDto.fromJson,
+    ).map((dto) => dto.toDomain()).toList(growable: false);
+  }
+}
