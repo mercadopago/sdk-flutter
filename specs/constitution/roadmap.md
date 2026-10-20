@@ -19,6 +19,7 @@ native privacy blockers below.
 - Android device fingerprinting via Platform Channel; empty iOS fallback
 - Analytics auto-tracking
 - Example app
+- Publication to pub.dev
 
 ### Release actions
 
@@ -41,7 +42,6 @@ native privacy blockers below.
 ### v0.2 candidates
 - Retry with exponential backoff for network errors
 - Full API reference documentation (dartdoc)
-- Pub.dev publishing and release credentials (dry-run is already gated locally)
 - Integration tests (`integration_test` package)
 
 ---
@@ -63,4 +63,4 @@ native privacy blockers below.
 ## Version policy
 
 - `0.x.y` = pre-release (no stability guarantees)
-- `1.0.0` = first stable release (after v0.3 is complete and pub.dev published)
+- `1.0.0` = first stable release (after v0.3 is complete)

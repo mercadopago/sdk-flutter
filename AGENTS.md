@@ -8,8 +8,8 @@ Full reference: `ai/sdk-context.md`
 Architecture: Clean Architecture, Dart layer (pure) + native Android device
 fingerprinting and an empty iOS compatibility channel. No third-party state
 management or DI frameworks.
-Installation before the first pub.dev release: use the Git repository and pin
-production integrations to an audited commit SHA, as shown in `README.md`.
+Installation: `flutter pub add mercadopago` (hosted on pub.dev), as shown in
+`README.md`.
 
 ## Before making changes
 
