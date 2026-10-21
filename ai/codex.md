@@ -6,8 +6,8 @@ Full reference: `ai/sdk-context.md`
 
 Flutter plugin for MercadoPago card tokenization. Integrators pass
 `PciFieldState` controllers directly instead of copying sensitive values into
-strings, then receive an opaque token. Until the first pub.dev release, install
-from Git and pin production integrations to an audited commit SHA.
+strings, then receive an opaque token. Install from pub.dev with
+`flutter pub add mercadopago`.
 
 Architecture:
 - `lib/src/core/` — HTTP, session, config, errors

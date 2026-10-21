@@ -282,5 +282,4 @@ Cardholder name: `APRO` (triggers approved response)
 - Integration tests against real MercadoPago API
 - Federated plugin architecture (deferred to post v1.0)
 - Automatic network retry
-- Publication to pub.dev (the archive is validated with `--dry-run` in CI)
 - Enriched iOS device fingerprinting (deliberately disabled for this release)

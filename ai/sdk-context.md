@@ -90,14 +90,10 @@ secure element or PCI DSS certification.
 
 ```yaml
 dependencies:
-  mercadopago:
-    git:
-      url: https://github.com/mercadopago/sdk-flutter.git
-      ref: main # Pin an audited commit SHA in production.
+  mercadopago: ^0.1.0
 ```
 
-After the first pub.dev release, use the hosted version shown on the package's
-official pub.dev page.
+Or run `flutter pub add mercadopago`.
 
 ### Android setup (required)
 
@@ -388,7 +384,7 @@ flutter run -d <device> \
 | Local quality, coverage, native-build and package dry-run gate | ✅ `./tool/verify.sh` |
 | License, pub.dev metadata, public API documentation comments | ✅ Implemented |
 | Integration tests against real API | ⏳ Pending |
-| Publication to pub.dev | ⏳ Pending |
+| Publication to pub.dev | ✅ v0.1.0 |
 | Federated plugin architecture | ⏳ Deferred post v1.0 |
 | Assigned product ID `CVQP49FTT60D1548Q56G` | ✅ Configured |
 
