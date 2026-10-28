@@ -4,7 +4,7 @@
 /// so the values are kept in by Dart's library privacy — enforced by the
 /// compiler — rather than by an `@internal` annotation, which is only an
 /// analyzer hint and does not stop a consuming app from importing
-/// `package:mercadopago/src/...` and calling the helper.
+/// `package:mercadopago_sdk_flutter/src/...` and calling the helper.
 ///
 /// The invariant this library exists to hold: **no symbol reachable from
 /// outside returns a raw value** — not as a `String`, not inside a request

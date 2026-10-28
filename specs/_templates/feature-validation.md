@@ -25,7 +25,7 @@
 
 ## Review checklist
 - [ ] No secrets committed
-- [ ] Public API exported only via `lib/mercadopago.dart`
+- [ ] Public API exported only via `lib/mercadopago_sdk_flutter.dart`
 - [ ] README / docs updated if user-facing
 - [ ] CHANGELOG.md updated
 - [ ] No TODOs or FIXMEs in lib/

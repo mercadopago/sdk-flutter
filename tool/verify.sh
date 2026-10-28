@@ -186,7 +186,7 @@ run_step "Validate pub.dev archive" dart pub publish --dry-run
 if [[ "${build_android}" == true ]]; then
   run_step "Run Android plugin unit tests" \
     run_in_example_android \
-    ./gradlew :mercadopago:testDebugUnitTest --no-daemon --console=plain
+    ./gradlew :mercadopago_sdk_flutter:testDebugUnitTest --no-daemon --console=plain
   run_step "Build Android release APK" \
     run_in_example flutter build apk --release
 fi

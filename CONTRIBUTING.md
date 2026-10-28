@@ -1,4 +1,4 @@
-# Contributing to mercadopago
+# Contributing to mercadopago_sdk_flutter
 
 Thank you for your interest in contributing. This guide covers how to set up
 the project locally, run tests, and submit a pull request.

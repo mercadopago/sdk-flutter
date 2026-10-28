@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago/mercadopago.dart';
+import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
 
 void main() {
   group('MercadoPagoError diagnostics', () {

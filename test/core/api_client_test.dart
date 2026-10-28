@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:mercadopago/src/core/api_client.dart';
-import 'package:mercadopago/src/core/api_error.dart';
-import 'package:mercadopago/src/core/constants.dart';
-import 'package:mercadopago/src/core/session_manager.dart';
+import 'package:mercadopago_sdk_flutter/src/core/api_client.dart';
+import 'package:mercadopago_sdk_flutter/src/core/api_error.dart';
+import 'package:mercadopago_sdk_flutter/src/core/constants.dart';
+import 'package:mercadopago_sdk_flutter/src/core/session_manager.dart';
 
 void main() {
   group('ApiClient', () {
