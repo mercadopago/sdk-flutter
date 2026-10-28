@@ -1,6 +1,6 @@
-import 'package:mercadopago/src/analytics/analytics_event.dart';
-import 'package:mercadopago/src/analytics/analytics_service.dart';
-import 'package:mercadopago/src/core/session_manager.dart';
+import 'package:mercadopago_sdk_flutter/src/analytics/analytics_event.dart';
+import 'package:mercadopago_sdk_flutter/src/analytics/analytics_service.dart';
+import 'package:mercadopago_sdk_flutter/src/core/session_manager.dart';
 
 class FakeAnalyticsService extends AnalyticsService {
   FakeAnalyticsService()

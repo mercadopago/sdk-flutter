@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:mercadopago/mercadopago.dart';
-import 'package:mercadopago/src/core/api_client.dart';
-import 'package:mercadopago/src/core/constants.dart';
-import 'package:mercadopago/src/core/session_manager.dart';
-import 'package:mercadopago/src/domain/models/device_data.dart';
-import 'package:mercadopago/src/pci/pci.dart';
+import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
+import 'package:mercadopago_sdk_flutter/src/core/api_client.dart';
+import 'package:mercadopago_sdk_flutter/src/core/constants.dart';
+import 'package:mercadopago_sdk_flutter/src/core/session_manager.dart';
+import 'package:mercadopago_sdk_flutter/src/domain/models/device_data.dart';
+import 'package:mercadopago_sdk_flutter/src/pci/pci.dart';
 
 /// Builds a tokenizer over an injected [MockClient].
 ///

@@ -65,7 +65,7 @@
 - Device fingerprinting delegates to Android DeviceSDK through the
   `mercadopago/fingerprint` Platform Channel. The iOS implementation returns
   an empty map; Dart must not recreate native signal collection.
-- The public API is exported only through `lib/mercadopago.dart`; `lib/src/`
+- The public API is exported only through `lib/mercadopago_sdk_flutter.dart`; `lib/src/`
   remains implementation detail.
 - The public package barrel exposes no raw-value getter. Integrator code must
   not import `lib/src/` helpers to bypass it. This design reduces accidental

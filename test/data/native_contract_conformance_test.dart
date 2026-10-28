@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago/src/data/dtos/installment_dto.dart';
-import 'package:mercadopago/src/data/dtos/issuer_dto.dart';
-import 'package:mercadopago/src/data/dtos/payment_method_dto.dart';
+import 'package:mercadopago_sdk_flutter/src/data/dtos/installment_dto.dart';
+import 'package:mercadopago_sdk_flutter/src/data/dtos/issuer_dto.dart';
+import 'package:mercadopago_sdk_flutter/src/data/dtos/payment_method_dto.dart';
 
 /// Conformance tests against the **canonical native payloads**.
 ///

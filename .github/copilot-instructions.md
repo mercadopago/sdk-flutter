@@ -1,11 +1,11 @@
 # GitHub Copilot — MercadoPago Flutter SDK
 
-Full reference: `ai/sdk-context.md` | Package: `mercadopago`
+Full reference: `ai/sdk-context.md` | Package: `mercadopago_sdk_flutter`
 
 ## Always suggest this import
 
 ```dart
-import 'package:mercadopago/mercadopago.dart';
+import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
 ```
 
 ## Tokenization — PciFieldState controllers, never raw strings

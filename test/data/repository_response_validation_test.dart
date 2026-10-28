@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:mercadopago/src/core/api_client.dart';
-import 'package:mercadopago/src/core/session_manager.dart';
-import 'package:mercadopago/src/data/repositories/identification_repository_impl.dart';
-import 'package:mercadopago/src/data/repositories/installment_repository_impl.dart';
-import 'package:mercadopago/src/data/repositories/issuer_repository_impl.dart';
-import 'package:mercadopago/src/data/repositories/payment_method_repository_impl.dart';
-import 'package:mercadopago/src/domain/repositories.dart';
+import 'package:mercadopago_sdk_flutter/src/core/api_client.dart';
+import 'package:mercadopago_sdk_flutter/src/core/session_manager.dart';
+import 'package:mercadopago_sdk_flutter/src/data/repositories/identification_repository_impl.dart';
+import 'package:mercadopago_sdk_flutter/src/data/repositories/installment_repository_impl.dart';
+import 'package:mercadopago_sdk_flutter/src/data/repositories/issuer_repository_impl.dart';
+import 'package:mercadopago_sdk_flutter/src/data/repositories/payment_method_repository_impl.dart';
+import 'package:mercadopago_sdk_flutter/src/domain/repositories.dart';
 
 void main() {
   ApiClient malformedListClient() => ApiClient(

@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = 'mercadopago'
+  s.name             = 'mercadopago_sdk_flutter'
   s.version          = '0.1.0'
   s.summary          = 'Official MercadoPago SDK for Flutter.'
   s.description      = <<-DESC
@@ -12,7 +12,7 @@ installments, and PCI input widgets for Latin America.
   s.source           = { :path => '.' }
   s.source_files        = 'Classes/**/*'
   s.resource_bundles    = {
-    'mercadopago_privacy' => ['Resources/PrivacyInfo.xcprivacy']
+    'mercadopago_sdk_flutter_privacy' => ['Resources/PrivacyInfo.xcprivacy']
   }
   s.dependency 'Flutter'
   s.platform         = :ios, '13.0'

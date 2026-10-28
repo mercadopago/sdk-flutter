@@ -62,7 +62,7 @@ lib/
     pci/            # PCI field state, widgets, validation, token assembly
     analytics/      # Event tracking
     fingerprint/    # Platform Channel bridge
-  mercadopago.dart  # Public API surface (barrel export)
+  mercadopago_sdk_flutter.dart  # Public API surface (barrel export)
 example/            # Minimal Flutter app demonstrating the SDK
 test/               # Mirror of lib/src/
 android/            # Platform Channel native (Kotlin)
@@ -72,7 +72,7 @@ specs/              # SDD documentation
 
 ## Conventions
 
-- Public API exported only via `lib/mercadopago.dart`
+- Public API exported only via `lib/mercadopago_sdk_flutter.dart`
 - All `src/` internals are private (no direct imports from outside)
 - Errors modeled as sealed classes: `MercadoPagoResult<T>` with `Success` and `Failure`
 - The supported public flow passes `PciFieldState` directly to tokenization;
