@@ -40,6 +40,8 @@ First public release on pub.dev, published as `mercadopago_sdk_flutter`.
 - `TEST-*` credential support for sandbox integrations.
 - Support for the 7 Latin American countries where MercadoPago operates
   (ARG, BRA, CHL, COL, MEX, PER, URY).
+- Platform support: Android API 23+ and iOS 15.0+ (the minimum deployment
+  target accepted by current Xcode releases).
 - Example app demonstrating `CoreMethods` with PCI widgets.
 - A reproducible local verification gate (`./tool/verify.sh`) for formatting,
   analysis, tests, coverage thresholds, Android/iOS release builds, and pub.dev

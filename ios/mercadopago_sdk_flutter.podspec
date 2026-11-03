@@ -15,7 +15,7 @@ installments, and PCI input widgets for Latin America.
     'mercadopago_sdk_flutter_privacy' => ['Resources/PrivacyInfo.xcprivacy']
   }
   s.dependency 'Flutter'
-  s.platform         = :ios, '13.0'
+  s.platform         = :ios, '15.0'
   s.swift_version    = '5.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 end

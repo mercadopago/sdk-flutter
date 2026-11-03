@@ -14,7 +14,7 @@ requiring application code to copy sensitive values into raw strings.
 [![Flutter](https://img.shields.io/badge/Flutter-3.44.2%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.12%2B-0175C2?logo=dart)](https://dart.dev)
 [![Android](https://img.shields.io/badge/Android-API%2023%2B-green?logo=android)](https://developer.android.com)
-[![iOS](https://img.shields.io/badge/iOS-13.0%2B-black?logo=apple)](https://developer.apple.com)
+[![iOS](https://img.shields.io/badge/iOS-15.0%2B-black?logo=apple)](https://developer.apple.com)
 
 </div>
 
@@ -53,7 +53,7 @@ tokenization instead of copying card values into ordinary strings.
 | Platform | Tokenization | PCI widgets | Device fingerprint |
 |----------|:---:|:---:|:---:|
 | Android (API 23+) | ✅ | ✅ | ✅ |
-| iOS (13.0+) | ✅ | ✅ | ➖ Empty fallback |
+| iOS (15.0+) | ✅ | ✅ | ➖ Empty fallback |
 
 This is a mobile-first SDK. MercadoPago card payments are designed for
 Android and iOS applications.
@@ -63,7 +63,7 @@ Android and iOS applications.
 ## Requirements
 
 - Flutter `3.44.2+` / Dart `3.12+`
-- iOS `13.0+`
+- iOS `15.0+`
 - Android API `23+` (Android 6.0)
 - A MercadoPago public key: `TEST-*` for testing or `APP_USR-*` for
   production — [get credentials here](https://www.mercadopago.com/developers/panel/app)
