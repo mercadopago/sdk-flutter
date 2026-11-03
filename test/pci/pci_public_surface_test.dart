@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Guards the PCI library's public surface.
 ///
 /// Every public symbol in `lib/src/pci/` is reachable by any consuming app via
-/// `import 'package:mercadopago/src/pci/pci.dart'` — `lib/src/` is a pub
+/// `import 'package:mercadopago_sdk_flutter/src/pci/pci.dart'` — `lib/src/` is a pub
 /// packaging convention, not a language boundary. The library's whole purpose
 /// is that none of those symbols can hand out a raw PAN or CVV, so a new public
 /// symbol appearing here needs a deliberate review.
@@ -67,7 +67,7 @@ void main() {
           'New public symbol(s) in the PCI library: '
           '${unexpected.map((s) => '$s (${found[s]})').join(', ')}.\n'
           'Every public symbol here can be reached by any consuming app via '
-          "import 'package:mercadopago/src/pci/pci.dart'. If it can return a "
+          "import 'package:mercadopago_sdk_flutter/src/pci/pci.dart'. If it can return a "
           'PAN or CVV — directly, inside an object, or by handing it to a sink '
           'the caller supplies — make it private. If it is genuinely safe, add '
           'it to allowedPublicSymbols and justify it in the PR.',

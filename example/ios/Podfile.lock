@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - mercadopago_sdk_flutter (0.1.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - mercadopago_sdk_flutter (from `.symlinks/plugins/mercadopago_sdk_flutter/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  mercadopago_sdk_flutter:
+    :path: ".symlinks/plugins/mercadopago_sdk_flutter/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  mercadopago_sdk_flutter: 7f467a98bc6f25331c21611be96cf71925cea2b6
+
+PODFILE CHECKSUM: e7980fbf8692191aec2af3395844cd7713059f70
+
+COCOAPODS: 1.17.0

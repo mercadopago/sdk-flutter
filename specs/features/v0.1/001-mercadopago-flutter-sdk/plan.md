@@ -45,7 +45,7 @@ Scaffold mínimo del proyecto Flutter plugin.
 - Gate local reproducible con toolchain fijado, cobertura, builds nativos y dry-run de pub.dev; GitHub Actions no está disponible por política de seguridad
 - `example/` app mínima con pantalla de inicio
 
-**Archivos clave**: `pubspec.yaml`, `analysis_options.yaml`, `lib/mercadopago.dart`
+**Archivos clave**: `pubspec.yaml`, `analysis_options.yaml`, `lib/mercadopago_sdk_flutter.dart`
 
 ---
 

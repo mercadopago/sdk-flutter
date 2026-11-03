@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago/mercadopago.dart';
+import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
 
 const _validPublicKey = 'APP_USR-00000000-0000-4000-8000-000000000000';
 

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-// The PCI library is imported directly (not through `package:mercadopago`)
+// The PCI library is imported directly (not through `package:mercadopago_sdk_flutter`)
 // because `debugSeedPciField` is the only write-only way to put a value into a
 // controller without pumping a widget, and it is deliberately not re-exported
 // from the public entry point.
-import 'package:mercadopago/src/pci/pci.dart';
+import 'package:mercadopago_sdk_flutter/src/pci/pci.dart';
 
 void main() {
   group('PciFieldState', () {

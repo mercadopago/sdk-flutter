@@ -7,7 +7,7 @@ in this repository without additional prompting.
 
 ## What this project is
 
-`mercadopago` is the official Flutter plugin for MercadoPago card
+`mercadopago_sdk_flutter` is the official Flutter plugin for MercadoPago card
 tokenization. Integrators use it to accept card payments across 7 Latin
 American markets without requiring raw card data on their application
 servers.
@@ -42,7 +42,7 @@ lib/src/
 └── analytics/      Fire-and-forget event tracking
 ```
 
-### Public surface (lib/mercadopago.dart)
+### Public surface (lib/mercadopago_sdk_flutter.dart)
 
 Only what is exported from the barrel is the public API. Everything under
 `lib/src/` is implementation detail. The key exports are:

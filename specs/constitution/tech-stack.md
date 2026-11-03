@@ -3,7 +3,7 @@
 ## Language & runtime
 
 - **Dart 3.x** (null-safety required, sealed classes, pattern matching)
-- **Flutter 3.44.2+** — verified mobile targets: iOS 13+, Android API 23+
+- **Flutter 3.44.2+** — verified mobile targets: iOS 15+, Android API 23+
 - Package type: **Flutter plugin** (not a pure Dart package — uses Platform Channels for fingerprinting)
 
 ## Package manager
@@ -62,7 +62,7 @@ lib/
     pci/            # PCI field state, widgets, validation, token assembly
     analytics/      # Event tracking
     fingerprint/    # Platform Channel bridge
-  mercadopago.dart  # Public API surface (barrel export)
+  mercadopago_sdk_flutter.dart  # Public API surface (barrel export)
 example/            # Minimal Flutter app demonstrating the SDK
 test/               # Mirror of lib/src/
 android/            # Platform Channel native (Kotlin)
@@ -72,7 +72,7 @@ specs/              # SDD documentation
 
 ## Conventions
 
-- Public API exported only via `lib/mercadopago.dart`
+- Public API exported only via `lib/mercadopago_sdk_flutter.dart`
 - All `src/` internals are private (no direct imports from outside)
 - Errors modeled as sealed classes: `MercadoPagoResult<T>` with `Success` and `Failure`
 - The supported public flow passes `PciFieldState` directly to tokenization;

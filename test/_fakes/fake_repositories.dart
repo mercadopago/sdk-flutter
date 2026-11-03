@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:mercadopago/mercadopago.dart';
-import 'package:mercadopago/src/domain/repositories.dart' as repos;
+import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
+import 'package:mercadopago_sdk_flutter/src/domain/repositories.dart' as repos;
 
 class FakePaymentMethodRepository implements repos.PaymentMethodRepository {
   FakePaymentMethodRepository({

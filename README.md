@@ -9,12 +9,12 @@
 Tokenize cards and collect card input through PCI-oriented widgets without
 requiring application code to copy sensitive values into raw strings.
 
-[![pub package](https://img.shields.io/pub/v/mercadopago.svg)](https://pub.dev/packages/mercadopago)
+[![pub package](https://img.shields.io/pub/v/mercadopago_sdk_flutter.svg)](https://pub.dev/packages/mercadopago_sdk_flutter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.44.2%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.12%2B-0175C2?logo=dart)](https://dart.dev)
 [![Android](https://img.shields.io/badge/Android-API%2023%2B-green?logo=android)](https://developer.android.com)
-[![iOS](https://img.shields.io/badge/iOS-13.0%2B-black?logo=apple)](https://developer.apple.com)
+[![iOS](https://img.shields.io/badge/iOS-15.0%2B-black?logo=apple)](https://developer.apple.com)
 
 </div>
 
@@ -53,7 +53,7 @@ tokenization instead of copying card values into ordinary strings.
 | Platform | Tokenization | PCI widgets | Device fingerprint |
 |----------|:---:|:---:|:---:|
 | Android (API 23+) | ✅ | ✅ | ✅ |
-| iOS (13.0+) | ✅ | ✅ | ➖ Empty fallback |
+| iOS (15.0+) | ✅ | ✅ | ➖ Empty fallback |
 
 This is a mobile-first SDK. MercadoPago card payments are designed for
 Android and iOS applications.
@@ -63,7 +63,7 @@ Android and iOS applications.
 ## Requirements
 
 - Flutter `3.44.2+` / Dart `3.12+`
-- iOS `13.0+`
+- iOS `15.0+`
 - Android API `23+` (Android 6.0)
 - A MercadoPago public key: `TEST-*` for testing or `APP_USR-*` for
   production — [get credentials here](https://www.mercadopago.com/developers/panel/app)
@@ -75,14 +75,14 @@ Android and iOS applications.
 ### 1. Add the dependency
 
 ```bash
-flutter pub add mercadopago
+flutter pub add mercadopago_sdk_flutter
 ```
 
 Or add it to `pubspec.yaml` manually and run `flutter pub get`:
 
 ```yaml
 dependencies:
-  mercadopago: ^0.1.0
+  mercadopago_sdk_flutter: ^0.1.0
 ```
 
 While the SDK is in `0.x`, a caret constraint only accepts patch releases
@@ -138,7 +138,7 @@ and tokenize through `CoreMethods`:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:mercadopago/mercadopago.dart';
+import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
 
 void main() {
   MercadoPagoSDK.shared.initialize(

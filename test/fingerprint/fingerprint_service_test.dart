@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago/src/fingerprint/fingerprint_service.dart';
+import 'package:mercadopago_sdk_flutter/src/fingerprint/fingerprint_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

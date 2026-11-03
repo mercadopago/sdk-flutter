@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:mercadopago/src/analytics/analytics_event.dart';
-import 'package:mercadopago/src/analytics/analytics_service.dart';
-import 'package:mercadopago/src/core/session_manager.dart';
+import 'package:mercadopago_sdk_flutter/src/analytics/analytics_event.dart';
+import 'package:mercadopago_sdk_flutter/src/analytics/analytics_service.dart';
+import 'package:mercadopago_sdk_flutter/src/core/session_manager.dart';
 
 void main() {
   group('AnalyticsService — tracks[] payload', () {

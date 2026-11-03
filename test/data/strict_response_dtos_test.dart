@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mercadopago/src/data/dtos/identification_type_dto.dart';
-import 'package:mercadopago/src/data/dtos/installment_dto.dart';
-import 'package:mercadopago/src/data/dtos/issuer_dto.dart';
+import 'package:mercadopago_sdk_flutter/src/data/dtos/identification_type_dto.dart';
+import 'package:mercadopago_sdk_flutter/src/data/dtos/installment_dto.dart';
+import 'package:mercadopago_sdk_flutter/src/data/dtos/issuer_dto.dart';
 
 void main() {
   group('IdentificationTypeDto', () {
