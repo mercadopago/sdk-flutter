@@ -4,7 +4,31 @@
 
 | Version | Supported |
 |---------|-----------|
-| 0.1.x   | ✅ Current |
+| 0.1.1   | ✅ Current |
+| 0.1.0   | ⚠️ Upgrade to 0.1.1 — allows toolchains affected by GHSA-frr6-h895-5pxp; if you stay on it, build with Flutter `3.47.8+` stable |
+
+## Toolchain advisories
+
+The SDK's HTTPS requests — including card tokenization — run on the Dart
+runtime compiled into the host application, so some fixes ship in the Flutter
+toolchain rather than in this package.
+
+- **[GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp)**
+  (high). On Android, Windows, and Linux, Dart validates TLS certificates
+  against its own bundled trust store. Dart stable before `3.13.7` (Flutter
+  `3.47.8`) and beta before `3.14.0-315.3.beta` (Flutter `3.50.0-0.2.pre`)
+  still trust compromised eMudhra intermediate CAs. A network attacker could
+  forge a certificate for the MercadoPago API and read card data sent for
+  tokenization. iOS uses Apple's Security framework and is not affected.
+  Starting with `0.1.1`, the SDK requires Dart `3.14.0+` (Flutter `3.50.0+`).
+  A pub constraint is a single range, and the
+  affected betas sort between the patched `3.13.7` stable and `3.14.0`, so the
+  patched `3.47.x` stable releases cannot be accepted without also accepting
+  those betas; `test/toolchain_constraints_test.dart` checks every affected
+  release against both pubspecs. Development (`main`) channel builds are not
+  supported. Applications already released with an affected toolchain must
+  upgrade Flutter, rebuild, and ship a new version — updating the device
+  operating system does not fix it.
 
 ## Reporting a vulnerability
 

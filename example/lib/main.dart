@@ -1,3 +1,5 @@
+// Must match the Material types the SDK widgets use; see lib/src/pci/pci.dart.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:mercadopago_sdk_flutter/mercadopago_sdk_flutter.dart';
 

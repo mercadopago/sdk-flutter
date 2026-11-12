@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-12
+
+### Security
+
+- Require Flutter `3.50.0+` / Dart `3.14.0+` because of
+  [GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp).
+  Affected toolchains trust compromised eMudhra intermediate certificates when
+  validating TLS on Android, which could let a network attacker intercept card
+  tokenization requests. iOS is not affected.
+- The patched Flutter `3.47.8`/`3.47.9` stable releases are not accepted: the
+  affected `3.48`–`3.50.0-0.1.pre` betas sort between them and `3.50.0`, and a
+  pub constraint cannot exclude that gap. Apps on `3.47.8+` remain protected
+  with `0.1.0`; moving to `0.1.1` requires Flutter `3.50`.
+- Applications already released with an affected Flutter must upgrade,
+  rebuild, and ship a new version; updating this package alone does not change
+  a binary that is already installed on devices.
+
 ## [0.1.0] - 2026-10-20
 
 First public release on pub.dev, published as `mercadopago_sdk_flutter`.
@@ -90,4 +107,5 @@ First public release on pub.dev, published as `mercadopago_sdk_flutter`.
   `X-Product-id` on card-token POSTs and as `product_id` on GET endpoints that
   require it.
 
+[0.1.1]: https://github.com/mercadopago/sdk-flutter/releases/tag/v0.1.1
 [0.1.0]: https://github.com/mercadopago/sdk-flutter/releases/tag/v0.1.0

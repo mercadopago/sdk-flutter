@@ -3,7 +3,7 @@
 ## Language & runtime
 
 - **Dart 3.x** (null-safety required, sealed classes, pattern matching)
-- **Flutter 3.44.2+** — verified mobile targets: iOS 15+, Android API 23+
+- **Flutter 3.50.0+ / Dart 3.14.0+** (GHSA-frr6-h895-5pxp) — verified mobile targets: iOS 15+, Android API 23+
 - Package type: **Flutter plugin** (not a pure Dart package — uses Platform Channels for fingerprinting)
 
 ## Package manager
@@ -46,7 +46,7 @@
 
 GitHub Actions are unavailable under the organization's security policy.
 `tool/verify.sh` is therefore the reproducible pull-request gate and must run
-with Flutter `3.44.2` or a compatible newer version. It enforces at least 80%
+with Flutter `3.50.0` or a compatible newer version. It enforces at least 80%
 line coverage independently for `lib/src/domain/`,
 `lib/src/core_methods/`, and `lib/src/pci/`. Android and iOS release-build
 evidence must come from correctly provisioned hosts before merge.

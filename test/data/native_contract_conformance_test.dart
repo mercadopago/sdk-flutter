@@ -321,9 +321,8 @@ void main() {
 
     test('accepts empty native strings and normalizes merchant account', () {
       final values = jsonDecode(fixture) as List<dynamic>;
-      final issuer = IssuerDto.fromJson(
-        values.single as Map<String, dynamic>,
-      ).toDomain();
+      final issuer = IssuerDto.fromJson(values.single as Map<String, dynamic>)
+          .toDomain();
 
       expect(issuer.id, '0');
       expect(issuer.name, 'Banco');

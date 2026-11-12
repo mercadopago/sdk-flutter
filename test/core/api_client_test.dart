@@ -38,25 +38,22 @@ void main() {
       );
     }
 
-    test(
-      'GET sends public_key + product_id query, no X-Product-id header',
-      () async {
-        final client = buildClient(
-          (_) async => http.Response('{"ok":true}', 200),
-        );
-        await client.get('/cho-off/v1/payment_methods');
+    test('GET sends public_key + product_id query, no X-Product-id header', () async {
+      final client = buildClient(
+        (_) async => http.Response('{"ok":true}', 200),
+      );
+      await client.get('/cho-off/v1/payment_methods');
 
-        final req = sentRequests.single;
-        // Always-on headers.
-        expect(req.headers[kHeaderSessionId], session.sessionId);
-        expect(req.headers[kHeaderSdkVersion], kSdkVersion);
-        // CoreMethods GETs authenticate with public_key + product_id as query
-        // params — never the X-Product-id header (that is POST card_tokens only).
-        expect(req.url.queryParameters['public_key'], 'APP_USR-test');
-        expect(req.url.queryParameters['product_id'], kProductId);
-        expect(req.headers[kHeaderProductId], isNull);
-      },
-    );
+      final req = sentRequests.single;
+      // Always-on headers.
+      expect(req.headers[kHeaderSessionId], session.sessionId);
+      expect(req.headers[kHeaderSdkVersion], kSdkVersion);
+      // CoreMethods GETs authenticate with public_key + product_id as query
+      // params — never the X-Product-id header (that is POST card_tokens only).
+      expect(req.url.queryParameters['public_key'], 'APP_USR-test');
+      expect(req.url.queryParameters['product_id'], kProductId);
+      expect(req.headers[kHeaderProductId], isNull);
+    });
 
     test('GET with sendProductId:false omits the product_id query', () async {
       final client = buildClient((_) async => http.Response('[]', 200));
@@ -73,28 +70,25 @@ void main() {
       expect(req.url.queryParameters['public_key'], 'APP_USR-test');
     });
 
-    test(
-      'POST card_tokens sends X-Product-id header, no product_id query',
-      () async {
-        final client = buildClient(
-          (_) async => http.Response('{"id":"abc"}', 200),
-        );
-        await client.post(
-          '/v1/card_tokens',
-          body: {'card_number': '4111'},
-          sendProductIdHeader: true,
-        );
+    test('POST card_tokens sends X-Product-id header, no product_id query', () async {
+      final client = buildClient(
+        (_) async => http.Response('{"id":"abc"}', 200),
+      );
+      await client.post(
+        '/v1/card_tokens',
+        body: {'card_number': '4111'},
+        sendProductIdHeader: true,
+      );
 
-        final req = sentRequests.single;
-        expect(req.method, 'POST');
-        expect(req.headers[kHeaderContentType], kContentTypeJson);
-        expect(req.headers[kHeaderProductId], kProductId);
-        expect(req.headers[kHeaderSessionId], session.sessionId);
-        // public_key travels as a query param; product_id must NOT (header only).
-        expect(req.url.queryParameters['public_key'], 'APP_USR-test');
-        expect(req.url.queryParameters['product_id'], isNull);
-      },
-    );
+      final req = sentRequests.single;
+      expect(req.method, 'POST');
+      expect(req.headers[kHeaderContentType], kContentTypeJson);
+      expect(req.headers[kHeaderProductId], kProductId);
+      expect(req.headers[kHeaderSessionId], session.sessionId);
+      // public_key travels as a query param; product_id must NOT (header only).
+      expect(req.url.queryParameters['public_key'], 'APP_USR-test');
+      expect(req.url.queryParameters['product_id'], isNull);
+    });
 
     test('caches GET responses for the configured TTL', () async {
       var calls = 0;

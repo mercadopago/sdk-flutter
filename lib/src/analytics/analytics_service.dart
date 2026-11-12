@@ -94,9 +94,8 @@ class AnalyticsService {
         },
       });
 
-      final uri = Uri.parse(
-        kTracksUrl,
-      ).replace(queryParameters: {'public_key': _key});
+      final uri = Uri.parse(kTracksUrl)
+          .replace(queryParameters: {'public_key': _key});
       await _client
           .post(
             uri,

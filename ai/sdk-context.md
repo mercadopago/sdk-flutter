@@ -90,7 +90,7 @@ secure element or PCI DSS certification.
 
 ```yaml
 dependencies:
-  mercadopago_sdk_flutter: ^0.1.0
+  mercadopago_sdk_flutter: ^0.1.1
 ```
 
 Or run `flutter pub add mercadopago_sdk_flutter`.

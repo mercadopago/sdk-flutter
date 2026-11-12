@@ -8,7 +8,7 @@ library;
 const String kProductId = 'CVQP49FTT60D1548Q56G';
 
 /// Current SDK version. Must stay in sync with `pubspec.yaml`.
-const String kSdkVersion = '0.1.0';
+const String kSdkVersion = '0.1.1';
 
 /// Base URL for the MercadoPago payments API.
 const String kApiBaseUrl = 'https://api.mercadopago.com';
