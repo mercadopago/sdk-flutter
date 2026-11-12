@@ -225,8 +225,9 @@ dart pub publish --dry-run
 Test files live in `test/` mirroring `lib/src/`. Fakes are in `test/_fakes/`.
 When adding a new public behavior, add tests in the matching `test/` path.
 
-The local gate (`tool/verify.sh`) targets the declared minimum Flutter `3.47.8`
-(Dart `3.13.7`, the first patched for GHSA-frr6-h895-5pxp), requires 80% line coverage separately
+The local gate (`tool/verify.sh`) targets Flutter `3.50.0` (Dart `3.14.0`); the
+declared floor is the first beta patched for GHSA-frr6-h895-5pxp, enforced by
+`test/toolchain_constraints_test.dart`. It requires 80% line coverage separately
 for `domain` and `core_methods`, and builds the example for Android and iOS.
 
 Fakes implement repository interfaces directly.

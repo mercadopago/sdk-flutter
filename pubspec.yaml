@@ -12,8 +12,8 @@ topics:
   - fintech
 
 environment:
-  sdk: ">=3.13.7 <4.0.0"
-  flutter: ">=3.47.8"
+  sdk: ">=3.14.0-315.3.beta <4.0.0"
+  flutter: ">=3.50.0-0.2.pre"
 
 dependencies:
   flutter:
@@ -26,6 +26,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  pub_semver: ^2.2.1
 
 flutter:
   plugin:

@@ -9,14 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-- Require Flutter `3.47.8+` and Dart `3.13.7+`, the first releases patched for
+- Require Flutter `3.50.0+` / Dart `3.14.0+` (or the patched beta
+  `3.50.0-0.2.pre` / `3.14.0-315.3.beta`) because of
   [GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp).
-  Earlier toolchains trust compromised eMudhra intermediate certificates when
+  Affected toolchains trust compromised eMudhra intermediate certificates when
   validating TLS on Android, which could let a network attacker intercept card
   tokenization requests. iOS is not affected.
-- Applications already released with Flutter earlier than `3.47.8` must
-  upgrade, rebuild, and ship a new version; updating this package alone does
-  not change a binary that is already installed on devices.
+- The patched Flutter `3.47.8`/`3.47.9` stable releases are not accepted: the
+  affected `3.48`–`3.50.0-0.1.pre` betas sort between them and `3.50.0`, and a
+  pub constraint cannot exclude that gap. Apps on `3.47.8+` remain protected
+  with `0.1.0`; moving to `0.1.1` requires Flutter `3.50`.
+- Applications already released with an affected Flutter must upgrade,
+  rebuild, and ship a new version; updating this package alone does not change
+  a binary that is already installed on devices.
 
 ## [0.1.0] - 2026-10-20
 

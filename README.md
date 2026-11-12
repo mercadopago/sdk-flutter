@@ -11,8 +11,8 @@ requiring application code to copy sensitive values into raw strings.
 
 [![pub package](https://img.shields.io/pub/v/mercadopago_sdk_flutter.svg)](https://pub.dev/packages/mercadopago_sdk_flutter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Flutter](https://img.shields.io/badge/Flutter-3.47.8%2B-02569B?logo=flutter)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.13.7%2B-0175C2?logo=dart)](https://dart.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.50%2B-02569B?logo=flutter)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.14%2B-0175C2?logo=dart)](https://dart.dev)
 [![Android](https://img.shields.io/badge/Android-API%2023%2B-green?logo=android)](https://developer.android.com)
 [![iOS](https://img.shields.io/badge/iOS-15.0%2B-black?logo=apple)](https://developer.apple.com)
 
@@ -62,9 +62,10 @@ Android and iOS applications.
 
 ## Requirements
 
-- Flutter `3.47.8+` / Dart `3.13.7+` (earlier versions are affected by
-  [GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp);
-  see [Security](#security))
+- Flutter `3.50.0+` / Dart `3.14.0+` (or beta `3.50.0-0.2.pre+`; earlier
+  stable and beta toolchains are affected by
+  [GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp) or cannot
+  be told apart from affected betas; see [Security](#security))
 - iOS `15.0+`
 - Android API `23+` (Android 6.0)
 - A MercadoPago public key: `TEST-*` for testing or `APP_USR-*` for
@@ -417,14 +418,18 @@ switch (result) {
   platform applies its TLS policy.
 - **Build with a patched Flutter** — on Android, Dart validates TLS
   certificates with its own bundled trust store, so the toolchain that compiles
-  your app decides which certificate authorities are trusted. Flutter versions
-  before `3.47.8` (Dart `3.13.7`) still trust compromised eMudhra intermediate
+  your app decides which certificate authorities are trusted. Flutter stable
+  before `3.47.8` (Dart `3.13.7`) and beta before `3.50.0-0.2.pre` (Dart
+  `3.14.0-315.3.beta`) still trust compromised eMudhra intermediate
   certificates
   ([GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp)),
-  which would let a network attacker intercept tokenization requests. This SDK
-  requires the patched versions from `0.1.1`; if your app shipped with an
-  earlier Flutter, upgrade, rebuild, and release a new version. iOS is not
-  affected.
+  which would let a network attacker intercept tokenization requests. From
+  `0.1.1` the SDK requires Flutter `3.50.0+` / Dart `3.14.0+` (or the patched
+  beta): pub version constraints are a single range, and the affected betas
+  sort between the patched `3.47.8` stable and `3.50.0`, so they cannot be
+  excluded while still accepting `3.47.x`. If your app shipped with an affected
+  Flutter, upgrade, rebuild, and release a new version. iOS is not affected.
+  Development (`main`) channel builds are not supported.
 - **Device fingerprinting** — Android's native DeviceSDK provides fraud
   signals. If collection fails, or when running on iOS, tokenization continues
   without a device payload. Review the merged Android permissions and privacy
@@ -502,7 +507,7 @@ correct, secure integration code without needing extra prompting.
 | Version | Focus |
 |---------|-------|
 | **v0.1.0** | Core tokenization, PCI widgets, Android device fingerprinting, pub.dev release |
-| **v0.1.1** | Require Flutter `3.47.8+` / Dart `3.13.7+` (GHSA-frr6-h895-5pxp) |
+| **v0.1.1** | Require Flutter `3.50.0+` / Dart `3.14.0+` (GHSA-frr6-h895-5pxp) |
 | **v0.2** | Integration tests, retry logic |
 | **v0.3** | ESC (Encrypted Security Code), Apple Pay |
 | **v1.0** | Stable public API, federated plugin architecture |

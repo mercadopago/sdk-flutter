@@ -6,7 +6,7 @@ integration sends the opaque token to its backend.
 
 ## Requirements
 
-- Flutter 3.47.8 or later (Dart 3.13.7+)
+- Flutter 3.50.0 or later (Dart 3.14.0+)
 - Android API 23+ or iOS 15+
 - A MercadoPago `TEST-*` public key for testing
 
