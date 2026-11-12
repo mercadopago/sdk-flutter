@@ -14,7 +14,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/mercadopago_sdk_flutter/ios"
 
 SPEC CHECKSUMS:
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
   mercadopago_sdk_flutter: 7f467a98bc6f25331c21611be96cf71925cea2b6
 
 PODFILE CHECKSUM: e7980fbf8692191aec2af3395844cd7713059f70
