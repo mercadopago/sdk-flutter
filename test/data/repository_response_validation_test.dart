@@ -21,9 +21,8 @@ void main() {
     addTearDown(api.close);
 
     await expectLater(
-      PaymentMethodRepositoryImpl(
-        api,
-      ).getByBin(bin: '45099535', mode: ProcessingMode.aggregator),
+      PaymentMethodRepositoryImpl(api)
+          .getByBin(bin: '45099535', mode: ProcessingMode.aggregator),
       throwsFormatException,
     );
   });
@@ -58,9 +57,8 @@ void main() {
     addTearDown(api.close);
 
     await expectLater(
-      InstallmentRepositoryImpl(
-        api,
-      ).get(bin: '45099535', amount: 100, mode: ProcessingMode.aggregator),
+      InstallmentRepositoryImpl(api)
+          .get(bin: '45099535', amount: 100, mode: ProcessingMode.aggregator),
       throwsFormatException,
     );
   });

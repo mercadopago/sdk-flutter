@@ -110,21 +110,17 @@ void main() {
       expect(() => InstallmentDto.fromJson(json), throwsFormatException);
     });
 
-    test(
-      'tolerates a missing monetary field (contract declares it nullable)',
-      () {
-        // Android `PayerCostResponse` declares every field nullable, so a payload
-        // without `total_amount` is valid and the native SDKs accept it.
-        final json = completeResponse();
-        final payerCost =
-            (json['payer_costs'] as List<dynamic>).single
-                as Map<String, dynamic>;
-        payerCost.remove('total_amount');
+    test('tolerates a missing monetary field (contract declares it nullable)', () {
+      // Android `PayerCostResponse` declares every field nullable, so a payload
+      // without `total_amount` is valid and the native SDKs accept it.
+      final json = completeResponse();
+      final payerCost =
+          (json['payer_costs'] as List<dynamic>).single as Map<String, dynamic>;
+      payerCost.remove('total_amount');
 
-        final dto = InstallmentDto.fromJson(json);
-        expect(dto.payerCosts.single.totalAmount, 0);
-      },
-    );
+      final dto = InstallmentDto.fromJson(json);
+      expect(dto.payerCosts.single.totalAmount, 0);
+    });
 
     test('still rejects a present-but-negative monetary field', () {
       // Absence is tolerated; corruption is not.

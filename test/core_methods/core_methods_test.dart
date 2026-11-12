@@ -895,9 +895,8 @@ void main() {
 
     test('trims paymentMethodId before sending it to the repository', () async {
       final issuers = FakeIssuerRepository();
-      final result = await buildCoreMethods(
-        issuers: issuers,
-      ).getIssuers(paymentMethodId: '  visa  ', bin: '42345678');
+      final result = await buildCoreMethods(issuers: issuers)
+          .getIssuers(paymentMethodId: '  visa  ', bin: '42345678');
 
       expect(result, isA<Success<List<Issuer>>>());
       expect(issuers.lastPaymentMethodId, 'visa');
