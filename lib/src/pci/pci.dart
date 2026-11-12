@@ -18,6 +18,11 @@
 /// private unless `test/pci/pci_public_surface_test.dart` is updated too.
 library;
 
+// Flutter 3.47 deprecates this import in favor of `package:material_ui`, but
+// that package ships separate Material types. The PCI widgets expose
+// `InputDecoration` publicly, so switching would reject decorations built with
+// `package:flutter/material.dart` in integrator apps. Migrate in a minor release.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 import '../core/api_client.dart';
