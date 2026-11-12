@@ -62,8 +62,8 @@ Android and iOS applications.
 
 ## Requirements
 
-- Flutter `3.50.0+` / Dart `3.14.0+` (or beta `3.50.0-0.2.pre+`; earlier
-  stable and beta toolchains are affected by
+- Flutter `3.50.0+` / Dart `3.14.0+` (earlier stable and beta toolchains are
+  affected by
   [GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp) or cannot
   be told apart from affected betas; see [Security](#security))
 - iOS `15.0+`
@@ -424,11 +424,11 @@ switch (result) {
   certificates
   ([GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp)),
   which would let a network attacker intercept tokenization requests. From
-  `0.1.1` the SDK requires Flutter `3.50.0+` / Dart `3.14.0+` (or the patched
-  beta): pub version constraints are a single range, and the affected betas
-  sort between the patched `3.47.8` stable and `3.50.0`, so they cannot be
-  excluded while still accepting `3.47.x`. If your app shipped with an affected
-  Flutter, upgrade, rebuild, and release a new version. iOS is not affected.
+  `0.1.1` the SDK requires Flutter `3.50.0+` / Dart `3.14.0+`: pub version
+  constraints are a single range, and the affected betas sort between the
+  patched `3.47.8` stable and `3.50.0`, so they cannot be excluded while still
+  accepting `3.47.x`. If your app shipped with an affected Flutter, upgrade,
+  rebuild, and release a new version. iOS is not affected.
   Development (`main`) channel builds are not supported.
 - **Device fingerprinting** — Android's native DeviceSDK provides fraud
   signals. If collection fails, or when running on iOS, tokenization continues

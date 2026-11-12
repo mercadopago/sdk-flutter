@@ -3,7 +3,7 @@
 ## Language & runtime
 
 - **Dart 3.x** (null-safety required, sealed classes, pattern matching)
-- **Flutter 3.50.0+ / Dart 3.14.0+** (or beta 3.50.0-0.2.pre+; GHSA-frr6-h895-5pxp) — verified mobile targets: iOS 15+, Android API 23+
+- **Flutter 3.50.0+ / Dart 3.14.0+** (GHSA-frr6-h895-5pxp) — verified mobile targets: iOS 15+, Android API 23+
 - Package type: **Flutter plugin** (not a pure Dart package — uses Platform Channels for fingerprinting)
 
 ## Package manager

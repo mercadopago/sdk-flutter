@@ -9,8 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-- Require Flutter `3.50.0+` / Dart `3.14.0+` (or the patched beta
-  `3.50.0-0.2.pre` / `3.14.0-315.3.beta`) because of
+- Require Flutter `3.50.0+` / Dart `3.14.0+` because of
   [GHSA-frr6-h895-5pxp](https://github.com/dart-lang/sdk/security/advisories/GHSA-frr6-h895-5pxp).
   Affected toolchains trust compromised eMudhra intermediate certificates when
   validating TLS on Android, which could let a network attacker intercept card

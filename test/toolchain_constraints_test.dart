@@ -31,10 +31,10 @@ final _vulnerableDart = [
   '3.14.0-211.1.beta', // Flutter 3.49.0-0.x.pre
   '3.14.0-315.1.beta', // Flutter 3.50.0-0.1.pre
 ];
-final _patchedDart = [
-  '3.14.0-315.3.beta', // Flutter 3.50.0-0.2.pre, first patched beta
-  '3.14.0', // Flutter 3.50.0
-];
+// The floor is the 3.14.0 stable rather than the first patched beta
+// (3.14.0-315.3.beta, Flutter 3.50.0-0.2.pre): pub asks packages with a
+// prerelease SDK floor to be published as prereleases themselves.
+final _patchedDart = ['3.14.0'];
 final _vulnerableFlutter = [
   '3.44.2',
   '3.47.7',
@@ -42,7 +42,7 @@ final _vulnerableFlutter = [
   '3.49.0-0.2.pre',
   '3.50.0-0.1.pre',
 ];
-final _patchedFlutter = ['3.50.0-0.2.pre', '3.50.0'];
+final _patchedFlutter = ['3.50.0'];
 
 void main() {
   for (final pubspec in ['pubspec.yaml', 'example/pubspec.yaml']) {
